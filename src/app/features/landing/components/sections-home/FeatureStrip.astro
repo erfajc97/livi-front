@@ -1,0 +1,32 @@
+---
+import FeatureItem from '../FeatureItem.astro';
+import BoxIcon from '@/assets/svg/BoxIcon';
+import HandsIcon from '@/assets/svg/HandsIcon';
+import LockIcon from '@/assets/svg/LockIcon';
+import TruckIcon from '@/assets/svg/TruckIcon';
+import WalletIcon from '@/assets/svg/WalletIcon';
+
+const FEATURES = [
+  { Icon: WalletIcon, label: 'Pago 100%\nSeguro' },
+  { Icon: LockIcon,   label: 'Autenticidad de\nproductos' },
+  { Icon: TruckIcon,  label: 'Envíos inmediatos\nServientrega' },
+  { Icon: HandsIcon,  label: 'Bajo\npedido' },
+  { Icon: BoxIcon,    label: 'Garantía de\ndevolución 7 días' },
+] as const;
+---
+
+<div class="relative z-10 -mt-28 translate-y-5 mx-6 md:mx-20 lg:mx-40">
+  <div class="relative overflow-hidden rounded-4xl border border-accent/30 bg-[url('/bg-black-feature.png')] bg-cover bg-center">
+
+    <div class="relative flex items-center justify-around px-6 py-10 md:px-12 md:py-14">
+      {FEATURES.map(({ Icon, label }, i) => (
+        <>
+          <FeatureItem Icon={Icon} label={label} />
+          {i < FEATURES.length - 1 && (
+            <div class="hidden md:block h-12 w-px bg-border" />
+          )}
+        </>
+      ))}
+    </div>
+  </div>
+</div>

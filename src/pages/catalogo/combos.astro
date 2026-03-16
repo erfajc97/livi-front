@@ -1,0 +1,46 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import Catalog from '@/app/features/catalog/Catalog';
+---
+
+<PublicLayout
+  title="Combos — Catálogo — NönDecants"
+  description="Explora nuestros combos especiales de perfumes en Ecuador."
+>
+  <div class="bg-white min-h-screen">
+    <div class="border-t border-gray-200"></div>
+
+    <!-- Banner — Astro estático (zero JS) -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
+      <div class="relative overflow-hidden rounded-2xl h-52 md:h-64">
+        <img
+          src="/banner-catalog.png"
+          alt="Combos de perfumes NönDecants"
+          class="w-full h-full object-cover"
+        />
+        <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
+          <img
+            src="/box-catalog.svg"
+            alt=""
+            class="w-12 h-12 md:w-14 md:h-14"
+            aria-hidden="true"
+          />
+          <h1 class="font-heading text-3xl md:text-5xl text-white uppercase tracking-widest">
+            Combos
+          </h1>
+          <p class="text-gray-300 text-sm tracking-wide">
+            Descubre nuestros combos especiales de perfumes
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="font-heading text-xl md:text-2xl font-bold text-black tracking-wide uppercase mb-6">
+        Mostrando nuestros combos
+      </h2>
+    </div>
+
+    <Catalog client:load tipo="combos" />
+  </div>
+</PublicLayout>

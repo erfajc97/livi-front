@@ -1,0 +1,1 @@
+import{u as s}from"./react.C6uJ37MP.js";const a=(o,e)=>{const r={duration:3e3,position:"top-right"};switch(e){case"success":s.success(o,r);break;case"error":s.error(o,r);break;case"loading":s.loading(o,{...r,duration:2e3});break}};export{a as s};

@@ -1,0 +1,17 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import OrderDetail from '@/app/features/order/OrderDetail';
+
+export function getStaticPaths() {
+  return [];
+}
+
+const { id } = Astro.params;
+---
+
+<PublicLayout
+  title="Orden confirmada — NönDecants"
+  description="Detalle y seguimiento de tu orden en NönDecants."
+>
+  <OrderDetail orderId={id!} client:visible />
+</PublicLayout>

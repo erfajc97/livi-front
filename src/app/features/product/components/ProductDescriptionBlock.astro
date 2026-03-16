@@ -1,0 +1,31 @@
+---
+interface Props {
+  description: string;
+}
+
+const { description } = Astro.props;
+---
+
+<div class="mt-12">
+  <div class="border-b-4 border-gray-100 mb-6 flex">
+    <h2 class="font-bold text-xl text-black border-b-[3px] border-black pb-2 mb-[-3.5px] pr-4">
+      Detalles del producto
+    </h2>
+  </div>
+
+  <div class="space-y-4 text-gray-500 text-sm leading-relaxed">
+    <p>{description || 'Este perfume es una fragancia excepcional que ha ganado popularidad por su mezcla equilibrada de notas que dejan una impresión elegante y sofisticada. Desde el primer momento ofrece un inicio fresco y dinámico que capta la atención. A medida que evoluciona en la piel, se despliegan notas de corazón cálidas y ricas.'}</p>
+    
+    <p>Esta composición tiene un carácter distintivo que equilibra dulzura, especias y calidez terrosa, haciéndolo versátil para diferentes ocasiones sin perder su personalidad ni intensidad. Este equilibrio entre frescura inicial y una firma profunda y atractiva lo convierte en una opción interesante tanto para uso nocturno como para eventos especiales donde se quiere destacar con una fragancia con presencia y sofisticación.</p>
+
+    <h3 class="font-bold text-gray-600 mt-6 mb-2">Ventajas del producto:</h3>
+    <ul class="list-disc pl-5 space-y-1">
+      <li>Combina notas frescas, especiadas y dulces de manera armoniosa para una experiencia olfativa compleja.</li>
+      <li>Tiene buena duración en la piel gracias a su base rica.</li>
+      <li>Adecuado tanto para noches especiales como para ocasiones formales donde se quiere dejar huella.</li>
+      <li>Perfil versátil que puede funcionar en climas templados y fríos.</li>
+      <li>Aporta una sensación de sofisticación y carácter, ideal para quien busca una fragancia con presencia.</li>
+      <li>Ofrece una relación calidad-precio atractiva en comparación con fragancias similares de diseñador.</li>
+    </ul>
+  </div>
+</div>

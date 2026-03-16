@@ -1,0 +1,8 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import Profile from '@/app/features/profile/Profile';
+---
+
+<PublicLayout title="Mi Cuenta — NönDecants" description="Gestiona tu perfil, pedidos y pagos">
+  <Profile client:load />
+</PublicLayout>

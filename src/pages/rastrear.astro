@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnnouncementBar from '@/app/features/landing/components/layout/AnnouncementBar.astro';
+import ShipmentTracker from '@/app/features/order/components/ShipmentTracker';
+---
+
+<BaseLayout title="Rastrear Pedido — NönDecants" description="Rastrea el estado de tu envío con Servientrega.">
+  <div class="min-h-screen bg-[url('/footer.png')] bg-[--color-bg] bg-repeat bg-center flex flex-col pt-[40px]">
+
+    <div class="fixed top-0 left-0 right-0 z-50">
+      <AnnouncementBar />
+    </div>
+
+    <header class="w-full flex justify-center items-center py-4 mt-6">
+      <a href="/">
+        <img src="/logo.svg" alt="NönDecants" class="h-8" />
+      </a>
+    </header>
+
+    <main class="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <ShipmentTracker client:load />
+    </main>
+  </div>
+</BaseLayout>

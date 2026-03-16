@@ -1,0 +1,81 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import BlogSection from '@/app/features/landing/components/sections-home/BlogSection.astro';
+
+const LOREM = 'Este perfume árabe de Lattafa es una fragancia oriental especiada que ha ganado popularidad por su mezcla equilibrada de notas que dejan una impresión elegante y sofisticada.';
+const LONG_TEXT = Array(12).fill(LOREM).join(' ');
+
+const RECOMMENDED_POSTS = [
+  { image: '/home-3.png', title: 'Titulo de blog' },
+  { image: '/home-3.png', title: 'Titulo de blog' },
+  { image: '/home-3.png', title: 'Titulo de blog' },
+];
+---
+
+<PublicLayout
+  title="Blog — NönDecants"
+  description="Lee artículos sobre perfumes, decants y tendencias en NönDecants."
+>
+  {/* ── Hero: Featured post + Recommended sidebar ── */}
+  <section class="bg-white py-14 px-4">
+    <div class="max-w-7xl mx-auto">
+      <div class="border-b border-gray-200 pb-10 mb-10">
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-10">
+
+          {/* Featured post */}
+          <div>
+            <h2 class="font-heading text-xl font-bold uppercase tracking-wide text-black mb-5">
+              Conoce nuestra colección de verano
+            </h2>
+            <img
+              src="/home-3.png"
+              alt="Colección de verano"
+              class="w-full h-[320px] sm:h-[420px] object-cover rounded-xl"
+            />
+          </div>
+
+          {/* Recommended posts sidebar */}
+          <div>
+            <h3 class="font-heading text-lg font-bold text-black mb-5">Posts Recomendados</h3>
+            <div class="flex flex-col gap-5">
+              {RECOMMENDED_POSTS.map((post) => (
+                <a href="/blog" class="flex gap-4 group">
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    class="w-24 h-20 object-cover rounded-lg shrink-0"
+                  />
+                  <div class="flex flex-col gap-1.5">
+                    <span class="font-heading text-sm font-bold text-black group-hover:text-gray-600 transition-colors">
+                      {post.title}
+                    </span>
+                    <p class="text-xs text-gray-500 leading-relaxed line-clamp-4" style="text-align: justify;">
+                      {LOREM}
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Article body ── */}
+      <div class="max-w-7xl mx-auto">
+        <h2 class="font-heading text-xl font-bold uppercase tracking-wide text-black mb-5">
+          Conoce nuestra colección de verano
+        </h2>
+        <p class="text-sm text-gray-600 leading-relaxed mb-6" style="text-align: justify;">
+          {LONG_TEXT}
+        </p>
+        <p class="text-sm text-gray-600 leading-relaxed" style="text-align: justify;">
+          {LONG_TEXT}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ── Blog posts grid (same component as home) ── */}
+  <BlogSection />
+</PublicLayout>

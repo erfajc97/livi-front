@@ -1,0 +1,103 @@
+---
+// Shipping timeline — compact design, dates computed client-side
+---
+
+<div class="border border-gray-200 rounded-lg p-4 mt-10">
+  <div class="flex items-start sm:items-center gap-2 text-xs sm:text-sm font-bold text-black">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5 sm:mt-0">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
+    </svg>
+    <span>
+      Si hace hoy su pedido antes de las <strong>14:00 PM</strong>&nbsp; recibirá su pedido entre el <strong id="timeline-date-1">--/--/----</strong> al <strong id="timeline-date-2">--/--/----</strong>
+    </span>
+  </div>
+
+  <div class="bg-gray-50 rounded-lg p-3 sm:p-5 mt-3 relative">
+    <!-- Line connector -->
+    <div class="absolute top-[54px] sm:top-[62px] left-[18%] right-[18%] h-[2px] bg-black z-0"></div>
+
+    <div class="flex justify-between items-start relative z-10">
+      <!-- Comprado -->
+      <div class="flex flex-col items-center text-center">
+        <div class="bg-white rounded-full p-1.5 sm:p-2 mb-2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDB989" stroke-width="2" stroke-linejoin="round" class="sm:w-7 sm:h-7">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+            <line x1="12" y1="22.08" x2="12" y2="12" />
+          </svg>
+        </div>
+        <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-black rounded-full mb-2 shadow-[0_0_0_3px_white]"></div>
+        <p class="font-bold text-black text-xs sm:text-sm">Comprado</p>
+        <p class="text-gray-500 text-[10px] sm:text-xs mt-0.5" id="timeline-day-0">--</p>
+      </div>
+
+      <!-- Procesamiento -->
+      <div class="flex flex-col items-center text-center">
+        <div class="bg-white rounded-full p-1.5 sm:p-2 mb-2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDB989" stroke-width="2" stroke-linejoin="round" class="sm:w-7 sm:h-7">
+            <rect x="1" y="3" width="15" height="13" />
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+          </svg>
+        </div>
+        <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-black rounded-full mb-2 shadow-[0_0_0_3px_white]"></div>
+        <p class="font-bold text-black text-xs sm:text-sm">Procesamiento</p>
+        <p class="text-gray-500 text-[10px] sm:text-xs mt-0.5" id="timeline-day-1">--</p>
+      </div>
+
+      <!-- Entregado -->
+      <div class="flex flex-col items-center text-center">
+        <div class="bg-white rounded-full p-1.5 sm:p-2 mb-2">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CDB989" stroke-width="2" stroke-linejoin="round" class="sm:w-7 sm:h-7">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </div>
+        <div class="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-black rounded-full mb-2 shadow-[0_0_0_3px_white]"></div>
+        <p class="font-bold text-black text-xs sm:text-sm">Entregado</p>
+        <p class="text-gray-500 text-[10px] sm:text-xs mt-0.5" id="timeline-day-2">--</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const today = new Date();
+
+  const formatDateFull = (date: Date) => {
+    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  };
+
+  const formatMonthDay = (date: Date) => {
+    const month = date.toLocaleDateString('es-ES', { month: 'long' });
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month.charAt(0).toUpperCase() + month.slice(1)} ${day}`;
+  };
+
+  const addDays = (date: Date, days: number) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+  const date1 = addDays(today, 2);
+  const date2 = addDays(today, 3);
+
+  const elDate1 = document.getElementById('timeline-date-1');
+  const elDate2 = document.getElementById('timeline-date-2');
+  if (elDate1) elDate1.innerText = formatDateFull(date1);
+  if (elDate2) elDate2.innerText = formatDateFull(date2);
+
+  const elDay0 = document.getElementById('timeline-day-0');
+  const elDay1 = document.getElementById('timeline-day-1');
+  const elDay2 = document.getElementById('timeline-day-2');
+
+  if (elDay0) elDay0.innerText = formatMonthDay(today);
+  if (elDay1) elDay1.innerText = formatMonthDay(addDays(today, 1));
+  if (elDay2) elDay2.innerText = formatMonthDay(addDays(today, 2));
+</script>

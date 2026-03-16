@@ -1,0 +1,17 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import Home from '@/app/features/landing/pages/home/Home';
+import HeroSection from '@/app/features/landing/components/sections-home/HeroSection.astro';
+import FeatureStrip from '@/app/features/landing/components/sections-home/FeatureStrip.astro';
+import BlogSection from '@/app/features/landing/components/sections-home/BlogSection.astro';
+---
+
+<PublicLayout
+  title="NönDecants — Perfumes sellados, decants y nondecants en Ecuador"
+  description="Compra perfumes sellados originales, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega."
+>
+  <HeroSection />
+  <FeatureStrip />
+  <Home client:load />
+  <BlogSection />
+</PublicLayout>
