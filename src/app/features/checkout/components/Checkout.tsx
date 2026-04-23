@@ -7,11 +7,11 @@ function CheckoutContent() {
   const checkoutData = useCheckoutHook();
 
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 relative">
+    <div className="bg-surface rounded-3xl p-6 md:p-8 lg:p-10 shadow-2xl flex flex-col lg:flex-row gap-8 lg:gap-12 relative">
       <div className="flex-1">
         <CheckoutForm {...checkoutData} />
       </div>
-      <div className="hidden lg:block w-px bg-gray-200 shrink-0" />
+      <div className="hidden lg:block w-px bg-surface-raised shrink-0" />
       <div className="lg:w-[400px] shrink-0">
         <CheckoutOrderSummary
           items={checkoutData.items}

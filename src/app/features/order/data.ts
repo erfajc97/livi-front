@@ -20,8 +20,8 @@ export const ORDER_STATUS_CONFIG: Record<OrderStatus, { label: string; color: st
   CONFIRMED:  { label: 'Confirmada',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
   PROCESSING: { label: 'En proceso',   color: 'bg-purple-500/20 text-purple-400 border-purple-500/40' },
   SHIPPED:    { label: 'Enviada',      color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' },
-  DELIVERED:  { label: 'Entregada',    color: 'bg-green-500/20 text-green-400 border-green-500/40' },
-  CANCELLED:  { label: 'Cancelada',    color: 'bg-red-500/20 text-red-400 border-red-500/40' },
+  DELIVERED:  { label: 'Entregada',    color: 'bg-success/20 text-success border-success/40' },
+  CANCELLED:  { label: 'Cancelada',    color: 'bg-error/20 text-error border-error/40' },
 };
 
 export const MOCK_ORDER: Order = {

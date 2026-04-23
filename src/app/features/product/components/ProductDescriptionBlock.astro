@@ -11,18 +11,18 @@ const hasBenefits = benefits && benefits.length > 0;
 ---
 
 <div class="mt-12">
-  <div class="border-b-4 border-gray-100 mb-6 flex">
-    <h2 class="font-bold text-xl text-black border-b-[3px] border-black pb-2 mb-[-3.5px] pr-4">
+  <div class="border-b-4 border-border mb-6 flex">
+    <h2 class="font-heading font-bold text-xl text-black border-b-[3px] border-black pb-2 mb-[-3.5px] pr-4">
       Detalles del producto
     </h2>
   </div>
 
-  <div class="space-y-4 text-gray-500 text-sm leading-relaxed">
+  <div class="space-y-4 text-text-muted text-sm leading-relaxed">
     {displayDescription && <p>{displayDescription}</p>}
 
     {hasBenefits && (
       <>
-        <h3 class="font-bold text-gray-600 mt-6 mb-2">Ventajas del producto:</h3>
+        <h3 class="font-heading font-bold text-text-muted mt-6 mb-2">Ventajas del producto:</h3>
         <ul class="list-disc pl-5 space-y-1">
           {benefits.map((benefit) => (
             <li>{benefit}</li>

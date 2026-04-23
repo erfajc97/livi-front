@@ -45,7 +45,7 @@ export default function TestimonialCard({
         </div>
 
         {/* Texto */}
-        <p className="font-body text-sm leading-relaxed text-gray-600">
+        <p className="font-body text-sm leading-relaxed text-text-muted">
           {text}
         </p>
 
@@ -63,7 +63,7 @@ export default function TestimonialCard({
           />
         </div>
         <div className="flex flex-col items-center gap-2">
-          <span className="font-body text-sm text-gray-500">
+          <span className="font-body text-sm text-text-muted">
             Review ({rating.toFixed(1)})
           </span>
           <StarRating rating={rating} size={16} />

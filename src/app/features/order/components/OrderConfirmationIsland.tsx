@@ -87,8 +87,8 @@ function OrderConfirmationContent() {
   if (status === 'loading') {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-10 h-10 border-3 border-gray-200 border-t-black rounded-full animate-spin" />
-        <p className="text-gray-500 text-sm">Verificando tu pago...</p>
+        <div className="w-10 h-10 border-3 border-border border-t-black rounded-full animate-spin" />
+        <p className="text-text-muted text-sm">Verificando tu pago...</p>
       </div>
     );
   }
@@ -96,13 +96,13 @@ function OrderConfirmationContent() {
   if (status === 'failed') {
     return (
       <div className="flex flex-col items-center text-center py-16 gap-5">
-        <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-full bg-error flex items-center justify-center">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </div>
         <h1 className="font-heading text-2xl font-bold text-black">Pago no completado</h1>
-        <p className="text-gray-500 text-sm max-w-sm">{error}</p>
+        <p className="text-text-muted text-sm max-w-sm">{error}</p>
         <a href="/checkout" className="mt-4 bg-black text-white px-8 py-3 rounded-full text-sm font-bold hover:bg-neutral-800 transition-colors">
           Intentar de nuevo
         </a>
@@ -125,13 +125,13 @@ function OrderConfirmationContent() {
       </h1>
 
       {order?.orderNumber && (
-        <p className="text-gray-500 text-sm">
+        <p className="text-text-muted text-sm">
           Orden: <span className="font-bold text-black">{order.orderNumber}</span>
         </p>
       )}
 
       {!isTransfer && order?.total ? (
-        <p className="text-gray-500 text-sm">
+        <p className="text-text-muted text-sm">
           Total pagado: <span className="font-bold text-black">{formatCurrency(order.total)}</span>
         </p>
       ) : null}
@@ -168,24 +168,24 @@ function OrderConfirmationContent() {
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center gap-2 hover:border-black transition-colors disabled:opacity-50"
+                className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 hover:border-black transition-colors disabled:opacity-50"
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-muted">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium text-text-muted">
                   {uploading ? 'Subiendo...' : 'Subir comprobante de transferencia'}
                 </span>
-                <span className="text-xs text-gray-400">JPG, PNG o PDF</span>
+                <span className="text-xs text-text-muted">JPG, PNG o PDF</span>
               </button>
             </div>
           )}
         </div>
       )}
 
-      <p className="text-gray-400 text-xs max-w-sm mt-2">
+      <p className="text-text-muted text-xs max-w-sm mt-2">
         Te enviaremos los detalles a <span className="font-medium">{order?.customerEmail || 'tu correo'}</span>.
       </p>
 
@@ -193,7 +193,7 @@ function OrderConfirmationContent() {
         <a href="/mi-cuenta" className="flex-1 bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-neutral-800 transition-colors text-center">
           Ver mi pedido
         </a>
-        <a href="/catalogo" className="flex-1 border border-gray-300 text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-50 transition-colors text-center">
+        <a href="/catalogo" className="flex-1 border border-border text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-surface-raised transition-colors text-center">
           Seguir comprando
         </a>
       </div>

@@ -20,7 +20,7 @@ export default function ProductGrid({ products, isLoading, isFetching }: Product
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-gray-500 text-sm">
+        <p className="text-text-muted text-sm">
           No se encontraron productos con esos filtros.
         </p>
       </div>

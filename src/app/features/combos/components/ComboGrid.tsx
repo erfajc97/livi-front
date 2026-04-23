@@ -19,7 +19,7 @@ export default function ComboGrid({ combos, isLoading }: ComboGridProps) {
   if (combos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-gray-500 text-sm">
+        <p className="text-text-muted text-sm">
           No hay combos disponibles en este momento.
         </p>
       </div>

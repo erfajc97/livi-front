@@ -48,24 +48,24 @@ export default function ProductReviewsCarousel({ name }: { name: string }) {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
                         key={star}
-                        className={star <= review.rating ? 'text-accent-hover' : 'text-gray-300'}
+                        className={star <= review.rating ? 'text-accent-hover' : 'text-text-muted'}
                       >
                         ★
                       </span>
                     ))}
                   </div>
-                  <span className="text-sm text-gray-500">{review.date}</span>
+                  <span className="text-sm text-text-muted">{review.date}</span>
                 </div>
 
                 <h3 className="font-heading text-lg sm:text-xl font-bold text-black mb-1">{name}</h3>
-                <p className="text-sm text-gray-500 mb-4">{review.author}</p>
+                <p className="text-sm text-text-muted mb-4">{review.author}</p>
 
-                <h4 className="font-bold text-accent-hover italic mb-2">{review.title}</h4>
-                <p className="text-sm text-gray-600 mb-5 line-clamp-3 leading-relaxed">
+                <h4 className="font-heading font-bold text-accent-hover italic mb-2">{review.title}</h4>
+                <p className="text-sm text-text-muted mb-5 line-clamp-3 leading-relaxed">
                   {review.text}
                 </p>
 
-                <button className="text-sm text-gray-500 hover:text-black transition-colors underline underline-offset-4">
+                <button className="text-sm text-text-muted hover:text-black transition-colors underline underline-offset-4">
                   Reseña completa
                 </button>
               </div>

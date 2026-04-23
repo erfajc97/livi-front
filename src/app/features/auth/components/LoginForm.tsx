@@ -31,13 +31,13 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
   return (
     <div>
       {/* Title */}
-      <h2 className="font-heading text-xl font-bold text-black text-center mb-1">Iniciar Sesión</h2>
-      <p className="text-sm text-gray-400 text-center mb-6">Para poder comprar logueate con tu cuenta</p>
+      <h2 className="font-heading text-xl font-bold text-text text-center mb-1">Iniciar Sesión</h2>
+      <p className="text-sm text-text-muted text-center mb-6">Para poder comprar logueate con tu cuenta</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+          <label className="block text-xs text-text-muted mb-1.5">Email</label>
           <input
             type="email"
             value={email}
@@ -50,7 +50,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
 
         {/* Password */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Password</label>
+          <label className="block text-xs text-text-muted mb-1.5">Password</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -63,7 +63,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
@@ -79,12 +79,12 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
               onChange={(e) => setKeepSession(e.target.checked)}
               className="w-4 h-4 accent-black rounded"
             />
-            <span className="text-xs text-gray-500">Mantenerme conectad@</span>
+            <span className="text-xs text-text-muted">Mantenerme conectad@</span>
           </label>
           <button
             type="button"
             onClick={onSwitchToForgot}
-            className="text-xs text-gray-500 hover:text-black transition-colors"
+            className="text-xs text-text-muted hover:text-text transition-colors"
           >
             Olvidé mi contraseña
           </button>
@@ -101,9 +101,9 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-2">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
-          <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex-1 h-px bg-surface-raised" />
+          <span className="text-xs text-text-muted">or</span>
+          <div className="flex-1 h-px bg-surface-raised" />
         </div>
 
         {/* Google */}
@@ -118,9 +118,9 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
         </div>
 
         {/* Switch to register */}
-        <p className="text-center text-sm text-gray-400 mt-2">
+        <p className="text-center text-sm text-text-muted mt-2">
           ¿No tienes cuenta?{' '}
-          <button type="button" onClick={onSwitchToRegister} className="text-black font-medium hover:underline">
+          <button type="button" onClick={onSwitchToRegister} className="text-text font-medium hover:underline">
             Regístrate
           </button>
         </p>

@@ -170,7 +170,7 @@ export default function Navbar() {
                 <path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
               {itemCount > 0 && (
-                <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-brand-gold font-bold text-[10px] text-brand-black">
+                <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-brand-gold font-bold text-xs text-brand-black">
                   {itemCount > 9 ? '9+' : itemCount}
                 </span>
               )}

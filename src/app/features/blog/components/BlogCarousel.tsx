@@ -22,9 +22,9 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-white border-t border-gray-200 pt-8 pb-14 px-4">
+    <section className="bg-white border-t border-border pt-8 pb-14 px-4">
       <div className="max-w-7xl mx-auto">
-        <h2 className="font-heading text-xl sm:text-2xl font-black md:text-[28px] text-bg uppercase tracking-wide mb-8 px-4 sm:px-12">
+        <h2 className="font-heading text-xl sm:text-2xl font-black md:text-3xl text-bg uppercase tracking-wide mb-8 px-4 sm:px-12">
           Más del blog
         </h2>
 
@@ -45,7 +45,7 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
             <div className="flex">
               {posts.map((post) => (
                 <div key={post.slug} className="px-2 shrink-0 basis-full sm:basis-1/2 lg:basis-1/3">
-                  <a href={`/blog/${post.slug}`} className="group/card flex flex-col border border-gray-200 rounded-2xl overflow-hidden h-full">
+                  <a href={`/blog/${post.slug}`} className="group/card flex flex-col border border-border rounded-2xl overflow-hidden h-full">
                     <img
                       src={post.imageUrl || '/home-3.png'}
                       alt={post.title}
@@ -53,15 +53,15 @@ export default function BlogCarousel({ posts }: BlogCarouselProps) {
                       loading="lazy"
                     />
                     <div className="flex flex-col items-center gap-4 p-6 flex-1">
-                      <h3 className="font-heading text-base font-bold text-black text-center group-hover/card:text-gray-600 transition-colors line-clamp-2">
+                      <h3 className="font-heading text-base font-bold text-black text-center group-hover/card:text-text-muted transition-colors line-clamp-2">
                         {post.title}
                       </h3>
                       {(post.content || post.excerpt) && (
-                        <p className="font-body text-sm leading-relaxed text-gray-600 text-center line-clamp-3">
+                        <p className="font-body text-sm leading-relaxed text-text-muted text-center line-clamp-3">
                           {post.content || post.excerpt}
                         </p>
                       )}
-                      <span className="mt-auto w-full py-2.5 bg-black text-white font-heading text-[13px] font-bold uppercase tracking-wider text-center rounded-full group-hover/card:bg-black/80 transition-colors">
+                      <span className="mt-auto w-full py-2.5 bg-black text-white font-heading text-sm font-bold uppercase tracking-wider text-center rounded-full group-hover/card:bg-black/80 transition-colors">
                         Leer el post
                       </span>
                     </div>

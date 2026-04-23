@@ -8,12 +8,12 @@ import { API_ENDPOINTS } from '@/app/api/endpoints';
 import Loader from '@/app/components/Loader';
 
 const INPUT =
-  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors';
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors';
 const INPUT_RO =
-  'w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-black cursor-default';
+  'w-full rounded-lg border border-border bg-surface-raised px-3 py-2.5 text-sm text-black cursor-default';
 const SELECT =
-  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors cursor-pointer';
-const LABEL = 'block text-xs text-gray-400 mb-1';
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors cursor-pointer';
+const LABEL = 'block text-xs text-text-muted mb-1';
 
 export default function ProfileTab() {
   const user = useAuthStore((s) => s.user);
@@ -110,7 +110,7 @@ export default function ProfileTab() {
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-bold text-black font-heading uppercase">Mi Perfil</h2>
-        <p className="text-xs text-gray-400 mt-0.5">Administra tu información personal y de envío</p>
+        <p className="text-xs text-text-muted mt-0.5">Administra tu información personal y de envío</p>
       </div>
 
       {/* Email verification warning */}
@@ -137,8 +137,8 @@ export default function ProfileTab() {
       )}
 
       {/* Personal data */}
-      <div className="rounded-xl border border-gray-200 p-5">
-        <h3 className="font-bold text-black text-sm mb-4">Datos personales</h3>
+      <div className="rounded-xl border border-border p-5">
+        <h3 className="font-heading font-bold text-black text-sm mb-4">Datos personales</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Nombre</label>
@@ -151,7 +151,7 @@ export default function ProfileTab() {
           <div>
             <label className={LABEL}>
               Email
-              {isGoogleUser && <span className="ml-1.5 text-[10px] text-gray-300">(Google — no editable)</span>}
+              {isGoogleUser && <span className="ml-1.5 text-xs text-text-muted">(Google — no editable)</span>}
             </label>
             <input type="email" value={email} readOnly className={INPUT_RO} />
           </div>
@@ -163,8 +163,8 @@ export default function ProfileTab() {
       </div>
 
       {/* Contact & shipping */}
-      <div className="rounded-xl border border-gray-200 p-5">
-        <h3 className="font-bold text-black text-sm mb-4">Contacto y envío</h3>
+      <div className="rounded-xl border border-border p-5">
+        <h3 className="font-heading font-bold text-black text-sm mb-4">Contacto y envío</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Teléfono</label>
@@ -233,7 +233,7 @@ export default function ProfileTab() {
         <button
           onClick={() => logout()}
           disabled={isLoggingOut}
-          className="px-6 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-50"
+          className="px-6 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-neutral-900 transition-colors disabled:opacity-50"
         >
           {isLoggingOut ? <Loader size={16} color="#fff" /> : 'Cerrar sesión'}
         </button>

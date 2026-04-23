@@ -20,18 +20,18 @@ export default function CartDrawer() {
 
       {/* Drawer */}
       <div
-        className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white flex flex-col shadow-2xl"
+        className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-surface flex flex-col shadow-2xl"
         role="dialog"
         aria-label="Carrito de compras"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-          <h2 className="font-heading text-xl font-bold text-black">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+          <h2 className="font-heading text-xl font-bold text-text">
             Tu pedido
           </h2>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-2 text-gray-400 hover:text-black transition-colors"
+            className="p-2 text-text-muted hover:text-text transition-colors"
             aria-label="Cerrar carrito"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -45,12 +45,12 @@ export default function CartDrawer() {
         <div className="flex-1 overflow-y-auto px-6">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-gray-300">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-text-muted">
                 <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
                 <line x1="3" y1="6" x2="21" y2="6"/>
                 <path d="M16 10a4 4 0 0 1-8 0"/>
               </svg>
-              <p className="text-gray-400 text-sm">Tu carrito está vacío.</p>
+              <p className="text-text-muted text-sm">Tu carrito está vacío.</p>
               <a
                 href="/catalogo"
                 onClick={() => setDrawerOpen(false)}
@@ -60,7 +60,7 @@ export default function CartDrawer() {
               </a>
             </div>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {items.map((item) => (
                 <CartItem
                   key={item.variantId}

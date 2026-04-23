@@ -16,7 +16,7 @@ function ProfileContent() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-border bg-white">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
           <h1 className="text-center text-xl font-heading font-bold tracking-wider text-black uppercase">
             Mi Cuenta — {user?.name ?? ''}

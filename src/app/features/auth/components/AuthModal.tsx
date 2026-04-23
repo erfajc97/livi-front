@@ -36,13 +36,13 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         aria-modal="true"
       >
         <div
-          className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
+          className="relative w-full max-w-4xl bg-surface rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 z-10 p-1.5 text-gray-400 hover:text-gray-700 transition-colors"
+            className="absolute top-4 right-4 z-10 p-1.5 text-text-muted hover:text-text transition-colors"
             aria-label="Cerrar"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -55,7 +55,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <div className="flex-1 px-8 py-10 sm:px-12 sm:py-12 overflow-y-auto max-h-[90vh]">
             {/* Logo */}
             <div className="flex justify-center mb-6">
-              <span className="font-heading text-2xl tracking-wide text-black">NönDecants</span>
+              <span className="font-heading text-2xl tracking-wide text-text">NönDecants</span>
             </div>
 
             {mode === 'login' && (

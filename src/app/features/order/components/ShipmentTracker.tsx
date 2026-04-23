@@ -32,7 +32,7 @@ export default function ShipmentTracker() {
               <span
                 className={[
                   'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors',
-                  searchType === opt.value ? 'border-black' : 'border-gray-400',
+                  searchType === opt.value ? 'border-black' : 'border-text-muted',
                 ].join(' ')}
               >
                 {searchType === opt.value && (
@@ -51,7 +51,7 @@ export default function ShipmentTracker() {
           onChange={(e) => setTrackingNumber(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           placeholder={SEARCH_PLACEHOLDERS[searchType]}
-          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-black placeholder:text-gray-400 focus:outline-none focus:border-black transition-colors"
+          className="w-full border border-border rounded-lg px-4 py-3 text-sm text-black placeholder:text-text-muted focus:outline-none focus:border-black transition-colors"
         />
 
         {/* Button */}

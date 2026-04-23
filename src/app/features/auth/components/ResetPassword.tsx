@@ -38,8 +38,8 @@ function ResetPasswordContent() {
   if (!token) {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20">
-          <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-error/20">
+          <svg className="h-8 w-8 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </div>
@@ -59,7 +59,7 @@ function ResetPasswordContent() {
     return (
       <div className="text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
-          <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="h-8 w-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -113,11 +113,11 @@ function ResetPasswordContent() {
             required
             minLength={6}
             className={`w-full px-4 py-3 border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none transition-colors ${
-              passwordMismatch ? 'border-red-400 focus:border-red-500' : 'border-border focus:border-accent'
+              passwordMismatch ? 'border-error focus:border-error' : 'border-border focus:border-accent'
             }`}
           />
           {passwordMismatch && (
-            <p className="text-xs text-red-400 mt-1">Las contraseñas no coinciden</p>
+            <p className="text-xs text-error mt-1">Las contraseñas no coinciden</p>
           )}
         </div>
 

@@ -49,7 +49,7 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
-        className="px-3 sm:px-5 py-2 sm:py-2.5 font-heading text-[10px] sm:text-xs uppercase tracking-wider border border-gray-300 text-gray-600 rounded-lg hover:border-black hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="px-3 sm:px-5 py-2 sm:py-2.5 font-heading text-xs sm:text-xs uppercase tracking-wider border border-border text-text-muted rounded-lg hover:border-black hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         Atrás
       </button>
@@ -57,7 +57,7 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
       <div className="flex items-center gap-1 sm:gap-1.5">
         {visiblePages.map((p, idx) =>
           p === '...' ? (
-            <span key={`dots-${idx}`} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-gray-400">
+            <span key={`dots-${idx}`} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-text-muted">
               ...
             </span>
           ) : (
@@ -67,7 +67,7 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
               className={`w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm font-heading rounded-lg transition-colors ${
                 p === page
                   ? 'bg-black text-white'
-                  : 'border border-gray-300 text-gray-500 hover:border-black hover:text-black'
+                  : 'border border-border text-text-muted hover:border-black hover:text-black'
               }`}
             >
               {p}
@@ -79,7 +79,7 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
-        className="px-3 sm:px-5 py-2 sm:py-2.5 font-heading text-[10px] sm:text-xs uppercase tracking-wider bg-black text-white rounded-lg hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="px-3 sm:px-5 py-2 sm:py-2.5 font-heading text-xs sm:text-xs uppercase tracking-wider bg-black text-white rounded-lg hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
       >
         Siguiente
       </button>

@@ -20,7 +20,7 @@ export default function NewArrivalsSection({ products, isLoading }: NewArrivalsS
       <div className="max-w-7xl mx-auto">
         {/* Header - TITLE ONLY */}
         <div className="flex items-start mb-6 px-4 sm:px-12">
-          <h2 className="font-heading text-2xl font-black md:text-[28px] text-bg uppercase tracking-wide">
+          <h2 className="font-heading text-2xl font-black md:text-3xl text-bg uppercase tracking-wide">
             ÚLTIMOS INGRESOS
           </h2>
         </div>

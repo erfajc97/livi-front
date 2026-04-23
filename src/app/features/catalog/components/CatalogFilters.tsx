@@ -31,7 +31,7 @@ interface CatalogFiltersProps {
 }
 
 const selectClass =
-  'w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 bg-white focus:border-black focus:outline-none transition-colors appearance-none cursor-pointer';
+  'w-full rounded-lg border border-border px-3 py-2.5 text-sm text-text bg-surface focus:border-black focus:outline-none transition-colors appearance-none cursor-pointer';
 
 export default function CatalogFilters({
   gender,
@@ -56,11 +56,11 @@ export default function CatalogFilters({
   const filteredCategories = categories.filter((c) => c.name.toLowerCase() !== 'all');
 
   return (
-    <aside className="border border-gray-200 rounded-xl p-5 space-y-6">
+    <aside className="border border-border rounded-xl p-5 space-y-6">
       {hasActiveFilters && (
         <button
           onClick={onClearFilters}
-          className="text-xs font-heading uppercase tracking-wider text-gray-500 hover:text-black transition-colors underline"
+          className="text-xs font-heading uppercase tracking-wider text-text-muted hover:text-text transition-colors underline"
         >
           Limpiar filtros
         </button>
@@ -69,7 +69,7 @@ export default function CatalogFilters({
       {/* Categorías — select */}
       {!hideCategories && filteredCategories.length > 0 && (
         <div>
-          <p className="font-heading text-base font-semibold text-black mb-3 italic">
+          <p className="font-heading text-base font-semibold text-text mb-3 italic">
             Categoría
           </p>
           <select
@@ -113,7 +113,7 @@ export default function CatalogFilters({
 
       {/* Concentración — radio buttons */}
       <div>
-        <p className="font-heading text-base font-semibold text-black mb-3 italic">
+        <p className="font-heading text-base font-semibold text-text mb-3 italic">
           Concentración
         </p>
         <div className="space-y-2.5">
@@ -133,7 +133,7 @@ export default function CatalogFilters({
                 }
                 className="w-4 h-4 accent-black cursor-pointer"
               />
-              <span className="text-sm text-gray-600 group-hover:text-black transition-colors">
+              <span className="text-sm text-text-muted group-hover:text-text transition-colors">
                 {opt.label}
               </span>
             </label>
@@ -161,7 +161,7 @@ export default function CatalogFilters({
             onChange={(e) => onHasDiscountChange(e.target.checked)}
             className="w-4 h-4 accent-black cursor-pointer rounded"
           />
-          <span className="font-heading text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">
+          <span className="font-heading text-sm font-semibold text-text group-hover:text-text transition-colors">
             Con descuento
           </span>
         </label>

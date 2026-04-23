@@ -138,7 +138,7 @@ export default function ProductPurchaseOptions({
       <div>
         <div className="flex items-start justify-between gap-3">
           <h1 className="font-heading text-2xl sm:text-3xl text-black font-bold leading-none">{product.name}</h1>
-          <button className="shrink-0 text-gray-300 hover:text-red-400 transition-colors mt-1">
+          <button className="shrink-0 text-text-muted hover:text-error transition-colors mt-1">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
@@ -147,12 +147,12 @@ export default function ProductPurchaseOptions({
         <div className="flex items-center gap-2 mt-1">
           <div className="flex gap-0.5 text-xs">
             {[1, 2, 3, 4, 5].map((star) => (
-              <span key={star} className={star <= 4 ? 'text-accent-hover' : 'text-gray-300'}>★</span>
+              <span key={star} className={star <= 4 ? 'text-accent-hover' : 'text-text-muted'}>★</span>
             ))}
           </div>
-          <span className="text-[11px] text-gray-400">4.5 (212)</span>
-          <span className="text-[11px] text-gray-300">·</span>
-          <span className={`text-[11px] font-bold ${inStock ? 'text-green-600' : 'text-red-500'}`}>
+          <span className="text-sm text-text-muted">4.5 (212)</span>
+          <span className="text-sm text-text-muted">·</span>
+          <span className={`text-sm font-bold ${inStock ? 'text-success' : 'text-error'}`}>
             {inStock ? 'En stock' : 'Agotado'}
           </span>
         </div>
@@ -163,22 +163,22 @@ export default function ProductPurchaseOptions({
         <p className="font-heading text-xl font-bold text-black">{discountedPriceDisplay}</p>
         {hasDiscount && (
           <>
-            <p className="text-sm text-gray-400 line-through">{originalPriceDisplay}</p>
-            <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-px rounded">-{discount}%</span>
+            <p className="text-sm text-text-muted line-through">{originalPriceDisplay}</p>
+            <span className="bg-error text-white text-xs font-bold px-1.5 py-px rounded">-{discount}%</span>
           </>
         )}
       </div>
 
       {/* Description + Tags inline */}
       {product.description && (
-        <p className="text-xs text-gray-500 leading-relaxed">{product.description}</p>
+        <p className="text-xs text-text-muted leading-relaxed">{product.description}</p>
       )}
 
       {detailTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {detailTags.map(tag => (
-            <span key={tag.label} className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-[11px]">
-              <span className="text-gray-400 font-medium">{tag.label}:</span>
+            <span key={tag.label} className="inline-flex items-center gap-1 bg-surface-raised border border-border rounded px-2 py-1 text-sm">
+              <span className="text-text-muted font-medium">{tag.label}:</span>
               <span className="text-black font-semibold">{tag.value}</span>
             </span>
           ))}
@@ -188,7 +188,7 @@ export default function ProductPurchaseOptions({
       {/* Variants */}
       {fullBottles.length > 0 && (
         <div>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Botella Completa</p>
+          <p className="text-sm font-bold text-text-muted uppercase tracking-wide mb-1.5">Botella Completa</p>
           <div className="grid grid-cols-2 gap-1.5">
             {fullBottles.map(v => (
               <button
@@ -197,11 +197,11 @@ export default function ProductPurchaseOptions({
                 className={`py-2 px-3 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${
                   selectedVariant?.id === v.id
                     ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-gray-200 hover:border-black'
+                    : 'bg-white text-black border-border hover:border-black'
                 }`}
               >
                 <span>{v.ml}ml</span>
-                <span className={selectedVariant?.id === v.id ? 'text-gray-300' : 'text-gray-500 text-xs'}>
+                <span className={selectedVariant?.id === v.id ? 'text-text-muted' : 'text-text-muted text-xs'}>
                   {formatCurrency(v.price)}
                 </span>
               </button>
@@ -212,7 +212,7 @@ export default function ProductPurchaseOptions({
 
       {decants.length > 0 && (
         <div>
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Decants</p>
+          <p className="text-sm font-bold text-text-muted uppercase tracking-wide mb-1.5">Decants</p>
           <div className="grid grid-cols-3 gap-1.5">
             {decants.map(v => (
               <button
@@ -221,11 +221,11 @@ export default function ProductPurchaseOptions({
                 className={`py-2 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
                   selectedVariant?.id === v.id
                     ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-gray-200 hover:border-black'
+                    : 'bg-white text-black border-border hover:border-black'
                 }`}
               >
                 <span>{v.ml}ml</span>
-                <span className={selectedVariant?.id === v.id ? 'text-gray-300' : 'text-gray-500'}>
+                <span className={selectedVariant?.id === v.id ? 'text-text-muted' : 'text-text-muted'}>
                   {formatCurrency(v.price)}
                 </span>
               </button>
@@ -268,29 +268,29 @@ export default function ProductPurchaseOptions({
 
       {/* Shipping + Guarantee — single row */}
       <div className="grid grid-cols-2 gap-1.5">
-        <div className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-green-600">
+        <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-success">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          <p className="text-[10px] text-gray-600 leading-tight"><span className="font-bold text-black">Garantía</span> · 7 días</p>
+          <p className="text-xs text-text-muted leading-tight"><span className="font-bold text-black">Garantía</span> · 7 días</p>
         </div>
-        <div className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 flex items-center gap-2">
+        <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-accent-hover">
             <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
             <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
           </svg>
-          <p className="text-[10px] text-gray-600 leading-tight"><span className="font-bold text-black">Envío</span> · desde $3</p>
+          <p className="text-xs text-text-muted leading-tight"><span className="font-bold text-black">Envío</span> · desde $3</p>
         </div>
       </div>
 
       {/* Payment */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-gray-400 font-medium">Pago:</span>
+        <span className="text-xs text-text-muted font-medium">Pago:</span>
         <div className="flex gap-1">
-          <div className="h-5 border border-gray-200 rounded px-1.5 flex items-center bg-orange-500 text-white font-bold text-[8px] italic">PayPhone</div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-blue-800 font-bold text-[8px] italic">VISA</span></div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-red-500 font-bold text-[8px]">MC</span></div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-[7px]">AMEX</span></div>
+          <div className="h-5 border border-border rounded px-1.5 flex items-center bg-orange-500 text-white font-bold text-xs italic">PayPhone</div>
+          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-white"><span className="text-blue-800 font-bold text-xs italic">VISA</span></div>
+          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-white"><span className="text-error font-bold text-xs">MC</span></div>
+          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-xs">AMEX</span></div>
         </div>
       </div>
     </div>

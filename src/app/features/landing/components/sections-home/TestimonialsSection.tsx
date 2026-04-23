@@ -22,11 +22,11 @@ export default function TestimonialsSection() {
       <div className="max-w-5xl mx-auto">
 
         {/* Título */}
-        <h2 className="font-heading text-2xl font-black md:text-[28px] text-bg uppercase tracking-wide mb-8">
+        <h2 className="font-heading text-2xl font-black md:text-3xl text-bg uppercase tracking-wide mb-8">
           Lo que opinan nuestros clientes
         </h2>
 
-        <hr className="border-gray-200 mb-10" />
+        <hr className="border-border mb-10" />
 
         {/* Contenido */}
         <TestimonialCard
@@ -46,7 +46,7 @@ export default function TestimonialsSection() {
               onClick={() => setCurrent(i)}
               aria-label={`Reseña ${i + 1}`}
               className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                i === current ? 'bg-bg' : 'bg-gray-300'
+                i === current ? 'bg-bg' : 'bg-surface-raised'
               }`}
             />
           ))}

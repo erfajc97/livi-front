@@ -23,11 +23,11 @@ export default function ProductCarouselSection({
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="bg-white border-t border-gray-200 pt-24 pb-14 px-4">
+    <section className="bg-white border-t border-border pt-24 pb-14 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-start mb-6 px-4 sm:px-12">
-          <h2 className="font-heading text-2xl font-black md:text-[28px] text-bg uppercase tracking-wide">
+          <h2 className="font-heading text-2xl font-black md:text-3xl text-bg uppercase tracking-wide">
             {title}
           </h2>
         </div>
@@ -37,7 +37,7 @@ export default function ProductCarouselSection({
             <Loader size={40} />
           </div>
         ) : products.length === 0 ? (
-          <p className="text-center text-gray-400 py-10 text-sm">
+          <p className="text-center text-text-muted py-10 text-sm">
             No hay productos disponibles.
           </p>
         ) : (

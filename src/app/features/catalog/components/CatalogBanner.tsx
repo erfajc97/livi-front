@@ -65,7 +65,7 @@ export default function CatalogBanner({ defaultTitle, defaultDescription }: Cata
           <h1 className="font-heading text-3xl md:text-5xl text-white uppercase tracking-widest">
             {title}
           </h1>
-          <p className="text-gray-300 text-sm md:text-base tracking-wide">
+          <p className="text-text-muted text-sm md:text-base tracking-wide">
             {description}
           </p>
         </div>

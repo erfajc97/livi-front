@@ -23,9 +23,9 @@ export default function FilterPriceRange({
         {label}
       </p>
       <div className="flex items-center justify-between gap-2 mb-3">
-        <span className="text-sm text-gray-500">{min}</span>
+        <span className="text-sm text-text-muted">{min}</span>
         <span className="text-sm font-semibold text-black">${value}</span>
-        <span className="text-sm text-gray-500">{max}</span>
+        <span className="text-sm text-text-muted">{max}</span>
       </div>
       <input
         type="range"
@@ -33,7 +33,7 @@ export default function FilterPriceRange({
         max={max}
         value={value}
         onChange={handleSliderChange}
-        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-gray-200 accent-neutral-900"
+        className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-surface-raised accent-neutral-900"
       />
     </div>
   );

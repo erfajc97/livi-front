@@ -52,26 +52,26 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     return (
       <div className="text-center py-6">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
-          <svg className="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="h-7 w-7 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="font-heading text-xl font-bold text-black mb-2">Revisa tu bandeja de entrada</h2>
-        <p className="text-sm text-gray-500 mb-6">
-          Te enviamos un enlace de verificación a <strong className="text-black">{email}</strong>
+        <h2 className="font-heading text-xl font-bold text-text mb-2">Revisa tu bandeja de entrada</h2>
+        <p className="text-sm text-text-muted mb-6">
+          Te enviamos un enlace de verificación a <strong className="text-text">{email}</strong>
         </p>
         <button
           type="button"
           onClick={handleResend}
           disabled={resending}
-          className="text-sm text-gray-500 hover:text-black underline mb-4 block mx-auto"
+          className="text-sm text-text-muted hover:text-text underline mb-4 block mx-auto"
         >
           {resending ? 'Reenviando...' : '¿No lo recibiste? Reenviar email'}
         </button>
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="text-sm text-black font-medium hover:underline"
+          className="text-sm text-text font-medium hover:underline"
         >
           Volver al login
         </button>
@@ -82,14 +82,14 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
   return (
     <div>
       {/* Title */}
-      <h2 className="font-heading text-xl font-bold text-black text-center mb-1">Crear cuenta</h2>
-      <p className="text-sm text-gray-400 text-center mb-6">Regístrate para empezar a comprar</p>
+      <h2 className="font-heading text-xl font-bold text-text text-center mb-1">Crear cuenta</h2>
+      <p className="text-sm text-text-muted text-center mb-6">Regístrate para empezar a comprar</p>
 
       <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Name row */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-gray-500 mb-1.5">Nombre</label>
+            <label className="block text-xs text-text-muted mb-1.5">Nombre</label>
             <input
               type="text"
               value={name}
@@ -100,7 +100,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1.5">Apellido</label>
+            <label className="block text-xs text-text-muted mb-1.5">Apellido</label>
             <input
               type="text"
               value={lastName}
@@ -114,7 +114,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         {/* Email */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+          <label className="block text-xs text-text-muted mb-1.5">Email</label>
           <input
             type="email"
             value={email}
@@ -127,7 +127,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         {/* Phone */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Teléfono</label>
+          <label className="block text-xs text-text-muted mb-1.5">Teléfono</label>
           <input
             type="tel"
             value={phone}
@@ -139,7 +139,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         {/* Password */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Contraseña</label>
+          <label className="block text-xs text-text-muted mb-1.5">Contraseña</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -153,7 +153,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
@@ -162,7 +162,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         {/* Confirm Password */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Confirmar contraseña</label>
+          <label className="block text-xs text-text-muted mb-1.5">Confirmar contraseña</label>
           <input
             type={showPassword ? 'text' : 'password'}
             value={confirmPassword}
@@ -170,12 +170,12 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             placeholder="Repite tu contraseña"
             required
             minLength={6}
-            className={`w-full px-4 py-3 border rounded-lg text-sm text-black placeholder:text-gray-400 focus:outline-none transition-colors ${
-              passwordMismatch ? 'border-red-400 focus:border-red-500' : 'border-gray-300 focus:border-black'
+            className={`w-full px-4 py-3 border rounded-lg text-sm text-text placeholder:text-text-muted focus:outline-none transition-colors ${
+              passwordMismatch ? 'border-error focus:border-error' : 'border-border focus:border-black'
             }`}
           />
           {passwordMismatch && (
-            <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
+            <p className="text-xs text-error mt-1">Las contraseñas no coinciden</p>
           )}
         </div>
 
@@ -190,9 +190,9 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
         {/* Divider */}
         <div className="flex items-center gap-3 my-1">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">or</span>
-          <div className="flex-1 h-px bg-gray-200" />
+          <div className="flex-1 h-px bg-surface-raised" />
+          <span className="text-xs text-text-muted">or</span>
+          <div className="flex-1 h-px bg-surface-raised" />
         </div>
 
         {/* Google */}
@@ -207,9 +207,9 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
         </div>
 
         {/* Switch to login */}
-        <p className="text-center text-sm text-gray-400 mt-1">
+        <p className="text-center text-sm text-text-muted mt-1">
           ¿Ya tienes cuenta?{' '}
-          <button type="button" onClick={onSwitchToLogin} className="text-black font-medium hover:underline">
+          <button type="button" onClick={onSwitchToLogin} className="text-text font-medium hover:underline">
             Ingresar
           </button>
         </p>

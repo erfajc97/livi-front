@@ -58,17 +58,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   const productUrl = `/producto/${product.id}`;
 
   return (
-    <a href={productUrl} className="group/card relative flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
+    <a href={productUrl} className="group/card relative flex flex-col bg-surface border border-border rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
       {/* Discount badge */}
       {hasDiscount && (
-        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+        <div className="absolute top-3 left-3 z-10 bg-error text-white text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
           -{discount}%
         </div>
       )}
 
       {/* Stock badge */}
       {hasStock && totalStock <= 5 && (
-        <div className="absolute top-3 right-3 z-10 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+        <div className="absolute top-3 right-3 z-10 bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
           Quedan {totalStock}
         </div>
       )}
@@ -93,7 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </>
         ) : (
-          <div className="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-300">
+          <div className="w-full aspect-square bg-surface-raised flex items-center justify-center text-text-muted">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
@@ -105,23 +105,23 @@ export default function ProductCard({ product }: ProductCardProps) {
 
       {/* Info */}
       <div className="flex flex-col gap-1.5 p-4">
-        <h3 className="font-heading font-semibold text-base text-black leading-snug line-clamp-1 tracking-wide">
+        <h3 className="font-heading font-semibold text-base text-text leading-snug line-clamp-1 tracking-wide">
           {product.name}
         </h3>
         {/* Tags */}
         <div className="flex flex-wrap gap-1">
           {product.gender && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-surface-raised text-text-muted">
               {GENDER_LABELS[product.gender] ?? product.gender}
             </span>
           )}
           {product.timeOfDay && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-surface-raised text-text-muted">
               {TIME_LABELS[product.timeOfDay] ?? product.timeOfDay}
             </span>
           )}
           {product.concentration && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">
+            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-surface-raised text-text-muted">
               {CONCENTRATION_SHORT[product.concentration] ?? product.concentration}
             </span>
           )}
@@ -129,11 +129,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="flex items-center gap-2 mt-0.5">
           {hasDiscount ? (
             <>
-              <span className="font-body text-xs text-gray-400 line-through">{originalLabel}</span>
-              <span className="font-heading text-sm font-bold text-red-600">{priceLabel}</span>
+              <span className="font-body text-xs text-text-muted line-through">{originalLabel}</span>
+              <span className="font-heading text-sm font-bold text-error">{priceLabel}</span>
             </>
           ) : (
-            <span className="font-body text-xs text-gray-500">{priceLabel}</span>
+            <span className="font-body text-xs text-text-muted">{priceLabel}</span>
           )}
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           className={`flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full ${
             hasStock
               ? 'bg-black text-white group-hover/card:bg-neutral-800'
-              : 'bg-gray-100 text-gray-400'
+              : 'bg-surface-raised text-text-muted'
           }`}
         >
           {hasStock ? 'VER PRODUCTO' : 'SIN STOCK'}

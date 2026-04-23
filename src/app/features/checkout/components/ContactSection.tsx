@@ -1,7 +1,7 @@
 import type { CustomerFormData } from '../types';
 
 const INPUT_CLASS =
-  'w-full bg-transparent border-0 border-b border-gray-300 px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
+  'w-full bg-transparent border-0 border-b border-border px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
 
 interface ContactSectionProps {
   customer: CustomerFormData;
@@ -11,7 +11,7 @@ interface ContactSectionProps {
 export default function ContactSection({ customer, onChange }: ContactSectionProps) {
   return (
     <section>
-      <h2 className="font-bold text-black text-lg mb-4">Contacto</h2>
+      <h2 className="font-heading font-bold text-black text-lg mb-4">Contacto</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 gap-y-5">
         <input
           type="text"
