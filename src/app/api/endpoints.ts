@@ -14,19 +14,36 @@ export const API_ENDPOINTS = {
   GOOGLE_AUTH:                '/auth/google',              // POST - public (Google ID token)
 
   // ── Users ───────────────────────────────────────
-  USER_ME:                    '/users/me',             // Not implemented - use GET /users/:id
+  USER_ME:                    '/users/me',             // GET (auth) / PATCH (auth)
   USERS:                      '/users',                // GET all (admin), POST create (public)
   USER:                       '/users',                // + /:id GET/PATCH/DELETE
 
   // ── Banners ─────────────────────────────────────
-  BANNERS:                    '/banners',              // Not in backend
+  BANNERS:                    '/banners',
+  BANNERS_VISIBLE:            '/banners/visible',
+  BANNERS_BY_CATEGORY:        '/banners/category',     // + /:categoryId
+  BANNERS_BY_MARCA:           '/banners/marca',        // + /:marcaId
+
+  // ── Blog ────────────────────────────────────────
+  BLOG_PUBLISHED:             '/blog/published',
+  BLOG_BY_SLUG:               '/blog/slug',            // + /:slug
+
+  // ── Coupons ─────────────────────────────────────
+  COUPONS_VALIDATE:           '/coupons/validate',     // POST
 
   // ── Categories ──────────────────────────────────
   CATEGORIES:                 '/categories',           // GET all (public), POST create (admin)
   CATEGORY:                   '/categories',           // + /:id GET/PATCH/DELETE
   CATEGORY_PRODUCTS:          '/categories',           // + /:id/products GET (public)
-  SUBCATEGORIES:              '/categories/subcategories',
-  SUBCATEGORY_PRODUCTS:       '/categories/subcategories', // + /:id/products GET (public)
+  MARCAS:                     '/categories/marcas',
+  MARCA_PRODUCTS:             '/categories/marcas',    // + /:id/products GET (public)
+
+  // ── Landing Sections ────────────────────────────
+  LANDING_SECTIONS:           '/landing-sections',     // GET all (admin), POST create (admin)
+  LANDING_SECTIONS_ACTIVE:    '/landing-sections/active', // GET active (public)
+  LANDING_SECTION:            '/landing-sections',     // + /:id GET/PATCH/DELETE (admin)
+  LANDING_SECTION_ADD_PRODUCT: '/landing-sections',   // + /:id/products/:productId POST (admin)
+  LANDING_SECTION_REMOVE_PRODUCT: '/landing-sections', // + /:id/products/:productId DELETE (admin)
 
   // ── Products ────────────────────────────────────
   PRODUCTS:                   '/products',             // GET all (public), POST create (admin)
@@ -56,9 +73,15 @@ export const API_ENDPOINTS = {
   DELIVERY_METHODS:           '/delivery-methods',     // Not in backend
 
   // ── Payments (Payphone) ──────────────────────────
-  CREATE_TRANSACTION:         '/payments/create-transaction',    // Not in backend
-  VERIFY_PAYMENT:             '/payments/verify',                // Not in backend
-  UPDATE_TRANSACTION_STATUS:  '/payments/update-status',         // Not in backend
+  CREATE_TRANSACTION:         '/payments/create-transaction',    // POST (auth)
+  VERIFY_PAYMENT:             '/payments/verify',                // GET (public, redirect callback)
+
+  // ── Combos ───────────────────────────────────────
+  COMBOS:                     '/combos',               // GET all (admin)
+  COMBOS_ACTIVE:              '/combos/active',         // GET active (public)
+
+  // ── Settings ─────────────────────────────────────
+  SETTINGS:                     '/settings',             // GET all (public), PUT /:key (admin)
 
   // ── Dashboard (admin) ────────────────────────────
   DASHBOARD_STATS:            '/dashboard/stats',      // Not in backend

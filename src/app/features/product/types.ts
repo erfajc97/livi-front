@@ -1,1 +1,1 @@
-export type { Product, ProductVariant, ProductType } from '@/app/types/global.types';
+export type { Product, ProductVariant } from '@/app/types/global.types';

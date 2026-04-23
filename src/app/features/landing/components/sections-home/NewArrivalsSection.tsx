@@ -16,7 +16,7 @@ export default function NewArrivalsSection({ products, isLoading }: NewArrivalsS
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="bg-white py-14 px-4">
+    <section className="bg-white pt-20 pb-14 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header - TITLE ONLY */}
         <div className="flex items-start mb-6 px-4 sm:px-12">

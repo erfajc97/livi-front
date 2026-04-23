@@ -24,11 +24,22 @@ export default function AddressSection({ customer, onChange }: AddressSectionPro
           className={`${INPUT_CLASS} md:col-span-2`}
           required
         />
-        <select className={SELECT_CLASS}>
+        <select
+          value={customer.province}
+          onChange={(e) => onChange('province', e.target.value)}
+          className={SELECT_CLASS}
+        >
           <option value="">Provincia</option>
           <option value="Guayas">Guayas</option>
           <option value="Pichincha">Pichincha</option>
           <option value="Azuay">Azuay</option>
+          <option value="Manabi">Manabí</option>
+          <option value="El Oro">El Oro</option>
+          <option value="Los Rios">Los Ríos</option>
+          <option value="Tungurahua">Tungurahua</option>
+          <option value="Imbabura">Imbabura</option>
+          <option value="Santo Domingo">Santo Domingo</option>
+          <option value="Santa Elena">Santa Elena</option>
         </select>
         <select
           value={customer.city}
@@ -42,6 +53,11 @@ export default function AddressSection({ customer, onChange }: AddressSectionPro
           <option value="Samborondon">Samborondón</option>
           <option value="Quito">Quito</option>
           <option value="Cuenca">Cuenca</option>
+          <option value="Machala">Machala</option>
+          <option value="Manta">Manta</option>
+          <option value="Ambato">Ambato</option>
+          <option value="Ibarra">Ibarra</option>
+          <option value="Santo Domingo">Santo Domingo</option>
         </select>
         <input
           type="tel"

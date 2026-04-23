@@ -4,9 +4,18 @@ import { secureStorage } from '@/app/helpers/secureStorage';
 interface AuthUser {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   role: 'ADMIN' | 'CLIENT';
   isEmailVerified: boolean;
+  phone?: string;
+  cedula?: string;
+  province?: string;
+  city?: string;
+  address?: string;
+  reference?: string;
+  preferredDeliveryMethod?: string;
 }
 
 interface AuthState {

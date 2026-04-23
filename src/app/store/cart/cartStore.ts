@@ -1,15 +1,21 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export interface ComboProduct {
+  productVariationId: number;
+  quantity: number;
+}
+
 export interface CartItem {
   productId: string;
   variantId: string;
   name: string;
-  brand: string;
   image: string;
   ml: number;
   price: number;
   quantity: number;
+  comboId?: number;
+  comboProducts?: ComboProduct[];
 }
 
 interface CartState {

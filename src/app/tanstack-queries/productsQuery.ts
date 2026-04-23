@@ -5,19 +5,95 @@ import { MOCK_ENABLED } from '@/app/lib/mock';
 import { MOCK_PRODUCTS } from '@/app/features/landing/data';
 import type { Product, ProductQueryParams, PaginatedResponse } from '@/app/types/global.types';
 
+/** Extract ml value from variation — tries measureValue, ml, name, or optionValues */
+const extractMl = (v: any): number => {
+  if (v.measureValue) return Number(v.measureValue);
+  if (v.ml) return Number(v.ml);
+  // Try parsing from name like "100ml"
+  const nameMatch = (v.name ?? '').match(/(\d+)\s*ml/i);
+  if (nameMatch) return Number(nameMatch[1]);
+  // Try parsing from optionValues
+  if (v.optionValues?.length) {
+    for (const ov of v.optionValues) {
+      const m = (ov.value ?? ov.displayName ?? '').match(/(\d+)\s*ml/i);
+      if (m) return Number(m[1]);
+    }
+  }
+  return 0;
+};
+
+/** Extract image URLs from backend image objects or plain strings */
+const extractImages = (images: any): string[] => {
+  if (!images || !Array.isArray(images)) return [];
+  return images.map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
+};
+
+/** Maps backend product shape to frontend Product interface */
+export const mapProduct = (raw: any): Product => {
+  const imageList = extractImages(raw.images);
+  return {
+    id: String(raw.id),
+    name: raw.name ?? '',
+    description: raw.description ?? '',
+    image: imageList[0] || raw.image || raw.imageUrl || '',
+    images: imageList.length > 0 ? imageList : [raw.imageUrl].filter(Boolean),
+    variants: (raw.variations ?? raw.variants ?? []).map((v: any) => ({
+      id: String(v.id),
+      ml: v.mlSize ?? extractMl(v),
+      price: Number(v.price ?? 0),
+      mlSize: v.mlSize ?? extractMl(v),
+      isFullBottle: v.isFullBottle ?? false,
+      availableQuantity: v.availableQuantity ?? 0,
+      images: extractImages(v.images),
+    })),
+    totalMl: raw.totalMl ?? 100,
+    openBottleMlRemaining: raw.openBottleMlRemaining ?? 0,
+    availableMl: raw.availableMl ?? 0,
+    isActive: raw.isActive ?? true,
+    bajoPedido: raw.bajoPedido ?? false,
+    gender: raw.gender ?? undefined,
+    timeOfDay: raw.timeOfDay ?? undefined,
+    concentration: raw.concentration ?? undefined,
+    projection: raw.projection ?? undefined,
+    discount: raw.discount ? Number(raw.discount) : undefined,
+    detailDescription: raw.detailDescription ?? undefined,
+    benefits: (() => {
+      if (!raw.benefits) return undefined;
+      try { const parsed = JSON.parse(raw.benefits); return Array.isArray(parsed) ? parsed : undefined; }
+      catch { return undefined; }
+    })(),
+    stock: raw.stock != null ? Number(raw.stock) : undefined,
+    price: raw.price ? Number(raw.price) : undefined,
+    createdAt: raw.createdAt ?? '',
+  };
+};
+
 const applyMockFilters = (params: ProductQueryParams): PaginatedResponse<Product> => {
   let filtered = [...MOCK_PRODUCTS];
-  if (params.type)   filtered = filtered.filter(p => p.type === params.type);
   if (params.search) filtered = filtered.filter(p =>
-    p.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-    p.brand.toLowerCase().includes(params.search!.toLowerCase())
+    p.name.toLowerCase().includes(params.search!.toLowerCase())
   );
-  if (params.inStock) filtered = filtered.filter(p => p.variants.some(v => v.stock > 0));
+  if (params.inStock) filtered = filtered.filter(p => p.variants.some(v => v.availableQuantity > 0));
+  if (params.bajoPedido !== undefined) filtered = filtered.filter(p => p.bajoPedido === (String(params.bajoPedido) === 'true'));
+  if (params.hasDiscount) filtered = filtered.filter(p => (p.discount ?? 0) > 0);
+  if (params.minPrice !== undefined) {
+    filtered = filtered.filter(p => (p.price ?? 0) >= params.minPrice!);
+  }
+  if (params.maxPrice !== undefined) {
+    filtered = filtered.filter(p => (p.price ?? 0) <= params.maxPrice!);
+  }
+  if (params.gender) filtered = filtered.filter(p => p.gender === params.gender);
   if (params.sortBy === 'createdAt') {
     filtered.sort((a, b) =>
-      params.order === 'asc'
+      params.sortOrder === 'ASC'
         ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  } else if (params.sortBy === 'price') {
+    filtered.sort((a, b) =>
+      params.sortOrder === 'ASC'
+        ? (a.price ?? 0) - (b.price ?? 0)
+        : (b.price ?? 0) - (a.price ?? 0)
     );
   }
   const limit = params.limit ?? 12;
@@ -39,18 +115,20 @@ export const fetchProducts = async (params: ProductQueryParams): Promise<Paginat
     const responseData = data?.data ?? data;
 
     if (Array.isArray(responseData)) {
-      return { content: responseData, pagination: { page: 1, limit: responseData.length, total: responseData.length, totalPages: 1 } };
+      return { content: responseData.map(mapProduct), pagination: { page: 1, limit: responseData.length, total: responseData.length, totalPages: 1 } };
     }
 
-    // If it's already in the correct format with content property
     if (responseData?.content) {
-      return responseData;
+      return {
+        ...responseData,
+        content: responseData.content.map(mapProduct),
+      };
     }
 
     // Map backend response format to expected format
     if (responseData?.data && Array.isArray(responseData.data)) {
       return {
-        content: responseData.data,
+        content: responseData.data.map(mapProduct),
         pagination: {
           page: responseData.page ?? 1,
           limit: responseData.limit ?? 20,
@@ -61,8 +139,8 @@ export const fetchProducts = async (params: ProductQueryParams): Promise<Paginat
     }
 
     return responseData || applyMockFilters(params);
-  } catch (error) {
-    console.warn('Error fetching products, using mock:', error);
+  } catch (error: any) {
+    console.error('[fetchProducts] API error — falling back to mock filters:', error?.response?.status, error?.response?.data ?? error?.message);
     return applyMockFilters(params);
   }
 };
@@ -77,9 +155,9 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     // Backend returns: { statusCode, message, data: Product, ... }
     const productData = data?.data ?? data;
     if (productData && typeof productData === 'object') {
-      return productData;
+      return mapProduct(productData);
     }
-    return data;
+    return mapProduct(data);
   } catch (error) {
     console.warn(`Error fetching product ${id}:`, error);
     return MOCK_PRODUCTS.find(p => p.id === id) ?? MOCK_PRODUCTS[0];

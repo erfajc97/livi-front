@@ -15,7 +15,7 @@ export default function VariantSelector({ variants, selected, onSelect }: Varian
       </p>
       <div className="flex flex-wrap gap-2">
         {variants.map((variant) => {
-          const inStock = variant.stock > 0;
+          const inStock = variant.availableQuantity > 0;
           const isSelected = selected?.id === variant.id;
 
           return (
@@ -41,7 +41,7 @@ export default function VariantSelector({ variants, selected, onSelect }: Varian
       {selected && (
         <p className="mt-2 text-sm text-[--color-text-muted]">
           Precio: <span className="text-[--color-accent] font-medium">{formatCurrency(selected.price)}</span>
-          {' '}· Stock: {selected.stock}
+          {' '}· Disponible: {selected.availableQuantity}
         </p>
       )}
     </div>

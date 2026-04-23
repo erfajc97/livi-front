@@ -1,0 +1,51 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
+import { blogService } from '@/app/features/blog/services/blogService';
+
+const posts = await blogService.fetchPublishedPosts();
+const featuredPost = posts[0];
+const otherPosts = posts.slice(1);
+---
+
+<PublicLayout
+  title="Blog — NönDecants"
+  description="Lee artículos sobre perfumes, decants y tendencias en NönDecants."
+>
+  {featuredPost ? (
+    <>
+      <article class="bg-white py-14 px-4">
+        <div class="max-w-4xl mx-auto">
+          <h1 class="font-heading text-3xl sm:text-4xl font-bold uppercase tracking-wide text-black mb-8">
+            {featuredPost.title}
+          </h1>
+
+          {featuredPost.imageUrl && (
+            <img
+              src={featuredPost.imageUrl}
+              alt={featuredPost.title}
+              class="w-full h-[320px] sm:h-[420px] object-cover rounded-xl mb-10"
+            />
+          )}
+
+          {featuredPost.content && (
+            <p class="text-base text-gray-600 leading-relaxed" style="text-align: justify;">
+              {featuredPost.content}
+            </p>
+          )}
+        </div>
+      </article>
+
+      {otherPosts.length > 0 && (
+        <BlogCarousel posts={otherPosts} client:visible />
+      )}
+    </>
+  ) : (
+    <section class="bg-white py-20 px-4">
+      <div class="max-w-7xl mx-auto text-center">
+        <h2 class="font-heading text-2xl font-bold text-gray-800 mb-4">Próximamente</h2>
+        <p class="text-gray-600">Estamos preparando contenido interesante para ti. ¡Vuelve pronto!</p>
+      </div>
+    </section>
+  )}
+</PublicLayout>

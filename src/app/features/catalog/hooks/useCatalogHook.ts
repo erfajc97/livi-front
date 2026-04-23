@@ -1,51 +1,81 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useProductsQuery } from '@/app/tanstack-queries/productsQuery';
 import type { CatalogFilters } from '../types';
-import type { ProductType } from '@/app/types/global.types';
+import type { Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
 
 export interface UseCatalogHookProps {
   tipo?: 'perfumes' | 'combos';
-  initialParams?: Partial<CatalogFilters>;
+  bajoPedido?: boolean;
+  initialCategoryId?: number;
+  initialMarcaId?: number;
 }
 
 const LIMIT = 9;
 
 const defaultFilters: CatalogFilters = {
-  search:  '',
-  type:    '',
-  brand:   '',
+  search: '',
   inStock: false,
-  page:    1,
-  sortBy:  'createdAt',
-  order:   'desc',
+  gender: '',
+  timeOfDay: '',
+  concentration: '',
+  projection: '',
+  hasDiscount: false,
+  page: 1,
+  sortBy: 'createdAt',
+  order: 'desc',
 };
 
-export function useCatalogHook({ tipo, initialParams }: UseCatalogHookProps = {}) {
-  const [filters, setFilters] = useState<CatalogFilters>({ ...defaultFilters, ...initialParams });
+function getUrlParams() {
+  if (typeof window === 'undefined') return {};
+  const params = new URLSearchParams(window.location.search);
+  const catId = params.get('category');
+  const subId = params.get('marca');
+  return {
+    categoryId: catId ? Number(catId) : undefined,
+    marcaId: subId ? Number(subId) : undefined,
+  };
+}
+
+export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMarcaId }: UseCatalogHookProps = {}) {
+  const urlParams = getUrlParams();
+  const catId = initialCategoryId ?? urlParams.categoryId;
+  const subId = initialMarcaId ?? urlParams.marcaId;
+
+  const [filters, setFilters] = useState<CatalogFilters>({
+    ...defaultFilters,
+    categoryId: catId,
+    marcaId: subId,
+  });
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
+  const [debouncedMaxPrice, setDebouncedMaxPrice] = useState(filters.maxPrice);
 
-  // Establecer el tipo de filtro cuando el hook se inicializa o cambia la prop
-  useEffect(() => {
-    if (tipo) {
-      setFilters((f) => ({ ...f, type: tipo === 'combos' ? 'NONDECANT' : '', page: 1 }));
-    }
-  }, [tipo]);
-
-  // Debounce 300ms en búsqueda
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(filters.search), 300);
     return () => clearTimeout(timer);
   }, [filters.search]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedMaxPrice(filters.maxPrice), 300);
+    return () => clearTimeout(timer);
+  }, [filters.maxPrice]);
+
   const queryParams = {
-    page:    filters.page,
-    limit:   LIMIT,
-    search:  debouncedSearch || undefined,
-    type:    filters.type || undefined,
-    brand:   filters.brand || undefined,
+    page: filters.page,
+    limit: LIMIT,
+    search: debouncedSearch || undefined,
     inStock: filters.inStock || undefined,
-    sortBy:  filters.sortBy,
-    order:   filters.order,
+    bajoPedido,
+    categoryId: filters.categoryId,
+    marcaId: filters.marcaId,
+    gender: filters.gender || undefined,
+    timeOfDay: filters.timeOfDay || undefined,
+    concentration: filters.concentration || undefined,
+    projection: filters.projection || undefined,
+    hasDiscount: filters.hasDiscount || undefined,
+    minPrice: filters.minPrice,
+    maxPrice: debouncedMaxPrice,
+    sortBy: filters.sortBy,
+    sortOrder: filters.order?.toUpperCase() as 'ASC' | 'DESC',
   };
 
   const { data, isLoading, isFetching } = useProductsQuery({ queryParams });
@@ -54,16 +84,40 @@ export function useCatalogHook({ tipo, initialParams }: UseCatalogHookProps = {}
     setFilters((f) => ({ ...f, search, page: 1 }));
   }, []);
 
-  const setType = useCallback((type: ProductType | '') => {
-    setFilters((f) => ({ ...f, type, page: 1 }));
-  }, []);
-
-  const setBrand = useCallback((brand: string) => {
-    setFilters((f) => ({ ...f, brand, page: 1 }));
-  }, []);
-
   const setInStock = useCallback((inStock: boolean) => {
     setFilters((f) => ({ ...f, inStock, page: 1 }));
+  }, []);
+
+  const setGender = useCallback((gender: Gender | '') => {
+    setFilters((f) => ({ ...f, gender, page: 1 }));
+  }, []);
+
+  const setTimeOfDay = useCallback((timeOfDay: TimeOfDay | '') => {
+    setFilters((f) => ({ ...f, timeOfDay, page: 1 }));
+  }, []);
+
+  const setConcentration = useCallback((concentration: Concentration | '') => {
+    setFilters((f) => ({ ...f, concentration, page: 1 }));
+  }, []);
+
+  const setProjection = useCallback((projection: Projection | '') => {
+    setFilters((f) => ({ ...f, projection, page: 1 }));
+  }, []);
+
+  const setHasDiscount = useCallback((hasDiscount: boolean) => {
+    setFilters((f) => ({ ...f, hasDiscount, page: 1 }));
+  }, []);
+
+  const setPriceRange = useCallback((minPrice?: number, maxPrice?: number) => {
+    setFilters((f) => ({ ...f, minPrice, maxPrice, page: 1 }));
+  }, []);
+
+  const setCategoryId = useCallback((categoryId?: number) => {
+    setFilters((f) => ({ ...f, categoryId, marcaId: undefined, page: 1 }));
+  }, []);
+
+  const setMarcaId = useCallback((marcaId?: number) => {
+    setFilters((f) => ({ ...f, marcaId, page: 1 }));
   }, []);
 
   const setPage = useCallback((page: number) => {
@@ -85,19 +139,39 @@ export function useCatalogHook({ tipo, initialParams }: UseCatalogHookProps = {}
 
   const sortValue = `${filters.sortBy}:${filters.order}`;
 
-  const clearFilters = useCallback(() => setFilters(defaultFilters), []);
+  const clearFilters = useCallback(() => {
+    setFilters({
+      ...defaultFilters,
+      categoryId: initialCategoryId,
+      marcaId: initialMarcaId,
+    });
+  }, [initialCategoryId, initialMarcaId]);
+
+  const hasActiveFilters = !!(
+    filters.search || filters.gender ||
+    filters.timeOfDay || filters.concentration || filters.projection ||
+    filters.hasDiscount || filters.minPrice || filters.maxPrice ||
+    (filters.categoryId && filters.categoryId !== catId)
+  );
 
   return {
     filters,
-    products:   data?.content ?? [],
+    products: data?.content ?? [],
     pagination: data?.pagination,
     isLoading,
     isFetching,
     sortValue,
+    hasActiveFilters,
     setSearch,
-    setType,
-    setBrand,
     setInStock,
+    setGender,
+    setTimeOfDay,
+    setConcentration,
+    setProjection,
+    setHasDiscount,
+    setPriceRange,
+    setCategoryId,
+    setMarcaId,
     setSort,
     setPage,
     clearFilters,

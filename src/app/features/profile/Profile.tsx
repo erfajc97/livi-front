@@ -1,16 +1,12 @@
 import AppProviders from '@/app/providers/AppProviders';
 import { useProfileHook } from './hooks/useProfileHook';
 import ProfileSidebar from './components/ProfileSidebar';
-import TrackingTab from './components/TrackingTab';
 import OrdersTab from './components/OrdersTab';
 import ProfileTab from './components/ProfileTab';
-import PaymentsTab from './components/PaymentsTab';
 
 const TAB_CONTENT = {
-  seguimiento: TrackingTab,
-  pedidos: OrdersTab,
   perfil: ProfileTab,
-  pagos: PaymentsTab,
+  pedidos: OrdersTab,
 } as const;
 
 function ProfileContent() {

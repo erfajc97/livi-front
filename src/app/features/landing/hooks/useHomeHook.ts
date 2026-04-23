@@ -1,25 +1,17 @@
 import { useBannersQuery } from '@/app/tanstack-queries/bannersQuery';
-import { useProductsQuery } from '@/app/tanstack-queries/productsQuery';
+import { useLandingSectionsActiveQuery } from '@/app/tanstack-queries/landingSectionsQuery';
 
 export function useHomeHook() {
   const { data: bannersData, isLoading: bannersLoading } = useBannersQuery();
 
-  const { data: featuredData, isLoading: featuredLoading } = useProductsQuery({
-    queryParams: { limit: 4 },
-  });
-
-  const { data: newArrivalsData, isLoading: newArrivalsLoading } = useProductsQuery({
-    queryParams: { limit: 4, sortBy: 'createdAt', order: 'desc', page: 1 },
-  });
+  // Secciones editables desde el admin
+  const { data: sectionsData, isLoading: sectionsLoading } = useLandingSectionsActiveQuery();
 
   return {
     banners: bannersData ?? [],
     bannersLoading,
 
-    featuredProducts: featuredData?.content ?? [],
-    featuredLoading,
-
-    newArrivals: newArrivalsData?.content ?? [],
-    newArrivalsLoading,
+    sections: sectionsData ?? [],
+    sectionsLoading,
   };
 }

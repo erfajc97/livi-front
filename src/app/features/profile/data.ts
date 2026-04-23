@@ -1,10 +1,8 @@
 import type { ProfileTabId } from './types';
 
 export const PROFILE_TABS: { id: ProfileTabId; label: string }[] = [
-  { id: 'seguimiento', label: 'Seguimiento' },
-  { id: 'pedidos', label: 'Mis Pedidos' },
   { id: 'perfil', label: 'Perfil' },
-  { id: 'pagos', label: 'Pagos' },
+  { id: 'pedidos', label: 'Mis Pedidos' },
 ];
 
 // === TRACKING TIMELINE ===

@@ -1,8 +1,8 @@
 ---
 import PublicLayout from '@/layouts/PublicLayout.astro';
-import Home from '@/app/features/landing/pages/home/Home';
-import HeroSection from '@/app/features/landing/components/sections-home/HeroSection.astro';
+import BannerCarouselIsland from '@/app/features/landing/components/sections-home/BannerCarouselIsland';
 import FeatureStrip from '@/app/features/landing/components/sections-home/FeatureStrip.astro';
+import Home from '@/app/features/landing/pages/home/Home';
 import BlogSection from '@/app/features/landing/components/sections-home/BlogSection.astro';
 ---
 
@@ -10,8 +10,10 @@ import BlogSection from '@/app/features/landing/components/sections-home/BlogSec
   title="NönDecants — Perfumes sellados, decants y nondecants en Ecuador"
   description="Compra perfumes sellados originales, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega."
 >
-  <HeroSection />
-  <FeatureStrip />
+  <div class="relative">
+    <BannerCarouselIsland client:load />
+    <FeatureStrip />
+  </div>
   <Home client:load />
   <BlogSection />
 </PublicLayout>

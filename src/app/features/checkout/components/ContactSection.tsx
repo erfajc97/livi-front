@@ -24,7 +24,10 @@ export default function ContactSection({ customer, onChange }: ContactSectionPro
         <input
           type="text"
           placeholder="Apellidos"
+          value={customer.lastName}
+          onChange={(e) => onChange('lastName', e.target.value)}
           className={INPUT_CLASS}
+          required
         />
         <input
           type="email"
@@ -37,11 +40,15 @@ export default function ContactSection({ customer, onChange }: ContactSectionPro
         <input
           type="text"
           placeholder="Cédula"
+          value={customer.cedula}
+          onChange={(e) => onChange('cedula', e.target.value)}
           className={INPUT_CLASS}
         />
         <input
           type="text"
           placeholder="Referencia (Opcional)"
+          value={customer.reference}
+          onChange={(e) => onChange('reference', e.target.value)}
           className={`${INPUT_CLASS} md:col-span-2`}
         />
       </div>

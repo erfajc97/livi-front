@@ -1,0 +1,25 @@
+---
+export const prerender = false;
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AnnouncementBar from '@/app/features/landing/components/layout/AnnouncementBar.astro';
+import OrderConfirmationIsland from '@/app/features/order/components/OrderConfirmationIsland';
+---
+
+<BaseLayout title="Confirmación de orden — NönDecants">
+  <div class="min-h-screen bg-white flex flex-col pt-[40px]">
+    <div class="fixed top-0 left-0 right-0 z-50">
+      <AnnouncementBar />
+    </div>
+
+    <header class="w-full flex justify-center items-center py-4 mt-6">
+      <a href="/">
+        <img src="/logo.svg" alt="NönDecants" class="h-8" />
+      </a>
+    </header>
+
+    <main class="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-6 pb-16">
+      <OrderConfirmationIsland client:load />
+    </main>
+  </div>
+</BaseLayout>

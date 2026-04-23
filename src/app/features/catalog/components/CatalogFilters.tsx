@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import {
-  CATALOG_CATEGORIES,
   CATALOG_GENDERS,
   CATALOG_TIME_OF_DAY,
   CATALOG_CONCENTRATIONS,
@@ -8,52 +6,109 @@ import {
 } from '../data';
 import FilterPillGroup from './FilterPillGroup';
 import FilterPriceRange from './FilterPriceRange';
-import type { ProductType } from '@/app/types/global.types';
+import { useCategoriesWithMarcasQuery } from '@/app/tanstack-queries/categoriesQuery';
+import type { Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
 
 interface CatalogFiltersProps {
-  selectedType: ProductType | '';
-  onTypeChange: (type: ProductType | '') => void;
+  gender: Gender | '';
+  onGenderChange: (v: Gender | '') => void;
+  timeOfDay: TimeOfDay | '';
+  onTimeOfDayChange: (v: TimeOfDay | '') => void;
+  concentration: Concentration | '';
+  onConcentrationChange: (v: Concentration | '') => void;
+  projection: Projection | '';
+  onProjectionChange: (v: Projection | '') => void;
+  hasDiscount: boolean;
+  onHasDiscountChange: (v: boolean) => void;
+  minPrice?: number;
+  maxPrice?: number;
+  onPriceRangeChange: (min?: number, max?: number) => void;
+  categoryId?: number;
+  onCategoryChange: (v?: number) => void;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
+  hideCategories?: boolean;
 }
 
+const selectClass =
+  'w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-gray-700 bg-white focus:border-black focus:outline-none transition-colors appearance-none cursor-pointer';
+
 export default function CatalogFilters({
-  selectedType,
-  onTypeChange,
+  gender,
+  onGenderChange,
+  timeOfDay,
+  onTimeOfDayChange,
+  concentration,
+  onConcentrationChange,
+  projection,
+  onProjectionChange,
+  hasDiscount,
+  onHasDiscountChange,
+  maxPrice,
+  onPriceRangeChange,
+  categoryId,
+  onCategoryChange,
+  hasActiveFilters,
+  onClearFilters,
+  hideCategories,
 }: CatalogFiltersProps) {
-  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
-  const [selectedTimeOfDay, setSelectedTimeOfDay] = useState<string[]>([]);
-  const [selectedConcentration, setSelectedConcentration] = useState('');
-  const [selectedProjections, setSelectedProjections] = useState<string[]>([]);
-  const [priceMax, setPriceMax] = useState(200);
-
-  const categorySelected = selectedType ? [selectedType] : [];
-
-  const handleCategoryChange = (values: string[]) => {
-    const newValue = values.find((v) => v !== selectedType) || '';
-    onTypeChange(newValue as ProductType | '');
-  };
+  const { data: categories = [] } = useCategoriesWithMarcasQuery();
+  const filteredCategories = categories.filter((c) => c.name.toLowerCase() !== 'all');
 
   return (
     <aside className="border border-gray-200 rounded-xl p-5 space-y-6">
-      <FilterPillGroup
-        label="Categorías"
-        options={CATALOG_CATEGORIES}
-        selected={categorySelected}
-        onChange={handleCategoryChange}
-        singleSelect
-      />
+      {hasActiveFilters && (
+        <button
+          onClick={onClearFilters}
+          className="text-xs font-heading uppercase tracking-wider text-gray-500 hover:text-black transition-colors underline"
+        >
+          Limpiar filtros
+        </button>
+      )}
+
+      {/* Categorías — select */}
+      {!hideCategories && filteredCategories.length > 0 && (
+        <div>
+          <p className="font-heading text-base font-semibold text-black mb-3 italic">
+            Categoría
+          </p>
+          <select
+            value={categoryId ?? ''}
+            onChange={(e) =>
+              onCategoryChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            className={selectClass}
+          >
+            <option value="">Todas las categorías</option>
+            {filteredCategories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <FilterPillGroup
         label="Género"
         options={CATALOG_GENDERS}
-        selected={selectedGenders}
-        onChange={setSelectedGenders}
+        selected={gender ? [gender] : []}
+        onChange={(values) => {
+          const newVal = values.find((v) => v !== gender) || '';
+          onGenderChange(newVal as Gender | '');
+        }}
+        singleSelect
       />
 
       <FilterPillGroup
         label="Hora del día"
         options={CATALOG_TIME_OF_DAY}
-        selected={selectedTimeOfDay}
-        onChange={setSelectedTimeOfDay}
+        selected={timeOfDay ? [timeOfDay] : []}
+        onChange={(values) => {
+          const newVal = values.find((v) => v !== timeOfDay) || '';
+          onTimeOfDayChange(newVal as TimeOfDay | '');
+        }}
+        singleSelect
       />
 
       {/* Concentración — radio buttons */}
@@ -70,8 +125,12 @@ export default function CatalogFilters({
               <input
                 type="radio"
                 name="concentration"
-                checked={selectedConcentration === opt.value}
-                onChange={() => setSelectedConcentration(opt.value)}
+                checked={concentration === opt.value}
+                onChange={() =>
+                  onConcentrationChange(
+                    concentration === opt.value ? '' : (opt.value as Concentration)
+                  )
+                }
                 className="w-4 h-4 accent-black cursor-pointer"
               />
               <span className="text-sm text-gray-600 group-hover:text-black transition-colors">
@@ -85,16 +144,35 @@ export default function CatalogFilters({
       <FilterPillGroup
         label="Proyección"
         options={CATALOG_PROJECTIONS}
-        selected={selectedProjections}
-        onChange={setSelectedProjections}
+        selected={projection ? [projection] : []}
+        onChange={(values) => {
+          const newVal = values.find((v) => v !== projection) || '';
+          onProjectionChange(newVal as Projection | '');
+        }}
+        singleSelect
       />
 
+      {/* Descuento */}
+      <div>
+        <label className="flex items-center gap-2.5 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={hasDiscount}
+            onChange={(e) => onHasDiscountChange(e.target.checked)}
+            className="w-4 h-4 accent-black cursor-pointer rounded"
+          />
+          <span className="font-heading text-sm font-semibold text-gray-700 group-hover:text-black transition-colors">
+            Con descuento
+          </span>
+        </label>
+      </div>
+
       <FilterPriceRange
-        label="Desde"
+        label="Precio máximo"
         min={0}
         max={500}
-        value={priceMax}
-        onChange={setPriceMax}
+        value={maxPrice ?? 500}
+        onChange={(val) => onPriceRangeChange(undefined, val < 500 ? val : undefined)}
       />
     </aside>
   );

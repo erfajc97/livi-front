@@ -9,15 +9,43 @@ interface CatalogPaginationProps {
   onPageChange: (page: number) => void;
 }
 
+function getVisiblePages(current: number, total: number): (number | '...')[] {
+  const maxVisible = 5;
+  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages: (number | '...')[] = [];
+  let start = Math.max(1, current - 2);
+  let end = Math.min(total, start + maxVisible - 1);
+
+  if (end - start < maxVisible - 1) {
+    start = Math.max(1, end - maxVisible + 1);
+  }
+
+  if (start > 1) {
+    pages.push(1);
+    if (start > 2) pages.push('...');
+  }
+
+  for (let i = start; i <= end; i++) {
+    if (!pages.includes(i)) pages.push(i);
+  }
+
+  if (end < total) {
+    if (end < total - 1) pages.push('...');
+    pages.push(total);
+  }
+
+  return pages;
+}
+
 export default function CatalogPagination({ pagination, onPageChange }: CatalogPaginationProps) {
   const { page, totalPages } = pagination;
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const visiblePages = getVisiblePages(page, totalPages);
 
   return (
-    <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-10 pt-6">
-      {/* ATRÁS */}
+    <div className="flex items-center justify-center gap-1.5 sm:gap-2 mt-10 pt-6 pb-4">
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
@@ -26,24 +54,28 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
         Atrás
       </button>
 
-      {/* Page numbers */}
       <div className="flex items-center gap-1 sm:gap-1.5">
-        {pages.map((p) => (
-          <button
-            key={p}
-            onClick={() => onPageChange(p)}
-            className={`w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm font-heading rounded-lg transition-colors ${
-              p === page
-                ? 'bg-black text-white'
-                : 'border border-gray-300 text-gray-500 hover:border-black hover:text-black'
-            }`}
-          >
-            {p}
-          </button>
-        ))}
+        {visiblePages.map((p, idx) =>
+          p === '...' ? (
+            <span key={`dots-${idx}`} className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center text-xs text-gray-400">
+              ...
+            </span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPageChange(p)}
+              className={`w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm font-heading rounded-lg transition-colors ${
+                p === page
+                  ? 'bg-black text-white'
+                  : 'border border-gray-300 text-gray-500 hover:border-black hover:text-black'
+              }`}
+            >
+              {p}
+            </button>
+          )
+        )}
       </div>
 
-      {/* SIGUIENTE */}
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}

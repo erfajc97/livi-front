@@ -3,12 +3,12 @@ import { useCartStore } from '@/app/store/cart/cartStore';
 import { useAuthStore } from '@/app/store/auth/authStore';
 
 export const NAV_LINKS = [
-  { href: '/',                   label: 'Inicio',             exact: true,  dropdown: false },
-  { href: '/catalogo/perfumes',  label: 'Perfumes',           exact: true,  dropdown: false },
-  { href: '/catalogo/combos',    label: 'Combos',             exact: true,  dropdown: false },
-  { href: '/bajo-pedido',        label: 'Bajo Pedido',        exact: true,  dropdown: true  },
-  { href: '/blog',               label: 'Blog',               exact: true,  dropdown: false },
-  { href: '/rastrear',           label: 'Rastrear tú pedido', exact: true,  dropdown: false },
+  { href: '/',                   label: 'Inicio',             exact: true,  dropdown: false,      dropdownId: '' },
+  { href: '/catalogo/perfumes',  label: 'Perfumes',           exact: true,  dropdown: true,       dropdownId: 'perfumes' },
+  { href: '/catalogo/combos',    label: 'Combos',             exact: true,  dropdown: false,      dropdownId: '' },
+  { href: '/bajo-pedido',        label: 'Bajo Pedido',        exact: true,  dropdown: true,       dropdownId: 'bajoPedido' },
+  { href: '/blog',               label: 'Blog',               exact: true,  dropdown: false,      dropdownId: '' },
+  { href: '/rastrear',           label: 'Rastrear tú pedido', exact: true,  dropdown: false,      dropdownId: '' },
 ];
 
 export function isLinkActive(href: string, currentUrl: string, exact: boolean) {
@@ -33,12 +33,13 @@ export function useNavbarHook() {
 
   const [authOpen, setAuthOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [perfumesOpen, setPerfumesOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(2);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState(0);
   const [pathname, setPathname] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Pathname tracking + scroll detection
   useEffect(() => {
@@ -67,14 +68,14 @@ export function useNavbarHook() {
 
   // Close dropdown on click outside or Escape
   useEffect(() => {
-    if (!perfumesOpen) return;
+    if (!openDropdown) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setPerfumesOpen(false);
+        setOpenDropdown(null);
       }
     };
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPerfumesOpen(false);
+      if (e.key === 'Escape') setOpenDropdown(null);
     };
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
@@ -82,7 +83,29 @@ export function useNavbarHook() {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [perfumesOpen]);
+  }, [openDropdown]);
+
+  const handleDropdownEnter = (dropdownId: string) => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setOpenDropdown(dropdownId);
+    setActiveCategory(0);
+  };
+
+  const handleDropdownLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200);
+  };
+
+  const handleDropdownContentEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+  };
+
+  const handleDropdownContentLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200);
+  };
 
   return {
     itemCount,
@@ -92,12 +115,16 @@ export function useNavbarHook() {
     setAuthOpen,
     mobileOpen,
     setMobileOpen,
-    perfumesOpen,
-    setPerfumesOpen,
+    openDropdown,
+    setOpenDropdown,
     activeCategory,
     setActiveCategory,
     dropdownRef,
     pathname,
     isScrolled,
+    handleDropdownEnter,
+    handleDropdownLeave,
+    handleDropdownContentEnter,
+    handleDropdownContentLeave,
   };
 }

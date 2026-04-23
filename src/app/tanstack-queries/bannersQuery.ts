@@ -8,8 +8,9 @@ import type { Banner } from '@/app/types/global.types';
 const fetchBanners = async (): Promise<Banner[]> => {
   if (MOCK_ENABLED) return MOCK_BANNERS;
   try {
-    const { data } = await axiosInstance.get(API_ENDPOINTS.BANNERS);
-    return data?.content ?? data ?? [];
+    const { data } = await axiosInstance.get(`${API_ENDPOINTS.BANNERS}/visible`);
+    const result = data?.data ?? data;
+    return Array.isArray(result) ? result : [];
   } catch {
     return MOCK_BANNERS;
   }

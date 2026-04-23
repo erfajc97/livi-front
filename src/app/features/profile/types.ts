@@ -1,1 +1,1 @@
-export type ProfileTabId = 'seguimiento' | 'pedidos' | 'perfil' | 'pagos';
+export type ProfileTabId = 'perfil' | 'pedidos';

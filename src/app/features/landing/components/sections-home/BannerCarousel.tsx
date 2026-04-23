@@ -22,37 +22,32 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {banners.map((banner) => (
-            <div key={banner.id} className="relative min-w-full">
-              <a href={banner.link ?? '#'} className="block">
-                <img
-                  src={banner.image}
-                  alt={banner.title}
-                  className="w-full h-[420px] md:h-[540px] object-cover"
-                />
-                <div
-                  className="absolute inset-0 flex items-end"
-                  style={{ background: 'linear-gradient(to top, rgba(27,25,25,0.85) 0%, rgba(27,25,25,0.2) 50%, transparent 100%)' }}
-                >
-                  <div className="px-8 md:px-16 pb-12 md:pb-16">
-                    <p className="text-[--color-accent] font-heading text-xs uppercase tracking-[0.3em] mb-3">
-                      NönDecants
-                    </p>
-                    <h2 className="font-heading text-4xl md:text-6xl text-[--color-text] uppercase leading-none mb-3">
-                      {banner.title}
-                    </h2>
-                    {banner.subtitle && (
-                      <p className="text-[--color-text-muted] text-sm tracking-wider max-w-md">
-                        {banner.subtitle}
-                      </p>
-                    )}
-                    <div className="mt-6">
-                      <span className="inline-block px-6 py-2.5 bg-[--color-accent] text-[--color-bg] font-heading text-xs uppercase tracking-widest hover:bg-[--color-accent-hover] transition-colors">
-                        Ver Catálogo
-                      </span>
-                    </div>
-                  </div>
+            <div key={banner.id} className="relative min-w-full" style={{ height: '100vh' }}>
+              <img
+                src={banner.imageUrl ?? banner.image ?? ''}
+                alt={banner.title}
+                className="absolute inset-0 w-full h-full object-cover object-center"
+              />
+              <div
+                className="absolute inset-0 flex items-start"
+                style={{ background: 'linear-gradient(to right, rgba(27,25,25,0.85) 0%, rgba(27,25,25,0.5) 55%, rgba(27,25,25,0.15) 100%)' }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <p className="hidden font-heading text-[clamp(1.6rem,2vw,2.8rem)] font-normal uppercase leading-[0.96] tracking-[-0.02em] text-white">
+                    {banner.subtitle ?? 'Única Experiencia'}
+                  </p>
+                  <span className="hidden mt-1 font-body text-[clamp(3.5rem,8vw,7rem)] font-black italic leading-[0.96] tracking-[-0.02em] text-[--color-accent]">
+                    {banner.title}
+                  </span>
+                  <a
+                    href={banner.link ?? '/catalogo'}
+                    className="inline-flex items-center justify-center px-14 py-4 bg-brand-gold text-brand-black font-heading text-sm uppercase tracking-[0.15em] font-bold rounded-lg transition-all duration-300 hover:bg-brand-gold/95 hover:shadow-[0_10px_40px_rgba(204,179,119,0.4)] hover:scale-105 active:scale-100 shadow-[0_4px_20px_rgba(204,179,119,0.25)] border border-brand-gold/20"
+                  >
+                    {banner.buttonText ?? 'Ver Catálogo'}
+                  </a>
                 </div>
-              </a>
+              </div>
             </div>
           ))}
         </div>

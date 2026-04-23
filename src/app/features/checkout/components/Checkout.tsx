@@ -18,6 +18,16 @@ function CheckoutContent() {
           subtotal={checkoutData.subtotal}
           deliveryCost={checkoutData.deliveryCost}
           total={checkoutData.total}
+          payphoneSurcharge={checkoutData.payphoneSurcharge}
+          couponCode={checkoutData.couponCode}
+          couponDiscount={checkoutData.couponDiscount}
+          couponFreeShipping={checkoutData.couponFreeShipping}
+          couponApplied={checkoutData.couponApplied}
+          couponLoading={checkoutData.couponLoading}
+          couponMessage={checkoutData.couponMessage}
+          onCouponCodeChange={checkoutData.setCouponCode}
+          onApplyCoupon={checkoutData.handleApplyCoupon}
+          onRemoveCoupon={checkoutData.handleRemoveCoupon}
         />
       </div>
     </div>

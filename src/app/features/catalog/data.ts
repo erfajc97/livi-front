@@ -1,14 +1,6 @@
-import type { ProductType } from '@/app/types/global.types';
-
-export const CATALOG_CATEGORIES: { value: ProductType | ''; label: string }[] = [
-  { value: 'SELLADO',   label: 'Nicho' },
-  { value: 'DECANT',    label: 'Diseñador' },
-  { value: 'NONDECANT', label: 'Árabes' },
-];
-
 export const CATALOG_GENDERS = [
-  { value: 'HOMBRES', label: 'Hombre' },
-  { value: 'MUJERES', label: 'Mujer' },
+  { value: 'HOMBRE', label: 'Hombre' },
+  { value: 'MUJER', label: 'Mujer' },
   { value: 'UNISEX',  label: 'Unisex' },
 ];
 

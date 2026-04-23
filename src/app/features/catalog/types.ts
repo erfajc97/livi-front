@@ -1,10 +1,18 @@
-import type { ProductType, ProductQueryParams } from '@/app/types/global.types';
+import type { ProductQueryParams, Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
 
 export interface CatalogFilters {
   search: string;
-  type: ProductType | '';
-  brand: string;
   inStock: boolean;
+  bajoPedido?: boolean;
+  categoryId?: number;
+  marcaId?: number;
+  gender: Gender | '';
+  timeOfDay: TimeOfDay | '';
+  concentration: Concentration | '';
+  projection: Projection | '';
+  hasDiscount: boolean;
+  minPrice?: number;
+  maxPrice?: number;
   page: number;
   sortBy: ProductQueryParams['sortBy'];
   order: 'asc' | 'desc';

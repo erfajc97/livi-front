@@ -1,11 +1,15 @@
 import type { PaymentMethod, DeliveryMethod, DeliveryOption } from '@/app/types/global.types';
 
 export interface CustomerFormData {
-  name:    string;
-  email:   string;
-  phone:   string;
-  city:    string;
-  address: string;
+  name:      string;
+  lastName:  string;
+  email:     string;
+  cedula:    string;
+  reference: string;
+  phone:     string;
+  province:  string;
+  city:      string;
+  address:   string;
 }
 
 export interface CheckoutFormData {

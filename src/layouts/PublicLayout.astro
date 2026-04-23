@@ -3,6 +3,7 @@ import BaseLayout from './BaseLayout.astro';
 import AnnouncementBar from '@/app/features/landing/components/layout/AnnouncementBar.astro';
 import Navbar from '@/app/features/landing/components/layout/Navbar';
 import Footer from '@/app/features/landing/components/layout/Footer.astro';
+import NewsletterSection from '@/app/features/landing/components/sections-home/NewsletterSection';
 
 interface Props {
   title?: string;
@@ -18,5 +19,6 @@ const { title, description } = Astro.props;
   <main>
     <slot />
   </main>
+  <NewsletterSection client:visible />
   <Footer />
 </BaseLayout>

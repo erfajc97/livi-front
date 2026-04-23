@@ -1,10 +1,8 @@
 ---
+export const prerender = false;
+
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import OrderDetail from '@/app/features/order/OrderDetail';
-
-export function getStaticPaths() {
-  return [];
-}
 
 const { id } = Astro.params;
 ---

@@ -17,7 +17,7 @@ export function useProductDetailHook(productId: string) {
       sonnerResponse('Selecciona un tamaño primero.', 'error');
       return;
     }
-    if (selectedVariant.stock < quantity) {
+    if (selectedVariant.availableQuantity < quantity) {
       sonnerResponse('No hay suficiente stock disponible.', 'error');
       return;
     }
@@ -25,8 +25,7 @@ export function useProductDetailHook(productId: string) {
       productId: product.id,
       variantId: selectedVariant.id,
       name:      product.name,
-      brand:     product.brand,
-      image:     product.image,
+      image:     selectedVariant.images?.[0] || product.image,
       ml:        selectedVariant.ml,
       price:     selectedVariant.price,
       quantity,

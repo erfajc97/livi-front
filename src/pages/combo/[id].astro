@@ -1,0 +1,31 @@
+---
+export const prerender = false;
+
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import { fetchComboById } from '@/app/tanstack-queries/combosQuery';
+import ComboDetailIsland from '@/app/features/combos/components/ComboDetailIsland';
+
+const { id } = Astro.params;
+const combo = await fetchComboById(id!);
+
+if (!combo) {
+  return Astro.redirect('/catalogo/combos');
+}
+---
+
+<PublicLayout title={`${combo.name} — Combo — NönDecants`}>
+  <div class="bg-white min-h-screen pt-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-10">
+      {/* Breadcrumb */}
+      <nav class="mb-4 text-sm font-bold text-gray-500 flex items-center gap-2">
+        <a href="/" class="hover:text-black transition-colors">Inicio</a>
+        <span class="text-gray-300">/</span>
+        <a href="/catalogo/combos" class="hover:text-black transition-colors">Combos</a>
+        <span class="text-gray-300">/</span>
+        <span class="text-black">{combo.name}</span>
+      </nav>
+
+      <ComboDetailIsland combo={combo} client:load />
+    </div>
+  </div>
+</PublicLayout>

@@ -1,5 +1,4 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
-import ProductTypeBadge from './ProductTypeBadge';
 import VariantSelector from './VariantSelector';
 import AddToCartButton from './AddToCartButton';
 import type { Product, ProductVariant } from '@/app/types/global.types';
@@ -31,8 +30,9 @@ export default function ProductInfo({
   return (
     <div className="space-y-6">
       <div>
-        <ProductTypeBadge type={product.type} />
-        <p className="mt-3 text-sm text-[--color-text-muted] uppercase tracking-widest">{product.brand}</p>
+        <span className="inline-block px-3 py-1 text-xs font-heading tracking-wider uppercase bg-accent text-bg rounded">
+          {product.totalMl}ml
+        </span>
         <h1 className="mt-1 font-heading text-3xl md:text-4xl text-[--color-text] uppercase leading-tight">
           {product.name}
         </h1>

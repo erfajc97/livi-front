@@ -1,18 +1,15 @@
 ---
-import BlogPostCard from '../BlogPostCard.astro';
-import { BLOG_POSTS } from '../../data';
+import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
+import { blogService } from '@/app/features/blog/services/blogService';
+
+let posts: any[] = [];
+try {
+  posts = await blogService.fetchPublishedPosts();
+} catch (error) {
+  console.error('Error fetching blog posts:', error);
+}
 ---
 
-<section class="bg-white border-t border-gray-200 py-14 px-4">
-  <div class="max-w-7xl mx-auto">
-    <h2 class="font-heading text-xl sm:text-2xl font-black md:text-[28px] text-bg uppercase tracking-wide mb-10">
-      Explora nuestra sección de blog
-    </h2>
-
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-      {BLOG_POSTS.map(post => (
-        <BlogPostCard image={post.image} text={post.text} />
-      ))}
-    </div>
-  </div>
-</section>
+{posts.length > 0 && (
+  <BlogCarousel posts={posts} client:visible />
+)}

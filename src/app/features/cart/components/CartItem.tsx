@@ -8,9 +8,13 @@ interface CartItemProps {
 }
 
 export default function CartItem({ item, onRemove, onQtyChange }: CartItemProps) {
-  const variantLabel = item.ml >= 30
-    ? `${item.ml} ml Botella original`
-    : `${item.ml}ml Decant`;
+  const isCombo = item.comboId != null;
+
+  const variantLabel = isCombo
+    ? `Combo · ${item.comboProducts?.length ?? 0} productos`
+    : item.ml >= 30
+      ? `${item.ml} ml Botella original`
+      : `${item.ml}ml Decant`;
 
   return (
     <div className="flex gap-4 py-5">
@@ -33,7 +37,6 @@ export default function CartItem({ item, onRemove, onQtyChange }: CartItemProps)
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-bold text-black leading-snug line-clamp-2">{item.name}</p>
-          {/* Delete */}
           <button
             onClick={() => onRemove(item.variantId)}
             className="p-1 text-gray-300 hover:text-red-500 transition-colors shrink-0"
@@ -51,17 +54,33 @@ export default function CartItem({ item, onRemove, onQtyChange }: CartItemProps)
           {variantLabel}
         </span>
 
-        {/* Price */}
-        <p className="text-sm font-bold text-black mt-2">
-          {formatCurrency(item.price * item.quantity)}
-        </p>
-
-        {/* Qty controls (compact) */}
-        {item.quantity > 1 && (
-          <p className="text-xs text-gray-400 mt-0.5">
-            {item.quantity} × {formatCurrency(item.price)}
+        {/* Price + Qty controls */}
+        <div className="flex items-center justify-between mt-2">
+          {isCombo ? (
+            <span className="text-xs font-bold text-black select-none">Cant: {item.quantity}</span>
+          ) : (
+            <div className="flex items-center gap-0">
+              <button
+                onClick={() => onQtyChange(item.variantId, item.quantity - 1)}
+                className="w-7 h-7 flex items-center justify-center border border-gray-300 text-gray-500 hover:text-black hover:border-black transition-colors rounded-l text-sm"
+              >
+                −
+              </button>
+              <span className="w-8 h-7 flex items-center justify-center border-y border-gray-300 text-xs font-bold text-black select-none">
+                {item.quantity}
+              </span>
+              <button
+                onClick={() => onQtyChange(item.variantId, item.quantity + 1)}
+                className="w-7 h-7 flex items-center justify-center border border-gray-300 text-gray-500 hover:text-black hover:border-black transition-colors rounded-r text-sm"
+              >
+                +
+              </button>
+            </div>
+          )}
+          <p className="text-sm font-bold text-black">
+            {formatCurrency(item.price * item.quantity)}
           </p>
-        )}
+        </div>
       </div>
     </div>
   );

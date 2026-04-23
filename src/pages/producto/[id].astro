@@ -1,22 +1,16 @@
 ---
+export const prerender = false;
+
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/productsQuery';
-import ProductGallery from '@/app/features/product/components/ProductGallery.astro';
-import ProductPurchaseOptions from '@/app/features/product/components/ProductPurchaseOptions';
+import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
 import ProductShippingTimeline from '@/app/features/product/components/ProductShippingTimeline.astro';
 import ProductDescriptionBlock from '@/app/features/product/components/ProductDescriptionBlock.astro';
 import ProductReviewsCarousel from '@/app/features/product/components/ProductReviewsCarousel';
 import ExploreCategoriesCarousel from '@/app/features/product/components/ExploreCategoriesCarousel';
 
-export async function getStaticPaths() {
-  const data = await fetchProducts({ limit: 100 });
-  return data.content.map((product) => ({
-    params: { id: product.id },
-  }));
-}
-
 const { id } = Astro.params;
-const product = await fetchProductById(id);
+const product = await fetchProductById(id!);
 
 if (!product) {
   return Astro.redirect('/404');
@@ -38,17 +32,10 @@ const relatedProducts = allProductsRes.content.filter(p => p.id !== product.id);
         <span class="text-black">{product.name}</span>
       </nav>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mt-6">
-        <div class="max-w-full overflow-hidden">
-          <ProductGallery images={product.images?.length ? product.images : [product.image].filter(Boolean)} name={product.name} />
-        </div>
-        <div>
-          <ProductPurchaseOptions product={product} client:load />
-        </div>
-      </div>
+      <ProductDetailIsland product={product} client:load />
 
       <ProductShippingTimeline />
-      <ProductDescriptionBlock description={product.description} />
+      <ProductDescriptionBlock description={product.description} detailDescription={product.detailDescription} benefits={product.benefits} />
       <ProductReviewsCarousel name={product.name} client:visible />
     </div>
 
