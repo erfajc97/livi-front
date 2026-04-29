@@ -1,1 +1,0 @@
-import{u as e}from"./useQuery.RgeVqo-g.js";import{a as s,A as t}from"./axiosConfig.D6CB3XNz.js";import{a as n}from"./data.CSYsaOFh.js";const o=async()=>{try{const{data:r}=await s.get(`${t.BANNERS}/visible`),a=r?.data??r;return Array.isArray(a)?a:[]}catch{return n}},y=(r=!0)=>e({queryKey:["banners"],queryFn:o,enabled:r,staleTime:1e3*60*10});export{y as u};
