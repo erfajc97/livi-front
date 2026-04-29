@@ -33,13 +33,15 @@ export default function ProductCard({ product }: ProductCardProps) {
   const prices   = variants.map((v) => v.price);
   const minPrice = prices.length > 0 ? Math.min(...prices) : (product.price ?? 0);
   const maxPrice = prices.length > 0 ? Math.max(...prices) : (product.price ?? 0);
-  const hasStock = variants.length > 0
-    ? variants.some((v) => v.availableQuantity > 0)
-    : (product.stock ?? 0) > 0;
+  const sealedStock = product.stock ?? 0;
+  const openMl = product.openBottleMlRemaining ?? 0;
+  const totalMl = product.totalMl ?? 0;
+  const availableMl = openMl + sealedStock * totalMl;
+  const hasFullBottleStock = sealedStock > 0;
+  const hasDecantStock = availableMl > 0;
+  const hasStock = hasFullBottleStock || hasDecantStock;
 
-  const totalStock = variants.length > 0
-    ? variants.reduce((sum, v) => sum + v.availableQuantity, 0)
-    : (product.stock ?? 0);
+  const totalStock = sealedStock;
 
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
@@ -147,7 +149,9 @@ export default function ProductCard({ product }: ProductCardProps) {
               : 'bg-gray-100 text-gray-500'
           }`}
         >
-          {hasStock ? 'VER PRODUCTO' : 'SIN STOCK'}
+          {hasStock
+            ? (hasDecantStock && !hasFullBottleStock ? 'DECANTS DISPONIBLES' : 'VER PRODUCTO')
+            : 'SIN STOCK'}
         </span>
       </div>
     </a>

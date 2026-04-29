@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
+import { useAuthStore } from '@/app/store/auth/authStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
+import AuthModal from '@/app/features/auth/components/AuthModal';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
 type SelectedOption = { type: 'full' } | { type: 'decant'; variant: ProductVariant };
@@ -17,12 +19,24 @@ export default function ProductPurchaseOptions({
   selectedVariant: externalVariant,
   onVariantChange,
 }: ProductPurchaseOptionsProps) {
-  // Default selection: full bottle
-  const [selected, setSelected] = useState<SelectedOption>({ type: 'full' });
+  // Default selection: full bottle if available, else first available decant
+  const [selected, setSelected] = useState<SelectedOption>(() => {
+    const stock = product.stock ?? 0;
+    if (stock > 0) return { type: 'full' };
+    const openMl = product.openBottleMlRemaining ?? 0;
+    const totalAvailMl = openMl + stock * (product.totalMl ?? 0);
+    const firstAvailable = (product.variants ?? [])
+      .filter(v => !v.isFullBottle && v.ml <= totalAvailMl)
+      .sort((a, b) => a.ml - b.ml)[0];
+    if (firstAvailable) return { type: 'decant', variant: firstAvailable };
+    return { type: 'full' };
+  });
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Sync external variant prop
   useEffect(() => {
@@ -66,12 +80,17 @@ export default function ProductPurchaseOptions({
   const hasDiscount = discount > 0;
   const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
 
-  // Stock
-  const inStock = isFullSelected
-    ? fullBottleStock > 0
-    : (selectedDecant?.availableQuantity ?? 0) > 0;
+  // Stock — use available ml to determine what's purchasable
+  const openMl = product.openBottleMlRemaining ?? 0;
+  const availableMl = openMl + fullBottleStock * fullBottleMl;
+  const canBuyFullBottle = fullBottleStock > 0;
+  const canBuyDecant = (ml: number) => availableMl >= ml;
 
-  const totalAvailable = fullBottleStock + decants.reduce((sum, v) => sum + v.availableQuantity, 0);
+  const inStock = isFullSelected
+    ? canBuyFullBottle
+    : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
+
+  const hasAnyStock = canBuyFullBottle || availableMl > 0;
 
   const getCartItem = () => {
     if (isFullSelected) {
@@ -110,6 +129,7 @@ export default function ProductPurchaseOptions({
   };
 
   const handleFastPurchase = () => {
+    if (!isAuthenticated) { setShowAuth(true); return; }
     if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
@@ -153,8 +173,8 @@ export default function ProductPurchaseOptions({
           </div>
           <span className="text-sm text-gray-500">4.5 (212)</span>
           <span className="text-sm text-gray-500">·</span>
-          <span className={`text-sm font-bold ${totalAvailable > 0 ? 'text-success' : 'text-error'}`}>
-            {totalAvailable > 0 ? 'En stock' : 'Agotado'}
+          <span className={`text-sm font-bold ${hasAnyStock ? 'text-success' : 'text-error'}`}>
+            {hasAnyStock ? 'En stock' : 'Agotado'}
           </span>
         </div>
       </div>
@@ -191,14 +211,17 @@ export default function ProductPurchaseOptions({
         <div>
           <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Botella Completa</p>
           <button
-            onClick={handleSelectFull}
+            onClick={canBuyFullBottle ? handleSelectFull : undefined}
+            disabled={!canBuyFullBottle}
             className={`w-full py-2.5 px-4 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${
-              isFullSelected
-                ? 'bg-black text-white border-black'
-                : 'bg-white text-black border-gray-200 hover:border-black'
+              !canBuyFullBottle
+                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+                : isFullSelected
+                  ? 'bg-black text-white border-black'
+                  : 'bg-white text-black border-gray-200 hover:border-black'
             }`}
           >
-            <span>{fullBottleMl}ml — Sellada</span>
+            <span>{fullBottleMl}ml — {canBuyFullBottle ? 'Sellada' : 'Agotada'}</span>
             <span className={isFullSelected ? 'text-gray-300' : 'text-gray-500'}>
               {formatCurrency(fullBottlePrice)}
             </span>
@@ -211,22 +234,28 @@ export default function ProductPurchaseOptions({
         <div>
           <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Decants</p>
           <div className="grid grid-cols-3 gap-1.5">
-            {decants.map(v => (
-              <button
-                key={v.id}
-                onClick={() => handleSelectDecant(v)}
-                className={`py-2 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
-                  selectedDecant?.id === v.id
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-gray-200 hover:border-black'
-                }`}
-              >
-                <span>{v.ml}ml</span>
-                <span className={selectedDecant?.id === v.id ? 'text-gray-300' : 'text-gray-500'}>
-                  {formatCurrency(v.price)}
-                </span>
-              </button>
-            ))}
+            {decants.map(v => {
+              const available = canBuyDecant(v.ml);
+              return (
+                <button
+                  key={v.id}
+                  onClick={available ? () => handleSelectDecant(v) : undefined}
+                  disabled={!available}
+                  className={`py-2 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
+                    !available
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
+                      : selectedDecant?.id === v.id
+                        ? 'bg-black text-white border-black'
+                        : 'bg-white text-black border-gray-200 hover:border-black'
+                  }`}
+                >
+                  <span>{v.ml}ml</span>
+                  <span className={selectedDecant?.id === v.id ? 'text-gray-300' : 'text-gray-500'}>
+                    {formatCurrency(v.price)}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
@@ -290,6 +319,8 @@ export default function ProductPurchaseOptions({
           <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-xs">AMEX</span></div>
         </div>
       </div>
+
+      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }

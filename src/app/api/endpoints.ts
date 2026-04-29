@@ -80,6 +80,9 @@ export const API_ENDPOINTS = {
   COMBOS:                     '/combos',               // GET all (admin)
   COMBOS_ACTIVE:              '/combos/active',         // GET active (public)
 
+  // ── Newsletter ────────────────────────────────────
+  NEWSLETTER_SUBSCRIBE:         '/newsletter/subscribe', // POST - public
+
   // ── Settings ─────────────────────────────────────
   SETTINGS:                     '/settings',             // GET all (public), PUT /:key (admin)
 

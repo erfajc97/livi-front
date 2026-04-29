@@ -14,6 +14,20 @@ export default function ComboCard({ combo }: ComboCardProps) {
   const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
   const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
 
+  // Check stock for all products in combo
+  const comboInStock = products.every((cp) => {
+    const prod = cp.product;
+    if (!prod) return false;
+    const sealedStock = prod.stock ?? 0;
+    const openMl = Number(prod.openBottleMlRemaining ?? 0);
+    const totalMl = Number(prod.totalMl ?? 0);
+    const availableMl = openMl + sealedStock * totalMl;
+    if (cp.productVariation) {
+      return availableMl >= Number(cp.productVariation.mlSize ?? 0) * cp.quantity;
+    }
+    return sealedStock >= cp.quantity;
+  });
+
   return (
     <a href={`/combo/${combo.id}`} className="group relative flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
       {/* Discount badge */}
@@ -94,8 +108,12 @@ export default function ComboCard({ combo }: ComboCardProps) {
 
       {/* CTA */}
       <div className="px-4 pb-4 mt-auto">
-        <span className="flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full bg-black text-white group-hover:bg-neutral-800">
-          Ver Combo
+        <span className={`flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full ${
+          comboInStock
+            ? 'bg-black text-white group-hover:bg-neutral-800'
+            : 'bg-gray-100 text-gray-500'
+        }`}>
+          {comboInStock ? 'Ver Combo' : 'Agotado'}
         </span>
       </div>
     </a>

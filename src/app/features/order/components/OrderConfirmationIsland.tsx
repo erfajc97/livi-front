@@ -147,52 +147,15 @@ function OrderConfirmationContent() {
         </p>
       ) : null}
 
-      {/* Transfer: upload receipt */}
+      {/* Transfer: receipt already uploaded during checkout */}
       {isTransfer && (
-        <div className="w-full max-w-md text-left">
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
-            <p className="text-sm font-bold text-amber-800 mb-1">Transferencia pendiente</p>
-            <p className="text-xs text-amber-700">
-              Realiza la transferencia y sube tu comprobante aquí. Tu orden será procesada una vez confirmado el pago.
-            </p>
+        <div className="w-full max-w-md">
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+            <p className="text-sm font-bold text-green-800">Comprobante enviado. Te notificaremos cuando confirmemos tu pago.</p>
           </div>
-
-          {receiptUploaded ? (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
-              </svg>
-              <p className="text-sm font-bold text-green-800">Comprobante subido. Te notificaremos cuando confirmemos tu pago.</p>
-            </div>
-          ) : (
-            <div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleUploadReceipt(f);
-                }}
-              />
-              <button
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="w-full border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center gap-2 hover:border-black transition-colors disabled:opacity-50"
-              >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-text-muted">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="17 8 12 3 7 8" />
-                  <line x1="12" y1="3" x2="12" y2="15" />
-                </svg>
-                <span className="text-sm font-medium text-text-muted">
-                  {uploading ? 'Subiendo...' : 'Subir comprobante de transferencia'}
-                </span>
-                <span className="text-xs text-text-muted">JPG, PNG o PDF</span>
-              </button>
-            </div>
-          )}
         </div>
       )}
 

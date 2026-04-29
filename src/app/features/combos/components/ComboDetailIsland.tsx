@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
+import { useAuthStore } from '@/app/store/auth/authStore';
+import AuthModal from '@/app/features/auth/components/AuthModal';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboDetailIslandProps {
@@ -11,12 +14,31 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const addItem = useCartStore((s) => s.addItem);
   const clearCart = useCartStore((s) => s.clearCart);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [showAuth, setShowAuth] = useState(false);
 
   const products = combo.comboProducts ?? [];
   const discount = combo.discount ?? 0;
   const hasDiscount = discount > 0;
   const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
   const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
+
+  // Check if all products in the combo have enough stock
+  const comboInStock = products.every((cp) => {
+    const prod = cp.product;
+    if (!prod) return false;
+    const sealedStock = prod.stock ?? 0;
+    const openMl = Number(prod.openBottleMlRemaining ?? 0);
+    const totalMl = Number(prod.totalMl ?? 0);
+    const availableMl = openMl + sealedStock * totalMl;
+
+    if (cp.productVariation) {
+      // Decant — check if enough ml
+      return availableMl >= Number(cp.productVariation.mlSize ?? 0) * cp.quantity;
+    }
+    // Full bottle — need sealed stock
+    return sealedStock >= cp.quantity;
+  });
 
   // Sum of individual product prices
   const originalSum = products.reduce((sum, cp) => {
@@ -27,6 +49,10 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const savings = originalSum > actualPrice ? originalSum - actualPrice : 0;
 
   const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      setShowAuth(true);
+      return;
+    }
     clearCart();
 
     // Build the list of individual products for backend order submission
@@ -143,11 +169,22 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
         {/* Action buttons */}
         <button
-          onClick={handleBuyNow}
-          className="w-full bg-accent text-white py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors"
+          onClick={comboInStock ? handleBuyNow : undefined}
+          disabled={!comboInStock}
+          className={`w-full py-3.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-colors ${
+            comboInStock
+              ? 'bg-accent text-white hover:bg-accent-hover'
+              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+          }`}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-          Comprar combo — {formatCurrency(actualPrice)}
+          {comboInStock ? (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+              Comprar combo — {formatCurrency(actualPrice)}
+            </>
+          ) : (
+            'Combo agotado'
+          )}
         </button>
         <button
           onClick={handleWhatsapp}
@@ -176,6 +213,8 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           </div>
         </div>
       </div>
+
+      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }

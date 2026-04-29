@@ -1,14 +1,36 @@
 import { useState } from 'react';
 import LogoIconSvg from '@/assets/LogoIconSvg';
+import axiosInstance from '@/app/config/axiosConfig';
+import { API_ENDPOINTS } from '@/app/api/endpoints';
+import { toast } from 'sonner';
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setSubmitted(true);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Por favor ingresa un correo electrónico válido.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await axiosInstance.post(API_ENDPOINTS.NEWSLETTER_SUBSCRIBE, { email });
+      setSubmitted(true);
+      toast.success('¡Te has suscrito exitosamente!');
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || 'Error al suscribirse. Intenta de nuevo.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,13 +69,15 @@ export default function NewsletterSection() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Tu correo electrónico"
                   required
+                  disabled={loading}
                   className="flex-1 w-full px-6 py-4 bg-white text-bg placeholder:text-text-muted text-base md:text-lg focus:outline-none rounded-md"
                 />
                 <button
                   type="submit"
-                  className="px-8 py-4 bg-black text-white font-heading text-sm md:text-base uppercase tracking-widest hover:bg-black/80 transition-colors shrink-0 whitespace-nowrap rounded-md"
+                  disabled={loading}
+                  className="px-8 py-4 bg-black text-white font-heading text-sm md:text-base uppercase tracking-widest hover:bg-black/80 transition-colors shrink-0 whitespace-nowrap rounded-md disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Suscribirme a NonDecants
+                  {loading ? 'Enviando...' : 'Suscribirme a NonDecants'}
                 </button>
               </form>
             )}
