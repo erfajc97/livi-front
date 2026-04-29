@@ -58,7 +58,7 @@ interface CouponResult {
 }
 
 export function useCheckoutHook() {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [customer, setCustomer] = useState<CustomerFormData>(buildInitialCustomer);
   const savedPrefs = loadPrefs();
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(getInitialDeliveryMethod(savedPrefs));
@@ -216,14 +216,22 @@ export function useCheckoutHook() {
       // Expand combo items into individual products for the backend
       const orderItems = items.flatMap((item) => {
         if (item.comboProducts && item.comboProducts.length > 0) {
-          return item.comboProducts.map((cp: any) => {
+          // Distribute combo price proportionally across items
+          const comboPrice = item.price; // This is the combo's actual price (finalPrice - discount)
+          const numProducts = item.comboProducts.length;
+          const pricePerItem = Math.round((comboPrice / numProducts) * 100) / 100;
+          // Last item gets the remainder to avoid rounding errors
+          const lastItemPrice = Math.round((comboPrice - pricePerItem * (numProducts - 1)) * 100) / 100;
+
+          return item.comboProducts.map((cp: any, idx: number) => {
+            const override = idx === numProducts - 1 ? lastItemPrice : pricePerItem;
             if (cp.productVariationId) {
-              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity };
+              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity, priceOverride: override };
             }
             if (cp.productId) {
-              return { productId: cp.productId, quantity: cp.quantity * item.quantity };
+              return { productId: cp.productId, quantity: cp.quantity * item.quantity, priceOverride: override };
             }
-            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity };
+            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity, priceOverride: override };
           });
         }
         // Regular item
@@ -278,6 +286,95 @@ export function useCheckoutHook() {
     }
   };
 
+  const handleTransferSubmit = async (receiptFile: File) => {
+    setIsPending(true);
+    try {
+      // Save profile in background
+      const isAuth = useAuthStore.getState().isAuthenticated;
+      if (isAuth) {
+        axiosInstance.patch(API_ENDPOINTS.USER_ME, {
+          firstName: customer.name,
+          lastName: customer.lastName,
+          phone: customer.phone,
+          cedula: customer.cedula,
+          province: customer.province,
+          city: customer.city,
+          address: customer.address,
+          reference: customer.reference,
+          preferredDeliveryMethod: deliveryMethod,
+        }).catch(() => {});
+      }
+
+      // Build order items (same logic as handleSubmit)
+      const orderItems = items.flatMap((item) => {
+        if (item.comboProducts && item.comboProducts.length > 0) {
+          const comboPrice = item.price;
+          const numProducts = item.comboProducts.length;
+          const pricePerItem = Math.round((comboPrice / numProducts) * 100) / 100;
+          const lastItemPrice = Math.round((comboPrice - pricePerItem * (numProducts - 1)) * 100) / 100;
+
+          return item.comboProducts.map((cp: any, idx: number) => {
+            const override = idx === numProducts - 1 ? lastItemPrice : pricePerItem;
+            if (cp.productVariationId) {
+              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity, priceOverride: override };
+            }
+            if (cp.productId) {
+              return { productId: cp.productId, quantity: cp.quantity * item.quantity, priceOverride: override };
+            }
+            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity, priceOverride: override };
+          });
+        }
+        const isFullBottle = item.variantId.startsWith('full-');
+        if (isFullBottle) {
+          return { productId: parseInt(item.productId, 10), quantity: item.quantity };
+        }
+        return { productVariationId: parseInt(item.variantId, 10), quantity: item.quantity };
+      });
+
+      const payload = {
+        items: orderItems,
+        paymentMethod: 'TRANSFERENCIA',
+        customerName: `${customer.name} ${customer.lastName}`.trim(),
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+        shippingCity: customer.city,
+        shippingAddress: customer.address,
+        deliveryMethod,
+        deliveryCost,
+        couponCode: couponApplied ? couponCode : undefined,
+        couponDiscount: couponApplied ? couponDiscount : undefined,
+        notes: [
+          customer.cedula && `Cédula: ${customer.cedula}`,
+          customer.reference && `Ref: ${customer.reference}`,
+          customer.province && `Provincia: ${customer.province}`,
+        ].filter(Boolean).join(' | ') || undefined,
+      };
+
+      // 1. Create the order
+      const { data } = await axiosInstance.post(API_ENDPOINTS.CREATE_TRANSACTION, payload);
+      const result = data?.data ?? data;
+      const orderId = result.order?.id;
+
+      // 2. Upload receipt immediately
+      if (orderId && receiptFile) {
+        const fd = new FormData();
+        fd.append('receipt', receiptFile);
+        await axiosInstance.post(`/payments/${orderId}/upload-receipt`, fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      }
+
+      clearCart();
+      sonnerResponse('¡Orden creada con comprobante!', 'success');
+      window.location.href = `/orden/confirmacion?orderId=${orderId}&method=TRANSFERENCIA`;
+    } catch (error: any) {
+      const msg = error.response?.data?.message || error.message || 'Error al crear la orden';
+      sonnerResponse(typeof msg === 'string' ? msg : JSON.stringify(msg), 'error');
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return {
     step,
     setStep,
@@ -307,5 +404,6 @@ export function useCheckoutHook() {
     setPaymentMethod,
     handleNextStep,
     handleSubmit,
+    handleTransferSubmit,
   };
 }
