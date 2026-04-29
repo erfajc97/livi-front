@@ -20,9 +20,14 @@ export interface BlogPost {
 
 export const blogService = {
   async fetchPublishedPosts(): Promise<BlogPost[]> {
-    const { data } = await axios.get(`${API_BASE_URL}${API_ENDPOINTS.BLOG_PUBLISHED}`)
-    // Backend wrapper: { statusCode, data: [...] }
-    return Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
+    try {
+      const { data } = await axios.get(`${API_BASE_URL}${API_ENDPOINTS.BLOG_PUBLISHED}`)
+      // Backend wrapper: { statusCode, data: [...] }
+      return Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : []
+    } catch {
+      // Prerender/build (e.g. Docker) often has no API; empty list shows the blog fallback UI.
+      return []
+    }
   },
 
   async fetchPostBySlug(slug: string): Promise<BlogPost> {
