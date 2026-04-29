@@ -1,10 +1,10 @@
 import type { CustomerFormData } from '../types';
 
 const INPUT_CLASS =
-  'w-full bg-transparent border-0 border-b border-border px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
+  'w-full bg-transparent border-0 border-b border-gray-300 px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
 
 const SELECT_CLASS =
-  'w-full bg-transparent border-0 border-b border-border px-0 py-2 text-sm text-text-muted focus:ring-0 focus:border-black transition-colors cursor-pointer';
+  'w-full bg-transparent border-0 border-b border-gray-300 px-0 py-2 text-sm text-gray-500 focus:ring-0 focus:border-black transition-colors cursor-pointer';
 
 interface AddressSectionProps {
   customer: CustomerFormData;

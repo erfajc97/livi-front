@@ -1,7 +1,7 @@
 import type { CustomerFormData } from '../types';
 
 const INPUT_CLASS =
-  'w-full bg-transparent border-0 border-b border-border px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
+  'w-full bg-transparent border-0 border-b border-gray-300 px-0 py-2 text-sm text-black focus:ring-0 focus:border-black transition-colors';
 
 interface ContactSectionProps {
   customer: CustomerFormData;

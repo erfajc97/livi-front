@@ -216,15 +216,22 @@ export function useCheckoutHook() {
       // Expand combo items into individual products for the backend
       const orderItems = items.flatMap((item) => {
         if (item.comboProducts && item.comboProducts.length > 0) {
-          return item.comboProducts.map((cp) => ({
-            productVariationId: cp.productVariationId,
-            quantity: cp.quantity * item.quantity,
-          }));
+          return item.comboProducts.map((cp: any) => {
+            if (cp.productVariationId) {
+              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity };
+            }
+            if (cp.productId) {
+              return { productId: cp.productId, quantity: cp.quantity * item.quantity };
+            }
+            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity };
+          });
         }
-        return {
-          productVariationId: parseInt(item.variantId, 10),
-          quantity: item.quantity,
-        };
+        // Regular item
+        const isFullBottle = item.variantId.startsWith('full-');
+        if (isFullBottle) {
+          return { productId: parseInt(item.productId, 10), quantity: item.quantity };
+        }
+        return { productVariationId: parseInt(item.variantId, 10), quantity: item.quantity };
       });
 
       const payload = {

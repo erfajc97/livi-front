@@ -11,7 +11,7 @@ export default function ProductImages({ images, name }: ProductImagesProps) {
 
   if (list.length === 0) {
     return (
-      <div className="aspect-square bg-[--color-surface] flex items-center justify-center text-[--color-text-muted]" style={{ borderRadius: 'var(--radius-md)' }}>
+      <div className="aspect-square bg-gray-100 flex items-center justify-center text-gray-400" style={{ borderRadius: 'var(--radius-md)' }}>
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
           <rect x="3" y="3" width="18" height="18" rx="2"/>
           <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -31,7 +31,7 @@ export default function ProductImages({ images, name }: ProductImagesProps) {
               key={i}
               onClick={() => setActive(i)}
               className={`w-14 h-18 shrink-0 overflow-hidden border transition-colors ${
-                active === i ? 'border-[--color-accent]' : 'border-[--color-border] opacity-60 hover:opacity-100'
+                active === i ? 'border-[--color-accent]' : 'border-gray-200 opacity-60 hover:opacity-100'
               }`}
               style={{ borderRadius: 'var(--radius-sm)', height: '72px' }}
             >
@@ -43,7 +43,7 @@ export default function ProductImages({ images, name }: ProductImagesProps) {
 
       {/* Main image — portrait */}
       <div
-        className="flex-1 aspect-3/4 overflow-hidden bg-[--color-surface]"
+        className="flex-1 aspect-3/4 overflow-hidden bg-gray-100"
         style={{ borderRadius: 'var(--radius-sm)' }}
       >
         <img

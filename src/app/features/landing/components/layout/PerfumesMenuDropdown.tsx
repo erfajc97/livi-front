@@ -17,7 +17,7 @@ export default function PerfumesMenuDropdown({
   onMouseEnter,
   onMouseLeave,
 }: PerfumesMenuDropdownProps) {
-  const { data: categories = [] } = useNormalCategoriesQuery();
+  const { data: categories = [], isLoading } = useNormalCategoriesQuery();
 
   return (
     <div
@@ -39,8 +39,10 @@ export default function PerfumesMenuDropdown({
 
         {/* Categories list */}
         <div className="flex flex-col pb-6 px-4">
-          {categories.length === 0 ? (
+          {isLoading ? (
             <p className="text-center text-base text-white/50 py-4">Cargando...</p>
+          ) : categories.length === 0 ? (
+            <p className="text-center text-base text-white/50 py-4">No hay categorías disponibles</p>
           ) : (
             <>
               {/* "All" category — always first, clickable link */}

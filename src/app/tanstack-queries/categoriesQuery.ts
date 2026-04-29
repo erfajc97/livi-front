@@ -57,8 +57,8 @@ export const useCategoriesQuery = (bajoPedido?: boolean) =>
 /** All categories (no filter) — used by CatalogBanner */
 export const useCategoriesWithMarcasQuery = () => useCategoriesQuery()
 
-/** Only normal categories (bajoPedido=false) — Perfumes dropdown */
-export const useNormalCategoriesQuery = () => useCategoriesQuery(false)
+/** All active categories — Perfumes dropdown (isActive categories appear here regardless of bajoPedido) */
+export const useNormalCategoriesQuery = () => useCategoriesQuery()
 
 /** Only bajo pedido categories (bajoPedido=true) — Bajo Pedido dropdown */
 export const useBajoPedidoCategoriesQuery = () => useCategoriesQuery(true)

@@ -17,7 +17,7 @@ function ProductGallery({
 
   if (!src) {
     return (
-      <div className="aspect-square bg-surface-raised flex items-center justify-center text-text-muted rounded-xl">
+      <div className="aspect-square bg-gray-100 flex items-center justify-center text-gray-400 rounded-xl">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
@@ -28,7 +28,7 @@ function ProductGallery({
   }
 
   return (
-    <div className="overflow-hidden bg-surface-raised rounded-2xl flex items-center justify-center aspect-square">
+    <div className="overflow-hidden bg-gray-100 rounded-2xl flex items-center justify-center aspect-square">
       <img
         src={src}
         alt={name}
@@ -38,14 +38,9 @@ function ProductGallery({
   );
 }
 
-function getDefaultVariant(product: Product): ProductVariant | null {
-  const variants = product.variants ?? [];
-  // Prefer first full bottle, then first decant
-  return variants.find(v => v.isFullBottle) ?? variants[0] ?? null;
-}
-
 export default function ProductDetailIsland({ product }: ProductDetailIslandProps) {
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(() => getDefaultVariant(product));
+  // Default: null = full bottle (product itself), not a variant
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
   // When a variant is selected and has images, show those; otherwise show product images
   const galleryImages = useMemo(() => {

@@ -49,10 +49,10 @@ export default function PaymentSection({ selected, onSelect }: PaymentSectionPro
         <label
           key={m.key}
           onClick={() => onSelect(m.key)}
-          className={`flex items-center justify-between cursor-pointer border rounded-xl px-5 py-4 transition-colors ${selected === m.key ? 'border-black bg-surface-raised' : 'border-border hover:border-black'}`}
+          className={`flex items-center justify-between cursor-pointer border rounded-xl px-5 py-4 transition-colors ${selected === m.key ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-black'}`}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selected === m.key ? 'border-black' : 'border-border'}`}>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selected === m.key ? 'border-black' : 'border-gray-300'}`}>
               {selected === m.key && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
             </div>
             {m.icon}

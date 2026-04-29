@@ -27,10 +27,19 @@ function OrderConfirmationContent() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const paymentId = params.get('id');
+    // PayPhone may send 'id' or 'paymentId'
+    const paymentId = params.get('id') || params.get('paymentId');
     const clientTransactionId = params.get('clientTransactionId');
     const orderId = params.get('orderId');
     const method = params.get('method');
+
+    console.log('[OrderConfirmation] URL params:', {
+      paymentId,
+      clientTransactionId,
+      orderId,
+      method,
+      fullSearch: window.location.search,
+    });
 
     if (method === 'TRANSFERENCIA' && orderId) {
       setStatus('transfer');
@@ -42,7 +51,9 @@ function OrderConfirmationContent() {
       verifyPayment(paymentId, clientTransactionId);
     } else {
       setStatus('failed');
-      setError('No se encontraron datos de pago.');
+      setError(
+        `No se encontraron datos de pago. Parámetros recibidos: ${window.location.search || '(ninguno)'}`,
+      );
     }
   }, []);
 

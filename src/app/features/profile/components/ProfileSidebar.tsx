@@ -35,7 +35,7 @@ export default function ProfileSidebar({ activeTab, onTabChange }: ProfileSideba
               'flex items-center gap-2.5 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-colors',
               isActive
                 ? 'bg-accent text-white'
-                : 'text-text-muted hover:bg-surface-raised',
+                : 'text-gray-600 hover:bg-gray-100',
             ].join(' ')}
           >
             {TAB_ICONS[tab.id]}

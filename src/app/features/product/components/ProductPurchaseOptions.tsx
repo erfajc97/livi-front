@@ -4,6 +4,8 @@ import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
+type SelectedOption = { type: 'full' } | { type: 'decant'; variant: ProductVariant };
+
 interface ProductPurchaseOptionsProps {
   product: Product;
   selectedVariant?: ProductVariant | null;
@@ -15,115 +17,114 @@ export default function ProductPurchaseOptions({
   selectedVariant: externalVariant,
   onVariantChange,
 }: ProductPurchaseOptionsProps) {
-  const [internalVariant, setInternalVariant] = useState<ProductVariant | null>(null);
-  const selectedVariant = externalVariant !== undefined ? externalVariant : internalVariant;
-  const setSelectedVariant = onVariantChange ?? setInternalVariant;
+  // Default selection: full bottle
+  const [selected, setSelected] = useState<SelectedOption>({ type: 'full' });
   const [hasHydrated, setHasHydrated] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
-  // Esperar a que Zustand se hidrate desde localStorage
+  // Sync external variant prop
   useEffect(() => {
-    const unsub = useCartStore.subscribe(
-      (state: any) => {
-        if (state._hasHydrated) {
-          setHasHydrated(true);
-        }
-      }
-    );
-
-    // Check immediate state
-    if (useCartStore.getState()._hasHydrated) {
-      setHasHydrated(true);
+    if (externalVariant === null) {
+      setSelected({ type: 'full' });
     }
+  }, [externalVariant]);
 
+  // Notify parent when selection changes (for gallery image switching)
+  const handleSelectFull = () => {
+    setSelected({ type: 'full' });
+    onVariantChange?.(null);
+  };
+
+  const handleSelectDecant = (v: ProductVariant) => {
+    setSelected({ type: 'decant', variant: v });
+    onVariantChange?.(v);
+  };
+
+  useEffect(() => {
+    const unsub = useCartStore.subscribe((state: any) => {
+      if (state._hasHydrated) setHasHydrated(true);
+    });
+    if (useCartStore.getState()._hasHydrated) setHasHydrated(true);
     return unsub;
   }, []);
 
+  const fullBottlePrice = product.price ?? 0;
+  const fullBottleStock = product.stock ?? 0;
+  const fullBottleMl = product.totalMl ?? 0;
+
+  const variants = product.variants ?? [];
+  const decants = variants.filter(v => !v.isFullBottle);
+
+  const isFullSelected = selected.type === 'full';
+  const selectedDecant = selected.type === 'decant' ? selected.variant : null;
+
+  // Price display
+  const currentPrice = isFullSelected ? fullBottlePrice : (selectedDecant?.price ?? 0);
+  const discount = product.discount ?? 0;
+  const hasDiscount = discount > 0;
+  const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
+
+  // Stock
+  const inStock = isFullSelected
+    ? fullBottleStock > 0
+    : (selectedDecant?.availableQuantity ?? 0) > 0;
+
+  const totalAvailable = fullBottleStock + decants.reduce((sum, v) => sum + v.availableQuantity, 0);
+
+  const getCartItem = () => {
+    if (isFullSelected) {
+      return {
+        productId: product.id,
+        variantId: `full-${product.id}`,
+        name: product.name,
+        image: product.image || product.images?.[0],
+        ml: fullBottleMl,
+        price: hasDiscount ? discountedPrice : fullBottlePrice,
+        quantity: 1,
+      };
+    }
+    if (selectedDecant) {
+      return {
+        productId: product.id,
+        variantId: selectedDecant.id,
+        name: product.name,
+        image: selectedDecant.images?.[0] || product.image,
+        ml: selectedDecant.ml,
+        price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
+        quantity: 1,
+      };
+    }
+    return null;
+  };
+
   const handleAddToCart = () => {
-    if (!hasHydrated) {
-      sonnerResponse('Cargando carrito...', 'error');
-      return;
-    }
-    if (!selectedVariant) {
-      sonnerResponse('Selecciona un tamaño primero.', 'error');
-      return;
-    }
-    if (selectedVariant.availableQuantity < 1) {
-      sonnerResponse('No hay suficiente stock disponible.', 'error');
-      return;
-    }
-    addItem({
-      productId: product.id,
-      variantId: selectedVariant.id,
-      name:      product.name,
-      image:     selectedVariant.images?.[0] || product.image,
-      ml:        selectedVariant.ml,
-      price:     selectedVariant.price,
-      quantity:  1,
-    });
+    if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
+    const item = getCartItem();
+    if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
+    if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
+    addItem(item);
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
     setDrawerOpen(true);
   };
 
   const handleFastPurchase = () => {
-    if (!hasHydrated) {
-      sonnerResponse('Cargando carrito...', 'error');
-      return;
-    }
-    if (!selectedVariant) {
-      sonnerResponse('Selecciona un tamaño primero.', 'error');
-      return;
-    }
-    if (selectedVariant.availableQuantity < 1) {
-      sonnerResponse('No hay suficiente stock disponible.', 'error');
-      return;
-    }
-    addItem({
-      productId: product.id,
-      variantId: selectedVariant.id,
-      name:      product.name,
-      image:     selectedVariant.images?.[0] || product.image,
-      ml:        selectedVariant.ml,
-      price:     selectedVariant.price,
-      quantity:  1,
-    });
+    if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
+    const item = getCartItem();
+    if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
+    if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
+    addItem(item);
     window.location.href = '/checkout';
   };
 
   const handleWhatsapp = () => {
-    if (!selectedVariant) {
-      sonnerResponse('Selecciona un tamaño primero.', 'error');
-      return;
-    }
-    const msg = `Hola, quiero comprar el perfume ${product.name} de ${selectedVariant.ml}ml por ${formatCurrency(selectedVariant.price)}.`;
+    const ml = isFullSelected ? fullBottleMl : selectedDecant?.ml;
+    const price = isFullSelected ? fullBottlePrice : selectedDecant?.price;
+    if (!ml || !price) return;
+    const msg = `Hola, quiero comprar el perfume ${product.name} de ${ml}ml por ${formatCurrency(price)}.`;
     window.open(`https://wa.me/593999707768?text=${encodeURIComponent(msg)}`, '_blank');
   };
-
-  const variants = product.variants ?? [];
-  const minPrice = variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
-  const maxPrice = variants.length > 0 ? Math.max(...variants.map((v) => v.price)) : 0;
-  const priceDisplay = selectedVariant
-    ? formatCurrency(selectedVariant.price)
-    : (minPrice === maxPrice ? formatCurrency(minPrice) : `Desde ${formatCurrency(minPrice)}`);
-
-  const fullBottles = variants.filter(v => v.isFullBottle);
-  const decants = variants.filter(v => !v.isFullBottle);
-
-  const totalAvailable = variants.reduce((sum, v) => sum + v.availableQuantity, 0);
-  const inStock = totalAvailable > 0;
-
-  const discount = product.discount ?? 0;
-  const hasDiscount = discount > 0;
-  const originalPriceDisplay = minPrice === maxPrice
-    ? formatCurrency(minPrice)
-    : `Desde ${formatCurrency(minPrice)}`;
-  const discountedMin = hasDiscount ? minPrice * (1 - discount / 100) : minPrice;
-  const discountedMax = hasDiscount ? maxPrice * (1 - discount / 100) : maxPrice;
-  const discountedPriceDisplay = selectedVariant
-    ? formatCurrency(hasDiscount ? selectedVariant.price * (1 - discount / 100) : selectedVariant.price)
-    : (discountedMin === discountedMax ? formatCurrency(discountedMin) : `Desde ${formatCurrency(discountedMin)}`);
 
   const detailTags = [
     product.gender && { label: 'Género', value: product.gender === 'HOMBRE' ? 'Hombre' : product.gender === 'MUJER' ? 'Mujer' : 'Unisex' },
@@ -134,11 +135,11 @@ export default function ProductPurchaseOptions({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Title + Price row */}
+      {/* Title */}
       <div>
         <div className="flex items-start justify-between gap-3">
           <h1 className="font-heading text-2xl sm:text-3xl text-black font-bold leading-none">{product.name}</h1>
-          <button className="shrink-0 text-text-muted hover:text-error transition-colors mt-1">
+          <button className="shrink-0 text-gray-500 hover:text-error transition-colors mt-1">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
@@ -147,85 +148,81 @@ export default function ProductPurchaseOptions({
         <div className="flex items-center gap-2 mt-1">
           <div className="flex gap-0.5 text-xs">
             {[1, 2, 3, 4, 5].map((star) => (
-              <span key={star} className={star <= 4 ? 'text-accent-hover' : 'text-text-muted'}>★</span>
+              <span key={star} className={star <= 4 ? 'text-accent-hover' : 'text-gray-500'}>★</span>
             ))}
           </div>
-          <span className="text-sm text-text-muted">4.5 (212)</span>
-          <span className="text-sm text-text-muted">·</span>
-          <span className={`text-sm font-bold ${inStock ? 'text-success' : 'text-error'}`}>
-            {inStock ? 'En stock' : 'Agotado'}
+          <span className="text-sm text-gray-500">4.5 (212)</span>
+          <span className="text-sm text-gray-500">·</span>
+          <span className={`text-sm font-bold ${totalAvailable > 0 ? 'text-success' : 'text-error'}`}>
+            {totalAvailable > 0 ? 'En stock' : 'Agotado'}
           </span>
         </div>
       </div>
 
       {/* Price */}
       <div className="flex items-baseline gap-2">
-        <p className="font-heading text-xl font-bold text-black">{discountedPriceDisplay}</p>
+        <p className="font-heading text-xl font-bold text-black">{formatCurrency(discountedPrice)}</p>
         {hasDiscount && (
           <>
-            <p className="text-sm text-text-muted line-through">{originalPriceDisplay}</p>
+            <p className="text-sm text-gray-500 line-through">{formatCurrency(currentPrice)}</p>
             <span className="bg-error text-white text-xs font-bold px-1.5 py-px rounded">-{discount}%</span>
           </>
         )}
       </div>
 
-      {/* Description + Tags inline */}
+      {/* Description + Tags */}
       {product.description && (
-        <p className="text-xs text-text-muted leading-relaxed">{product.description}</p>
+        <p className="text-xs text-gray-500 leading-relaxed">{product.description}</p>
       )}
 
       {detailTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {detailTags.map(tag => (
-            <span key={tag.label} className="inline-flex items-center gap-1 bg-surface-raised border border-border rounded px-2 py-1 text-sm">
-              <span className="text-text-muted font-medium">{tag.label}:</span>
+            <span key={tag.label} className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm">
+              <span className="text-gray-500 font-medium">{tag.label}:</span>
               <span className="text-black font-semibold">{tag.value}</span>
             </span>
           ))}
         </div>
       )}
 
-      {/* Variants */}
-      {fullBottles.length > 0 && (
+      {/* Full Bottle — always first, selected by default */}
+      {fullBottlePrice > 0 && (
         <div>
-          <p className="text-sm font-bold text-text-muted uppercase tracking-wide mb-1.5">Botella Completa</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            {fullBottles.map(v => (
-              <button
-                key={v.id}
-                onClick={() => setSelectedVariant(v)}
-                className={`py-2 px-3 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${
-                  selectedVariant?.id === v.id
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-border hover:border-black'
-                }`}
-              >
-                <span>{v.ml}ml</span>
-                <span className={selectedVariant?.id === v.id ? 'text-text-muted' : 'text-text-muted text-xs'}>
-                  {formatCurrency(v.price)}
-                </span>
-              </button>
-            ))}
-          </div>
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Botella Completa</p>
+          <button
+            onClick={handleSelectFull}
+            className={`w-full py-2.5 px-4 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${
+              isFullSelected
+                ? 'bg-black text-white border-black'
+                : 'bg-white text-black border-gray-200 hover:border-black'
+            }`}
+          >
+            <span>{fullBottleMl}ml — Sellada</span>
+            <span className={isFullSelected ? 'text-gray-300' : 'text-gray-500'}>
+              {formatCurrency(fullBottlePrice)}
+            </span>
+          </button>
         </div>
       )}
 
+      {/* Decants */}
       {decants.length > 0 && (
         <div>
-          <p className="text-sm font-bold text-text-muted uppercase tracking-wide mb-1.5">Decants</p>
+          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Decants</p>
           <div className="grid grid-cols-3 gap-1.5">
             {decants.map(v => (
               <button
                 key={v.id}
-                onClick={() => setSelectedVariant(v)}
+                onClick={() => handleSelectDecant(v)}
                 className={`py-2 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
-                  selectedVariant?.id === v.id
+                  selectedDecant?.id === v.id
                     ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-border hover:border-black'
+                    : 'bg-white text-black border-gray-200 hover:border-black'
                 }`}
               >
                 <span>{v.ml}ml</span>
-                <span className={selectedVariant?.id === v.id ? 'text-text-muted' : 'text-text-muted'}>
+                <span className={selectedDecant?.id === v.id ? 'text-gray-300' : 'text-gray-500'}>
                   {formatCurrency(v.price)}
                 </span>
               </button>
@@ -266,31 +263,31 @@ export default function ProductPurchaseOptions({
         </button>
       </div>
 
-      {/* Shipping + Guarantee — single row */}
+      {/* Shipping + Guarantee */}
       <div className="grid grid-cols-2 gap-1.5">
-        <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-success">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
           </svg>
-          <p className="text-xs text-text-muted leading-tight"><span className="font-bold text-black">Garantía</span> · 7 días</p>
+          <p className="text-xs text-gray-500 leading-tight"><span className="font-bold text-black">Garantía</span> · 7 días</p>
         </div>
-        <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-accent-hover">
             <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
             <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
           </svg>
-          <p className="text-xs text-text-muted leading-tight"><span className="font-bold text-black">Envío</span> · desde $3</p>
+          <p className="text-xs text-gray-500 leading-tight"><span className="font-bold text-black">Envío</span> · desde $3</p>
         </div>
       </div>
 
       {/* Payment */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-text-muted font-medium">Pago:</span>
+        <span className="text-xs text-gray-500 font-medium">Pago:</span>
         <div className="flex gap-1">
-          <div className="h-5 border border-border rounded px-1.5 flex items-center bg-orange-500 text-white font-bold text-xs italic">PayPhone</div>
-          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-white"><span className="text-blue-800 font-bold text-xs italic">VISA</span></div>
-          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-white"><span className="text-error font-bold text-xs">MC</span></div>
-          <div className="h-5 w-8 border border-border rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-xs">AMEX</span></div>
+          <div className="h-5 border border-gray-200 rounded px-1.5 flex items-center bg-orange-500 text-white font-bold text-xs italic">PayPhone</div>
+          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-blue-800 font-bold text-xs italic">VISA</span></div>
+          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-error font-bold text-xs">MC</span></div>
+          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-xs">AMEX</span></div>
         </div>
       </div>
     </div>

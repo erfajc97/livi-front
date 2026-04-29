@@ -32,10 +32,11 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
     // Build the list of individual products for backend order submission
     const comboProducts = products.map((cp) => {
       const variant = cp.productVariation;
-      return {
-        productVariationId: variant ? variant.id : cp.productId,
-        quantity: cp.quantity,
-      };
+      if (variant) {
+        return { productVariationId: parseInt(String(variant.id), 10), quantity: cp.quantity };
+      }
+      // Full bottle — no variation, use productId
+      return { productId: parseInt(String(cp.productId), 10), quantity: cp.quantity };
     });
 
     // Add the combo as a single cart item
@@ -63,11 +64,11 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
       {/* Image */}
-      <div className="overflow-hidden bg-surface-raised rounded-2xl flex items-center justify-center aspect-square">
+      <div className="overflow-hidden bg-gray-100 rounded-2xl flex items-center justify-center aspect-square">
         {combo.imageUrl ? (
           <img src={combo.imageUrl} alt={combo.name} className="w-full h-full object-cover" />
         ) : (
-          <div className="text-text-muted flex flex-col items-center gap-2">
+          <div className="text-gray-500 flex flex-col items-center gap-2">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
               <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a4 4 0 0 0-8 0v2" />
             </svg>
@@ -80,16 +81,16 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
       <div className="flex flex-col gap-4">
         <div>
           <span className="text-xs font-bold text-accent uppercase tracking-wider">Combo</span>
-          <h1 className="font-heading text-2xl sm:text-3xl text-text font-bold leading-tight mt-1">{combo.name}</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl text-black font-bold leading-tight mt-1">{combo.name}</h1>
         </div>
 
         {combo.description && (
-          <p className="text-sm text-text-muted leading-relaxed">{combo.description}</p>
+          <p className="text-sm text-gray-500 leading-relaxed">{combo.description}</p>
         )}
 
         {/* Pricing */}
         <div className="flex items-baseline gap-3">
-          <span className="font-heading text-2xl font-bold text-text">{formatCurrency(actualPrice)}</span>
+          <span className="font-heading text-2xl font-bold text-black">{formatCurrency(actualPrice)}</span>
           {hasDiscount && (
             <span className="text-sm text-error line-through">{formatCurrency(combo.finalPrice)}</span>
           )}
@@ -109,28 +110,31 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
         {/* Included products */}
         <div>
-          <h3 className="font-heading text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Productos incluidos</h3>
+          <h3 className="font-heading text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Productos incluidos</h3>
           <div className="flex flex-col gap-2">
             {products.map((cp) => {
               const variant = cp.productVariation;
               const productPrice = Number(variant?.price ?? cp.product?.price ?? 0);
               return (
-                <div key={cp.id} className="flex items-center gap-3 rounded-lg border border-border p-2.5">
-                  <div className="w-10 h-10 rounded-lg bg-surface-raised overflow-hidden shrink-0">
-                    {cp.product?.image || cp.product?.imageUrl ? (
-                      <img src={cp.product.image || cp.product.imageUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-text-muted text-xs">N/A</div>
-                    )}
+                <div key={cp.id} className="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+                    {(() => {
+                      const img = cp.product?.imageUrl || cp.product?.image || (cp.product as any)?.images?.[0]?.url;
+                      return img ? (
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-500 text-xs">N/A</div>
+                      );
+                    })()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text truncate">{cp.product?.name ?? 'Producto'}</p>
-                    <p className="text-sm text-text-muted">
+                    <p className="text-sm font-medium text-black truncate">{cp.product?.name ?? 'Producto'}</p>
+                    <p className="text-sm text-gray-500">
                       {variant?.mlSize ? `${variant.mlSize}ml` : ''} {variant?.isFullBottle ? 'Botella' : variant?.mlSize ? 'Decant' : ''}
                       {cp.quantity > 1 && ` · ${cp.quantity}x`}
                     </p>
                   </div>
-                  <span className="text-xs text-text-muted">{formatCurrency(productPrice)}</span>
+                  <span className="text-xs text-gray-500">{formatCurrency(productPrice)}</span>
                 </div>
               );
             })}
@@ -157,18 +161,18 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
         {/* Trust */}
         <div className="grid grid-cols-2 gap-1.5">
-          <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
+          <div className="bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-success">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
             </svg>
-            <p className="text-xs text-text-muted"><span className="font-bold text-text">Garantía</span> · 7 días</p>
+            <p className="text-xs text-gray-500"><span className="font-bold text-black">Garantía</span> · 7 días</p>
           </div>
-          <div className="bg-surface-raised border border-border rounded-lg px-2.5 py-2 flex items-center gap-2">
+          <div className="bg-gray-100 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-accent-hover">
               <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
               <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
             </svg>
-            <p className="text-xs text-text-muted"><span className="font-bold text-text">Envío</span> · desde $3</p>
+            <p className="text-xs text-gray-500"><span className="font-bold text-black">Envío</span> · desde $3</p>
           </div>
         </div>
       </div>

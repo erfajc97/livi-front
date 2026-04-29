@@ -47,7 +47,7 @@ function CatalogContent({
   const hideCategories = !!filters.marcaId;
 
   return (
-    <div className="bg-bg min-h-[calc(100vh-80px)]">
+    <div className="bg-white min-h-[calc(100vh-80px)]">
       <CatalogBanner
         defaultTitle={bannerTitle}
         defaultDescription={bannerDescription}

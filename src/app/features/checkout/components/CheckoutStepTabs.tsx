@@ -5,7 +5,7 @@ interface CheckoutStepTabsProps {
 
 export default function CheckoutStepTabs({ step, setStep }: CheckoutStepTabsProps) {
   return (
-    <div className="flex gap-8 border-b border-border pb-0 font-bold text-sm text-text-muted">
+    <div className="flex gap-8 border-b border-gray-200 pb-0 font-bold text-sm text-gray-400">
       <button
         type="button"
         onClick={() => setStep(1)}

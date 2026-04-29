@@ -18,7 +18,7 @@ export default function CatalogSearchBar({
       {/* Search input */}
       <div className="relative flex-1">
         <svg
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           width="20"
           height="20"
           viewBox="0 0 24 24"
@@ -34,7 +34,7 @@ export default function CatalogSearchBar({
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Buscar por nombre de producto"
-          className="w-full pl-12 pr-4 py-3.5 bg-surface border border-border rounded-lg text-text placeholder:text-text-muted text-sm focus:outline-none focus:border-black transition-colors"
+          className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-lg text-black placeholder:text-gray-400 text-sm focus:outline-none focus:border-black transition-colors"
         />
       </div>
 
@@ -43,7 +43,7 @@ export default function CatalogSearchBar({
         <select
           value={sortValue}
           onChange={(e) => onSortChange(e.target.value)}
-          className="w-full appearance-none px-4 py-3.5 bg-surface border border-border rounded-lg text-text text-sm focus:outline-none focus:border-black transition-colors pr-10 cursor-pointer"
+          className="w-full appearance-none px-4 py-3.5 bg-white border border-gray-200 rounded-lg text-black text-sm focus:outline-none focus:border-black transition-colors pr-10 cursor-pointer"
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -52,7 +52,7 @@ export default function CatalogSearchBar({
           ))}
         </select>
         <svg
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
           width="16"
           height="16"
           viewBox="0 0 24 24"

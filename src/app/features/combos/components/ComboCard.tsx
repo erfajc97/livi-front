@@ -15,7 +15,7 @@ export default function ComboCard({ combo }: ComboCardProps) {
   const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
 
   return (
-    <a href={`/combo/${combo.id}`} className="group relative flex flex-col bg-surface border border-border rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
+    <a href={`/combo/${combo.id}`} className="group relative flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
       {/* Discount badge */}
       {discountPercent > 0 && (
         <div className="absolute top-3 left-3 z-10 bg-error text-white text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -33,7 +33,7 @@ export default function ComboCard({ combo }: ComboCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full aspect-square bg-surface-raised flex items-center justify-center text-text-muted">
+          <div className="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-400">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
               <rect x="2" y="7" width="20" height="14" rx="2" />
               <path d="M16 7V5a4 4 0 0 0-8 0v2" />
@@ -44,18 +44,18 @@ export default function ComboCard({ combo }: ComboCardProps) {
 
       {/* Info */}
       <div className="flex flex-col gap-2 p-4">
-        <h3 className="font-heading font-semibold text-base text-text leading-snug line-clamp-2 tracking-wide">
+        <h3 className="font-heading font-semibold text-base text-black leading-snug line-clamp-2 tracking-wide">
           {combo.name}
         </h3>
 
         {combo.description && (
-          <p className="text-text-muted text-xs line-clamp-2">{combo.description}</p>
+          <p className="text-gray-500 text-xs line-clamp-2">{combo.description}</p>
         )}
 
         {/* Included products */}
         {products.length > 0 && (
           <div className="flex flex-col gap-0.5">
-            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               Incluye:
             </span>
             <ul className="space-y-0.5">
@@ -63,7 +63,7 @@ export default function ComboCard({ combo }: ComboCardProps) {
                 const isFullBottle = cp.productVariation?.isFullBottle;
                 const mlSize = cp.productVariation?.mlSize;
                 return (
-                  <li key={cp.id} className="text-sm text-text-muted leading-tight">
+                  <li key={cp.id} className="text-sm text-gray-500 leading-tight">
                     {cp.quantity > 1 && <span className="font-medium">{cp.quantity}x </span>}
                     {cp.product?.name ?? 'Producto'}
                     {mlSize && ` (${mlSize}ml${isFullBottle ? ' - Botella' : ''})`}
@@ -71,7 +71,7 @@ export default function ComboCard({ combo }: ComboCardProps) {
                 );
               })}
               {products.length > 4 && (
-                <li className="text-sm text-text-muted">
+                <li className="text-sm text-gray-500">
                   +{products.length - 4} producto{products.length - 4 > 1 ? 's' : ''} más
                 </li>
               )}
@@ -86,7 +86,7 @@ export default function ComboCard({ combo }: ComboCardProps) {
               {formatCurrency(combo.finalPrice)}
             </span>
           )}
-          <span className={`font-heading text-lg font-bold ${hasDiscount ? 'text-success' : 'text-text'}`}>
+          <span className={`font-heading text-lg font-bold ${hasDiscount ? 'text-success' : 'text-black'}`}>
             {formatCurrency(actualPrice)}
           </span>
         </div>

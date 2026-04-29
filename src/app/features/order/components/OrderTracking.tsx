@@ -5,8 +5,8 @@ interface OrderTrackingProps {
 export default function OrderTracking({ trackingCode }: OrderTrackingProps) {
   if (!trackingCode) {
     return (
-      <div className="bg-[--color-surface] border border-[--color-border] p-5" style={{ borderRadius: 'var(--radius-md)' }}>
-        <p className="text-sm text-[--color-text-muted]">
+      <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: 'var(--radius-md)' }}>
+        <p className="text-sm text-gray-500">
           El código de seguimiento estará disponible cuando el pedido sea despachado.
         </p>
       </div>
@@ -14,8 +14,8 @@ export default function OrderTracking({ trackingCode }: OrderTrackingProps) {
   }
 
   return (
-    <div className="bg-[--color-surface] border border-[--color-border] p-5" style={{ borderRadius: 'var(--radius-md)' }}>
-      <p className="font-heading text-xs uppercase tracking-wider text-[--color-text-muted] mb-2">
+    <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: 'var(--radius-md)' }}>
+      <p className="font-heading text-xs uppercase tracking-wider text-gray-500 mb-2">
         Seguimiento Servientrega
       </p>
       <p className="font-heading text-lg text-[--color-accent]">{trackingCode}</p>

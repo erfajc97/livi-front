@@ -40,7 +40,7 @@ export default function FilterPillGroup({
               className={`px-4 py-1.5 text-sm font-body rounded-full border transition-colors ${
                 isActive
                   ? 'bg-black text-white border-black'
-                  : 'bg-white text-text-muted border-border hover:border-black'
+                  : 'bg-white text-gray-500 border-gray-200 hover:border-black'
               }`}
             >
               {opt.label}
