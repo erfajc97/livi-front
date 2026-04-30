@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -12,33 +12,34 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build application
-RUN npm run build
+# Build application (hybrid + @astrojs/node → dist/client + dist/server)
+RUN npm run build \
+    && npm prune --omit=dev
 
-# Production stage
-FROM node:20-alpine
+# Production: run Astro Node standalone server (not static `serve dist`)
+FROM node:24-alpine
 
 WORKDIR /app
 
-# Install serve to run the built Astro app
-RUN npm install -g serve
-
-# Copy built files from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
-
-# Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001
+    adduser -S nextjs -u 1001 -G nodejs
+
+# Standalone server still resolves runtime packages (e.g. react) from node_modules
+COPY --chown=nextjs:nodejs --from=builder /app/package.json ./package.json
+COPY --chown=nextjs:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=nextjs:nodejs --from=builder /app/dist ./dist
 
 USER nextjs
+
+ENV HOST=0.0.0.0
+ENV PORT=3000
 
 # Expose port
 EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+    CMD node -e "require('http').get('http://127.0.0.1:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
-# Start application (serve the dist folder as static site)
-CMD ["serve", "-l", "3000", "dist"]
+# Astro standalone adapter entrypoint
+CMD ["node", "./dist/server/entry.mjs"]
