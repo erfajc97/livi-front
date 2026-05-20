@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { useCartStore } from '@/app/store/cart/cartStore';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboCardProps {
@@ -6,6 +7,9 @@ interface ComboCardProps {
 }
 
 export default function ComboCard({ combo }: ComboCardProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+
   const comboImage = combo.imageUrl;
   const products = combo.comboProducts ?? [];
 
@@ -27,6 +31,34 @@ export default function ComboCard({ combo }: ComboCardProps) {
     }
     return sealedStock >= cp.quantity;
   });
+
+  const comboHasBajoPedido = products.some((cp) => cp.product?.bajoPedido);
+
+  const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const comboProducts = products.map((cp) => {
+      const variant = cp.productVariation;
+      if (variant) {
+        return { productVariationId: parseInt(String(variant.id), 10), quantity: cp.quantity };
+      }
+      return { productId: parseInt(String(cp.productId), 10), quantity: cp.quantity };
+    });
+
+    addItem({
+      productId: `combo-${combo.id}`,
+      variantId: `combo-${combo.id}`,
+      name: combo.name,
+      image: comboImage || products[0]?.product?.image || '',
+      ml: 0,
+      price: actualPrice,
+      quantity: 1,
+      comboId: combo.id,
+      comboProducts,
+      bajoPedido: comboHasBajoPedido,
+    });
+    setDrawerOpen(true);
+  };
 
   return (
     <a href={`/combo/${combo.id}`} className="group relative flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
@@ -106,14 +138,22 @@ export default function ComboCard({ combo }: ComboCardProps) {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="px-4 pb-4 mt-auto">
-        <span className={`flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full ${
-          comboInStock
-            ? 'bg-black text-white group-hover:bg-neutral-800'
-            : 'bg-gray-100 text-gray-500'
-        }`}>
-          {comboInStock ? 'Ver Combo' : 'Agotado'}
+      {/* CTAs */}
+      <div className="px-4 pb-4 mt-auto flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={handleAddToCart}
+          disabled={!comboInStock}
+          className={`flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full ${
+            comboInStock
+              ? 'bg-black text-white hover:bg-neutral-800'
+              : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+          }`}
+        >
+          {comboInStock ? 'Agregar al carrito' : 'Agotado'}
+        </button>
+        <span className="flex items-center justify-center w-full py-2 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full border border-gray-200 text-gray-500 group-hover:text-black group-hover:border-black">
+          Ver Combo
         </span>
       </div>
     </a>

@@ -61,6 +61,16 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="divide-y divide-gray-200">
+              {items.some((i) => i.bajoPedido) && (
+                <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 my-3 flex items-start gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-amber-600 mt-0.5">
+                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <p className="text-xs text-amber-800 leading-snug">
+                    Tu pedido incluye productos <span className="font-bold">bajo pedido</span>. Demora estimada de entrega: aproximadamente 2 semanas tras confirmación del pago.
+                  </p>
+                </div>
+              )}
               {items.map((item) => (
                 <CartItem
                   key={item.variantId}

@@ -12,7 +12,6 @@ interface ComboDetailIslandProps {
 
 function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const clearCart = useCartStore((s) => s.clearCart);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [showAuth, setShowAuth] = useState(false);
@@ -48,25 +47,18 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
   const savings = originalSum > actualPrice ? originalSum - actualPrice : 0;
 
-  const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      setShowAuth(true);
-      return;
-    }
-    clearCart();
+  const comboHasBajoPedido = products.some((cp) => cp.product?.bajoPedido);
 
-    // Build the list of individual products for backend order submission
+  const buildComboCartItem = () => {
     const comboProducts = products.map((cp) => {
       const variant = cp.productVariation;
       if (variant) {
         return { productVariationId: parseInt(String(variant.id), 10), quantity: cp.quantity };
       }
-      // Full bottle — no variation, use productId
       return { productId: parseInt(String(cp.productId), 10), quantity: cp.quantity };
     });
 
-    // Add the combo as a single cart item
-    addItem({
+    return {
       productId: `combo-${combo.id}`,
       variantId: `combo-${combo.id}`,
       name: combo.name,
@@ -76,8 +68,21 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
       quantity: 1,
       comboId: combo.id,
       comboProducts,
-    });
+      bajoPedido: comboHasBajoPedido,
+    };
+  };
 
+  const handleAddToCart = () => {
+    addItem(buildComboCartItem());
+    setDrawerOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      setShowAuth(true);
+      return;
+    }
+    addItem(buildComboCartItem());
     window.location.href = '/checkout';
   };
 
@@ -185,6 +190,21 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           ) : (
             'Combo agotado'
           )}
+        </button>
+        <button
+          onClick={comboInStock ? handleAddToCart : undefined}
+          disabled={!comboInStock}
+          className={`w-full py-3 rounded-full font-bold text-sm flex items-center justify-center gap-2 transition-colors border ${
+            comboInStock
+              ? 'border-black text-black hover:bg-black hover:text-white'
+              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+          Agregar al carrito
         </button>
         <button
           onClick={handleWhatsapp}

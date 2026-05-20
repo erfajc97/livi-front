@@ -29,7 +29,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
-        <h1 className="font-heading text-3xl text-[--color-text] uppercase tracking-wider">
+        <h1 className="font-heading text-2xl sm:text-3xl lg:text-4xl text-[--color-text] uppercase tracking-wider">
           ¡Orden confirmada!
         </h1>
         <p className="text-[--color-text-muted] text-sm mt-2">
@@ -83,7 +83,7 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
         <h2 className="font-heading text-sm uppercase tracking-wider text-[--color-text-muted]">
           Información de entrega
         </h2>
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <div>
             <p className="text-[--color-text-muted] text-xs mb-0.5">Cliente</p>
             <p className="text-[--color-text]">{order.customerName}</p>

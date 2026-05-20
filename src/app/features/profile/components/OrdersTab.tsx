@@ -30,13 +30,14 @@ interface Order {
 }
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  order_created: { label: 'Pendiente', color: 'bg-amber-100 text-amber-700' },
-  order_received: { label: 'Recibido', color: 'bg-blue-100 text-blue-700' },
-  order_accepted: { label: 'Aceptado', color: 'bg-blue-100 text-blue-700' },
+  order_created: { label: 'Pendiente de pago', color: 'bg-amber-100 text-amber-700' },
+  order_received: { label: 'Pagado', color: 'bg-blue-100 text-blue-700' },
+  order_accepted: { label: 'Pagado', color: 'bg-blue-100 text-blue-700' },
   order_shipped: { label: 'Enviado', color: 'bg-indigo-100 text-indigo-700' },
   order_delivered: { label: 'Entregado', color: 'bg-green-100 text-green-700' },
   order_cancelled: { label: 'Cancelado', color: 'bg-error text-white' },
   order_delayed: { label: 'Retrasado', color: 'bg-amber-100 text-amber-700' },
+  order_rejected: { label: 'Rechazado', color: 'bg-error text-white' },
 }
 
 const isServientrega = (m?: string) => m === 'SERVIENTREGA_GYE' || m === 'SERVIENTREGA_NACIONAL';
@@ -136,16 +137,28 @@ export default function OrdersTab() {
             <p className="text-sm font-bold text-blue-800 mb-1">Número de guía Servientrega</p>
             <p className="text-lg font-mono font-bold text-blue-900 mb-2">{selected.trackingCode}</p>
             <p className="text-xs text-blue-700 mb-2">
-              Ingresa a la página de Servientrega y pon este número para rastrear tu envío:
+              Haz clic para rastrear tu envío con tu número de guía:
             </p>
-            <a
-              href="https://www.servientrega.com/wps/portal/rastreo-envio"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                window.open(
+                  `https://www.servientrega.com.ec/Tracking/Index/?guia=${encodeURIComponent(selected.trackingCode!)}`,
+                  '_blank',
+                  'noopener,noreferrer',
+                )
+              }}
+              className="inline-flex items-center gap-2 cursor-pointer bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Rastrear en Servientrega
-            </a>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </button>
           </div>
         )}
 

@@ -83,14 +83,16 @@ export default function ProductPurchaseOptions({
   // Stock — use available ml to determine what's purchasable
   const openMl = product.openBottleMlRemaining ?? 0;
   const availableMl = openMl + fullBottleStock * fullBottleMl;
-  const canBuyFullBottle = fullBottleStock > 0;
-  const canBuyDecant = (ml: number) => availableMl >= ml;
+  const isBajoPedido = !!product.bajoPedido;
+  // Bajo pedido products are always sellable; stock is ignored for the CTA.
+  const canBuyFullBottle = isBajoPedido || fullBottleStock > 0;
+  const canBuyDecant = (ml: number) => isBajoPedido || availableMl >= ml;
 
   const inStock = isFullSelected
     ? canBuyFullBottle
     : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
 
-  const hasAnyStock = canBuyFullBottle || availableMl > 0;
+  const hasAnyStock = isBajoPedido || canBuyFullBottle || availableMl > 0;
 
   const getCartItem = () => {
     if (isFullSelected) {
@@ -98,10 +100,11 @@ export default function ProductPurchaseOptions({
         productId: product.id,
         variantId: `full-${product.id}`,
         name: product.name,
-        image: product.image || product.images?.[0],
+        image: product.image || product.images?.[0] || '',
         ml: fullBottleMl,
         price: hasDiscount ? discountedPrice : fullBottlePrice,
         quantity: 1,
+        bajoPedido: isBajoPedido,
       };
     }
     if (selectedDecant) {
@@ -109,13 +112,31 @@ export default function ProductPurchaseOptions({
         productId: product.id,
         variantId: selectedDecant.id,
         name: product.name,
-        image: selectedDecant.images?.[0] || product.image,
+        image: selectedDecant.images?.[0] || product.image || '',
         ml: selectedDecant.ml,
         price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
         quantity: 1,
+        bajoPedido: isBajoPedido,
       };
     }
     return null;
+  };
+
+  const [pendingAction, setPendingAction] = useState<null | 'add' | 'fast'>(null);
+
+  const proceedAdd = () => {
+    const item = getCartItem();
+    if (!item) return;
+    addItem(item);
+    sonnerResponse(`${product.name} agregado al carrito.`, 'success');
+    setDrawerOpen(true);
+  };
+
+  const proceedFastPurchase = () => {
+    const item = getCartItem();
+    if (!item) return;
+    addItem(item);
+    window.location.href = '/checkout';
   };
 
   const handleAddToCart = () => {
@@ -123,9 +144,8 @@ export default function ProductPurchaseOptions({
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    addItem(item);
-    sonnerResponse(`${product.name} agregado al carrito.`, 'success');
-    setDrawerOpen(true);
+    if (isBajoPedido) { setPendingAction('add'); return; }
+    proceedAdd();
   };
 
   const handleFastPurchase = () => {
@@ -134,8 +154,14 @@ export default function ProductPurchaseOptions({
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    addItem(item);
-    window.location.href = '/checkout';
+    if (isBajoPedido) { setPendingAction('fast'); return; }
+    proceedFastPurchase();
+  };
+
+  const confirmBajoPedido = () => {
+    if (pendingAction === 'add') proceedAdd();
+    else if (pendingAction === 'fast') proceedFastPurchase();
+    setPendingAction(null);
   };
 
   const handleWhatsapp = () => {
@@ -320,7 +346,46 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
+      {isBajoPedido && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-amber-600 mt-0.5">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <p className="text-xs text-amber-800 leading-snug">
+            <span className="font-bold">Producto bajo pedido.</span> Demora estimada de entrega: aproximadamente 2 semanas tras la confirmación del pago.
+          </p>
+        </div>
+      )}
+
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+
+      {pendingAction !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setPendingAction(null)}>
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-600">
+                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-heading text-lg font-bold text-black">Producto bajo pedido</h3>
+                <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                  Este producto se importa bajo pedido. Tras confirmar el pago, la demora estimada de entrega es de <span className="font-bold">aproximadamente 2 semanas</span>. ¿Deseas continuar?
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => setPendingAction(null)} className="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Cancelar
+              </button>
+              <button onClick={confirmBajoPedido} className="px-4 py-2 rounded-full bg-accent text-white text-sm font-bold hover:bg-accent-hover">
+                Continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

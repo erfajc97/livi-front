@@ -15,7 +15,17 @@ export const SEARCH_PLACEHOLDERS: Record<SearchType, string> = {
   factura: 'Número de Factura : Ejemplo 87654321',
 };
 
-export const ORDER_STATUS_CONFIG: Record<OrderStatus, { label: string; color: string }> = {
+export const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  // Backend keys (current)
+  order_created:   { label: 'Pendiente de pago', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
+  order_received:  { label: 'Pagado',            color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
+  order_accepted:  { label: 'Pagado',            color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
+  order_shipped:   { label: 'Enviado',           color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' },
+  order_delivered: { label: 'Entregado',         color: 'bg-success/20 text-success border-success/40' },
+  order_delayed:   { label: 'Retrasado',         color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
+  order_cancelled: { label: 'Cancelado',         color: 'bg-error/20 text-error border-error/40' },
+  order_rejected:  { label: 'Rechazado',         color: 'bg-error/20 text-error border-error/40' },
+  // Legacy uppercase keys (mock / older data)
   PENDING:    { label: 'Pendiente',    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
   CONFIRMED:  { label: 'Confirmada',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
   PROCESSING: { label: 'En proceso',   color: 'bg-purple-500/20 text-purple-400 border-purple-500/40' },

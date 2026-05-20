@@ -6,10 +6,12 @@ export function useShipmentTrackerHook() {
   const [trackingNumber, setTrackingNumber] = useState('');
 
   const handleSubmit = () => {
-    if (!trackingNumber.trim()) return;
+    const code = trackingNumber.trim();
+    if (!code) return;
     window.open(
-      `https://www.servientrega.com.ec/tracking/?guia=${trackingNumber}&tipo=${searchType}`,
+      `https://www.servientrega.com.ec/Tracking/Index/?guia=${encodeURIComponent(code)}`,
       '_blank',
+      'noopener,noreferrer',
     );
   };
 
