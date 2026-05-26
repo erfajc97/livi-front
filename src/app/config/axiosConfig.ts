@@ -4,7 +4,7 @@ import { secureStorage } from '@/app/helpers/secureStorage';
 import { useAuthStore } from '@/app/store/auth/authStore';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4001/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://stgapi.nondecants.com/api',
   headers: {
     'Content-Type': 'application/json',
   },
