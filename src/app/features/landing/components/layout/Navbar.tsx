@@ -1,3 +1,4 @@
+import LogoIconSvg from '@/assets/LogoIconSvg';
 import CartDrawerIsland from '@/app/features/cart/CartDrawerIsland';
 import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
 import AppProviders from '@/app/providers/AppProviders';
@@ -42,6 +43,15 @@ export default function Navbar() {
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6">
+
+          {/* Logo */}
+          <a href="/" className="shrink-0" aria-label="NönDecants — Inicio">
+            <LogoIconSvg
+              width={200}
+              height={32}
+              color={isLightTheme ? 'white' : '#CCB377'}
+            />
+          </a>
 
           {/* Desktop nav */}
           <nav
