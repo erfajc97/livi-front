@@ -3,6 +3,16 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
+# Vite/Astro build-time public env (inlined into the client bundle)
+ARG VITE_API_BASE_URL
+ARG VITE_SECRET_KEY
+ARG VITE_USE_MOCK
+ARG VITE_GOOGLE_CLIENT_ID
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_SECRET_KEY=$VITE_SECRET_KEY \
+    VITE_USE_MOCK=$VITE_USE_MOCK \
+    VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 # Copy package files
 COPY package*.json ./
 
