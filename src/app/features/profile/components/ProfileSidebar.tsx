@@ -32,10 +32,10 @@ export default function ProfileSidebar({ activeTab, onTabChange }: ProfileSideba
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
             className={[
-              'flex items-center gap-2.5 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-medium transition-colors',
+              'flex items-center gap-2.5 whitespace-nowrap border-l-2 px-4 py-3 font-body text-xs uppercase tracking-[0.16em] transition-colors',
               isActive
-                ? 'bg-accent text-white'
-                : 'text-gray-600 hover:bg-gray-100',
+                ? 'border-accent bg-bg-alt text-text'
+                : 'border-transparent text-text-soft hover:text-text',
             ].join(' ')}
           >
             {TAB_ICONS[tab.id]}

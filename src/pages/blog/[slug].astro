@@ -2,54 +2,86 @@
 export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
-import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
 import { blogService } from '@/app/features/blog/services/blogService';
 
 const { slug } = Astro.params;
-
-if (!slug) {
-  return Astro.redirect('/blog');
-}
+if (!slug) return Astro.redirect('/blog');
 
 let post;
-let otherPosts = [];
-
+let otherPosts: any[] = [];
 try {
   post = await blogService.fetchPostBySlug(slug);
   const allPosts = await blogService.fetchPublishedPosts();
-  otherPosts = allPosts.filter(p => p.slug !== slug);
-} catch (error) {
+  otherPosts = allPosts.filter((p) => p.slug !== slug);
+} catch {
   return Astro.redirect('/blog');
 }
+
+const fmtDate = (d?: string | null) =>
+  d ? new Date(d).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+const date = fmtDate(post.publishedAt || post.createdAt);
+const FALLBACK = '/banner-catalog.png';
 ---
 
 <PublicLayout
-  title={`${post.title} — Blog NönDecants`}
-  description={post.excerpt || `Lee sobre ${post.title} en el blog de NönDecants.`}
+  title={`${post.title} — Journal NönDecants`}
+  description={post.excerpt || `Lee sobre ${post.title} en el journal de NönDecants.`}
 >
-  <article class="bg-white pt-6 px-4">
-    <div class="max-w-4xl mx-auto">
-      <h1 class="font-heading text-3xl sm:text-4xl font-bold uppercase tracking-wide text-black mb-8">
-        {post.title}
-      </h1>
-
-      {post.imageUrl && (
-        <img
-          src={post.imageUrl}
-          alt={post.title}
-          class="w-full h-[400px] object-cover rounded-xl mb-10"
-        />
-      )}
-
-      {post.content && (
-        <p class="text-base text-gray-600 leading-relaxed" style="text-align: justify;">
-          {post.content}
-        </p>
-      )}
+  <article class="bg-bg">
+    <div class="mx-auto max-w-3xl px-6 pb-4 pt-12 md:pt-20">
+      <a href="/blog" class="font-body text-[11px] uppercase tracking-[0.18em] text-text-muted transition-colors hover:text-text">
+        ← Journal
+      </a>
+      <div class="mt-10 text-center">
+        <span class="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
+          Journal{date ? ` · ${date}` : ''}
+        </span>
+        <h1 class="mt-4 font-display text-4xl font-light leading-tight tracking-[-0.02em] text-text md:text-6xl">
+          {post.title}
+        </h1>
+      </div>
     </div>
+
+    {post.imageUrl && (
+      <div class="mx-auto max-w-5xl px-6 md:px-14">
+        <img src={post.imageUrl} alt={post.title} class="aspect-[16/9] w-full object-cover" />
+      </div>
+    )}
+
+    {post.content && (
+      <div class="mx-auto max-w-2xl px-6 py-14 md:py-20">
+        <div class="whitespace-pre-line font-body text-[15px] leading-[1.85] text-text-soft">
+          {post.content}
+        </div>
+      </div>
+    )}
   </article>
 
   {otherPosts.length > 0 && (
-    <BlogCarousel posts={otherPosts} client:visible />
+    <section class="bg-bg px-6 pb-24 md:px-14">
+      <div class="mb-10 border-t border-border pt-8">
+        <span class="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft">— Más del journal</span>
+      </div>
+      <div class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        {otherPosts.slice(0, 3).map((p) => (
+          <a href={`/blog/${p.slug}`} class="group/card flex flex-col">
+            <div class="aspect-[4/3] overflow-hidden bg-surface-raised">
+              <img
+                src={p.imageUrl || FALLBACK}
+                alt={p.title}
+                loading="lazy"
+                class="h-full w-full object-cover transition-transform duration-700 group-hover/card:scale-[1.03]"
+              />
+            </div>
+            {fmtDate(p.publishedAt || p.createdAt) && (
+              <span class="mt-4 font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
+                {fmtDate(p.publishedAt || p.createdAt)}
+              </span>
+            )}
+            <h3 class="mt-2 font-display text-xl font-light leading-tight text-text">{p.title}</h3>
+          </a>
+        ))}
+      </div>
+    </section>
   )}
 </PublicLayout>

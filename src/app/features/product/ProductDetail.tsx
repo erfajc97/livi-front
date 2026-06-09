@@ -38,21 +38,24 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
     );
   }
 
-  const images = product.images?.length ? product.images : [product.image].filter(Boolean);
+  const images = (product.images?.length ? product.images : [product.image].filter(Boolean)) as string[];
+  const isBajo = !!product.bajoPedido;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div className="mx-auto max-w-[1500px] px-6 pb-24 md:px-14">
       {/* Breadcrumb */}
-      <nav className="mb-8 text-xs text-[--color-text-muted] flex items-center gap-2">
-        <a href="/" className="hover:text-[--color-accent] transition-colors">Inicio</a>
-        <span>›</span>
-        <a href="/catalogo" className="hover:text-[--color-accent] transition-colors">Catálogo</a>
-        <span>›</span>
-        <span className="text-[--color-text]">{product.name}</span>
+      <nav className="flex items-center gap-2 py-6 font-body text-[11px] tracking-[0.04em] text-text-muted">
+        <a href="/" className="transition-colors hover:text-text">Inicio</a>
+        <span>·</span>
+        <a href={isBajo ? '/bajo-pedido' : '/catalogo/perfumes'} className="transition-colors hover:text-text">
+          {isBajo ? 'Bajo Pedido' : 'Perfumes'}
+        </a>
+        <span>·</span>
+        <span className="text-text">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <ProductImages images={images} name={product.name} />
+      <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[1.05fr_1fr] md:gap-20">
+        <ProductImages images={images} name={product.name} bajoPedido={isBajo} />
         <ProductInfo
           product={product}
           selectedVariant={selectedVariant}

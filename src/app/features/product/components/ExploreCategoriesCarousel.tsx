@@ -7,25 +7,6 @@ interface ExploreCategoriesCarouselProps {
   products: Product[];
 }
 
-function CarouselArrow({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      aria-label={direction === 'left' ? 'Anterior' : 'Siguiente'}
-      className="absolute z-10 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-accent-hover shadow-lg hover:scale-105 transition-transform"
-      style={direction === 'left' ? { left: '-4px' } : { right: '-4px' }}
-    >
-      <div className="bg-bg w-7 h-7 sm:w-9 sm:h-9 flex items-center justify-center rounded-full text-white">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          {direction === 'left'
-            ? <polyline points="15 18 9 12 15 6" />
-            : <polyline points="9 18 15 12 9 6" />}
-        </svg>
-      </div>
-    </button>
-  );
-}
-
 export default function ExploreCategoriesCarousel({ products }: ExploreCategoriesCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
 
@@ -35,26 +16,45 @@ export default function ExploreCategoriesCarousel({ products }: ExploreCategorie
   if (products.length === 0) return null;
 
   return (
-    <div className="mt-16 mb-10">
-      <h2 className="font-heading text-2xl md:text-3xl font-bold uppercase text-black mb-8 px-2 sm:px-12">
-        Explora nuestras categorias
-      </h2>
+    <section className="mt-16 mb-10">
+      {/* Header editorial */}
+      <div className="mb-10 flex items-baseline justify-between md:mb-12">
+        <div className="flex items-baseline gap-4">
+          <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">— 04</span>
+          <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft md:text-[11px]">
+            De la misma categoría
+          </span>
+        </div>
+      </div>
 
-      <div className="relative flex items-center">
-        <CarouselArrow direction="left" onClick={scrollPrev} />
+      {/* Carrusel con flechas editoriales (estilo Atelier) */}
+      <div className="relative">
+        <button
+          onClick={scrollPrev}
+          aria-label="Anterior"
+          className="absolute -left-2 top-[32%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-text/25 bg-bg/80 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent sm:-left-3 sm:flex lg:-left-5"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+        </button>
 
-        <div className="overflow-hidden w-full px-2 sm:px-12" ref={emblaRef}>
+        <div className="w-full overflow-hidden" ref={emblaRef}>
           <div className="flex">
             {products.map((product) => (
-              <div key={product.id} className="px-2 shrink-0 basis-1/2 md:basis-1/3 lg:basis-1/4">
+              <div key={product.id} className="shrink-0 basis-1/2 px-2 md:basis-1/3 md:px-3 lg:basis-1/4">
                 <ProductCard product={product} />
               </div>
             ))}
           </div>
         </div>
 
-        <CarouselArrow direction="right" onClick={scrollNext} />
+        <button
+          onClick={scrollNext}
+          aria-label="Siguiente"
+          className="absolute -right-2 top-[32%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-text/25 bg-bg/80 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent sm:-right-3 sm:flex lg:-right-5"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
+        </button>
       </div>
-    </div>
+    </section>
   );
 }

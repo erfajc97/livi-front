@@ -27,9 +27,7 @@ export default function FilterPillGroup({
 
   return (
     <div>
-      <p className="font-heading text-base font-semibold text-black mb-3 italic">
-        {label}
-      </p>
+      <p className="eyebrow mb-3">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => {
           const isActive = selected.includes(opt.value);
@@ -37,10 +35,10 @@ export default function FilterPillGroup({
             <button
               key={opt.value}
               onClick={() => handleToggle(opt.value)}
-              className={`px-4 py-1.5 text-sm font-body rounded-full border transition-colors ${
+              className={`px-4 py-1.5 font-body text-xs tracking-wide border transition-colors ${
                 isActive
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-gray-500 border-gray-200 hover:border-black'
+                  ? 'bg-text text-bg border-text'
+                  : 'bg-transparent text-text-soft border-border hover:border-text'
               }`}
             >
               {opt.label}

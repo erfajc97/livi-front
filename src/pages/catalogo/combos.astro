@@ -7,38 +7,24 @@ import CombosSection from '@/app/features/combos/CombosSection';
   title="Combos — Catálogo — NönDecants"
   description="Explora nuestros combos especiales de perfumes en Ecuador."
 >
-  <div class="bg-white min-h-screen">
-    <div class="border-t border-gray-200"></div>
-
-    <!-- Banner — Astro estático (zero JS) -->
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
-      <div class="relative overflow-hidden rounded-2xl h-52 md:h-64">
-        <img
-          src="/banner-catalog.png"
-          alt="Combos de perfumes NönDecants"
-          class="w-full h-full object-cover"
-        />
-        <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2">
-          <img
-            src="/box-catalog.svg"
-            alt=""
-            class="w-12 h-12 md:w-14 md:h-14"
-            aria-hidden="true"
-          />
-          <h1 class="font-heading text-3xl md:text-5xl text-white uppercase tracking-widest">
-            Combos
-          </h1>
-          <p class="text-gray-300 text-sm tracking-wide">
-            Descubre nuestros combos especiales de perfumes
-          </p>
-        </div>
+  <div class="bg-bg">
+    <!-- Banner full-width (Astro estático, zero JS) -->
+    <div class="relative h-56 w-full overflow-hidden sm:h-72 md:h-80">
+      <img
+        src="/banner-catalog.png"
+        alt="Combos de perfumes NönDecants"
+        class="absolute inset-0 h-full w-full object-cover brightness-[0.6]"
+      />
+      <div class="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent"></div>
+      <div class="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
+        <span class="eyebrow text-white/80">Selección curada</span>
+        <h1 class="font-display text-4xl font-light italic leading-none text-white sm:text-5xl md:text-6xl">
+          Combos
+        </h1>
+        <p class="max-w-md font-body text-xs tracking-wide text-white/80 sm:text-sm">
+          Descubre nuestros combos especiales de perfumes
+        </p>
       </div>
-    </div>
-
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="font-heading text-xl md:text-2xl font-bold text-black tracking-wide uppercase mb-6">
-        Mostrando nuestros combos
-      </h2>
     </div>
 
     <CombosSection client:load />

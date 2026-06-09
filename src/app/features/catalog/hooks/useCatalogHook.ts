@@ -59,12 +59,18 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     return () => clearTimeout(timer);
   }, [filters.maxPrice]);
 
+  // Vista de categoría ("todas las casas {cat}"): muestra TODOS los productos
+  // de esa categoría, estén o no en bajo pedido. Solo el browse general
+  // (perfumes / bajo-pedido sin categoría) respeta el flag de la página.
+  const effectiveBajoPedido =
+    filters.categoryId && !filters.marcaId ? undefined : bajoPedido;
+
   const queryParams = {
     page: filters.page,
     limit: LIMIT,
     search: debouncedSearch || undefined,
     inStock: filters.inStock || undefined,
-    bajoPedido,
+    bajoPedido: effectiveBajoPedido,
     categoryId: filters.categoryId,
     marcaId: filters.marcaId,
     gender: filters.gender || undefined,

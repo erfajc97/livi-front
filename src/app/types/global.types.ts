@@ -61,6 +61,8 @@ export interface Product {
   benefits?: string[];
   stock?: number;
   price?: number;
+  categoryId?: number;
+  marcaId?: number;
   createdAt: string;
 }
 

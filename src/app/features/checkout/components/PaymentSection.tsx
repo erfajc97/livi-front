@@ -34,14 +34,14 @@ const METHODS: { key: PaymentMethod; label: string; icon: React.ReactNode }[] = 
 export default function PaymentSection({ selected, onSelect }: PaymentSectionProps) {
   return (
     <div className="flex flex-col gap-3">
-      <h2 className="font-heading font-bold text-black text-lg mb-1">Método de pago</h2>
+      <h2 className="eyebrow mb-1">Método de pago</h2>
       {selected === 'PAYPHONE' && (
-        <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+        <p className="border-l-2 border-accent bg-bg-alt px-3 py-2.5 font-body text-xs text-text-soft">
           Se aplica un recargo del 6% por procesamiento con tarjeta.
         </p>
       )}
       {selected === 'TRANSFERENCIA' && (
-        <p className="text-xs text-blue-600 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+        <p className="border-l-2 border-border bg-bg-alt px-3 py-2.5 font-body text-xs text-text-soft">
           Después de confirmar, podrás subir tu comprobante de transferencia.
         </p>
       )}
@@ -49,14 +49,14 @@ export default function PaymentSection({ selected, onSelect }: PaymentSectionPro
         <label
           key={m.key}
           onClick={() => onSelect(m.key)}
-          className={`flex items-center justify-between cursor-pointer border rounded-xl px-5 py-4 transition-colors ${selected === m.key ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-black'}`}
+          className={`flex cursor-pointer items-center justify-between border px-5 py-4 transition-colors ${selected === m.key ? 'border-text bg-bg-alt' : 'border-border hover:border-text'}`}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selected === m.key ? 'border-black' : 'border-gray-300'}`}>
-              {selected === m.key && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+            <div className={`flex h-5 w-5 items-center justify-center rounded-full border transition-colors ${selected === m.key ? 'border-text' : 'border-border'}`}>
+              {selected === m.key && <div className="h-2.5 w-2.5 rounded-full bg-text" />}
             </div>
             {m.icon}
-            <span className="text-sm font-medium text-black">{m.label}</span>
+            <span className="font-body text-sm text-text">{m.label}</span>
           </div>
         </label>
       ))}

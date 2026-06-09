@@ -84,9 +84,10 @@ export default function ProductPurchaseOptions({
   const openMl = product.openBottleMlRemaining ?? 0;
   const availableMl = openMl + fullBottleStock * fullBottleMl;
   const isBajoPedido = !!product.bajoPedido;
-  // Bajo pedido products are always sellable; stock is ignored for the CTA.
+  // El frasco completo SÍ puede ir bajo pedido (importación). Los decants NO:
+  // un decant requiere abrir un frasco real, así que se topan por ml disponible.
   const canBuyFullBottle = isBajoPedido || fullBottleStock > 0;
-  const canBuyDecant = (ml: number) => isBajoPedido || availableMl >= ml;
+  const canBuyDecant = (ml: number) => availableMl >= ml;
 
   const inStock = isFullSelected
     ? canBuyFullBottle
@@ -105,6 +106,8 @@ export default function ProductPurchaseOptions({
         price: hasDiscount ? discountedPrice : fullBottlePrice,
         quantity: 1,
         bajoPedido: isBajoPedido,
+        // Frasco completo: si es bajo pedido no hay tope; si no, lo limita el stock.
+        maxQty: isBajoPedido ? undefined : fullBottleStock,
       };
     }
     if (selectedDecant) {
@@ -117,6 +120,8 @@ export default function ProductPurchaseOptions({
         price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
         quantity: 1,
         bajoPedido: isBajoPedido,
+        // Decant: SIEMPRE topado por las unidades disponibles (ml / mlSize).
+        maxQty: selectedDecant.availableQuantity,
       };
     }
     return null;
@@ -180,206 +185,147 @@ export default function ProductPurchaseOptions({
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-5 text-text">
       {/* Title */}
       <div>
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="font-heading text-2xl sm:text-3xl text-black font-bold leading-none">{product.name}</h1>
-          <button className="shrink-0 text-gray-500 hover:text-error transition-colors mt-1">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        {detailTags.length > 0 && (
+          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
+            {detailTags.map((t) => t.value).join(' · ')}
+          </span>
+        )}
+        <div className="mt-2 flex items-start justify-between gap-3">
+          <h1 className="font-display text-5xl font-light leading-[0.95] tracking-[-0.025em] text-text md:text-6xl">{product.name}</h1>
+          <button className="mt-1 shrink-0 text-text-muted transition-colors hover:text-accent" aria-label="Favorito">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+              <path d="M12 20s-7-4.5-9-9.5C1.5 6.5 4.5 4 7.5 5 9 5.5 12 8 12 8s3-2.5 4.5-3c3-1 6 1.5 4.5 6.5-2 5-9 9.5-9 9.5z" />
             </svg>
           </button>
         </div>
-        <div className="flex items-center gap-2 mt-1">
-          <div className="flex gap-0.5 text-xs">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <span key={star} className={star <= 4 ? 'text-accent-hover' : 'text-gray-500'}>★</span>
-            ))}
-          </div>
-          <span className="text-sm text-gray-500">4.5 (212)</span>
-          <span className="text-sm text-gray-500">·</span>
-          <span className={`text-sm font-bold ${hasAnyStock ? 'text-success' : 'text-error'}`}>
+        <div className="mt-3">
+          <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${hasAnyStock ? 'text-text-muted' : 'text-error'}`}>
             {hasAnyStock ? 'En stock' : 'Agotado'}
           </span>
         </div>
       </div>
 
-      {/* Price */}
-      <div className="flex items-baseline gap-2">
-        <p className="font-heading text-xl font-bold text-black">{formatCurrency(discountedPrice)}</p>
-        {hasDiscount && (
-          <>
-            <p className="text-sm text-gray-500 line-through">{formatCurrency(currentPrice)}</p>
-            <span className="bg-error text-white text-xs font-bold px-1.5 py-px rounded">-{discount}%</span>
-          </>
-        )}
-      </div>
-
-      {/* Description + Tags */}
-      {product.description && (
-        <p className="text-xs text-gray-500 leading-relaxed">{product.description}</p>
-      )}
-
-      {detailTags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {detailTags.map(tag => (
-            <span key={tag.label} className="inline-flex items-center gap-1 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm">
-              <span className="text-gray-500 font-medium">{tag.label}:</span>
-              <span className="text-black font-semibold">{tag.value}</span>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Full Bottle — always first, selected by default */}
-      {fullBottlePrice > 0 && (
-        <div>
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Botella Completa</p>
-          <button
-            onClick={canBuyFullBottle ? handleSelectFull : undefined}
-            disabled={!canBuyFullBottle}
-            className={`w-full py-2.5 px-4 rounded-lg border text-sm font-bold transition-all flex items-center justify-between ${
-              !canBuyFullBottle
-                ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
-                : isFullSelected
-                  ? 'bg-black text-white border-black'
-                  : 'bg-white text-black border-gray-200 hover:border-black'
-            }`}
-          >
-            <span>{fullBottleMl}ml — {canBuyFullBottle ? 'Sellada' : 'Agotada'}</span>
-            <span className={isFullSelected ? 'text-gray-300' : 'text-gray-500'}>
-              {formatCurrency(fullBottlePrice)}
-            </span>
-          </button>
-        </div>
-      )}
-
-      {/* Decants */}
-      {decants.length > 0 && (
-        <div>
-          <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-1.5">Decants</p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {decants.map(v => {
-              const available = canBuyDecant(v.ml);
-              return (
-                <button
-                  key={v.id}
-                  onClick={available ? () => handleSelectDecant(v) : undefined}
-                  disabled={!available}
-                  className={`py-2 px-2.5 rounded-lg border text-xs font-bold transition-all flex items-center justify-between ${
-                    !available
-                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60'
-                      : selectedDecant?.id === v.id
-                        ? 'bg-black text-white border-black'
-                        : 'bg-white text-black border-gray-200 hover:border-black'
-                  }`}
-                >
-                  <span>{v.ml}ml</span>
-                  <span className={selectedDecant?.id === v.id ? 'text-gray-300' : 'text-gray-500'}>
-                    {formatCurrency(v.price)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <button
-        onClick={handleFastPurchase}
-        className="w-full bg-accent text-white py-3 rounded-full font-bold text-sm flex items-center justify-center gap-2 hover:bg-accent-hover transition-colors"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-        Comprar ahora — Pago seguro
-      </button>
-      <div className="flex gap-1.5">
-        <button
-          onClick={handleAddToCart}
-          className="flex-1 bg-black text-white py-2.5 rounded-full font-bold text-sm flex items-center justify-center gap-2 hover:bg-neutral-800 transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-          </svg>
-          Agregar al carrito
-        </button>
-        <button
-          onClick={handleWhatsapp}
-          className="shrink-0 w-11 h-11 bg-green-600 text-white rounded-full flex items-center justify-center hover:bg-green-700 transition-colors"
-          title="Consultar por WhatsApp"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.996 2C6.474 2 2 6.474 2 11.996C2 13.921 2.548 15.717 3.511 17.25L2.146 22.18L7.204 20.852C8.683 21.688 10.297 22.158 11.996 22.158C17.518 22.158 22 17.684 22 12.162C22 6.64 17.518 2.166 11.996 2.166V2ZM17.152 16.315C16.94 16.91 16.1 17.433 15.441 17.545C14.945 17.625 14.284 17.682 11.838 16.669C8.91 15.452 7.027 12.441 6.884 12.253C6.741 12.064 5.72 10.71 5.72 9.31C5.72 7.91 6.442 7.238 6.741 6.93C6.983 6.681 7.404 6.551 7.82 6.551C7.962 6.551 8.089 6.558 8.199 6.564C8.484 6.577 8.627 6.602 8.814 7.051C9.05 7.618 9.623 9.022 9.693 9.172C9.764 9.322 9.851 9.531 9.742 9.742C9.643 9.941 9.551 10.035 9.408 10.203C9.266 10.372 9.13 10.493 8.979 10.672C8.847 10.832 8.694 10.992 8.865 11.282C9.036 11.571 9.625 12.532 10.489 13.303C11.603 14.298 12.51 14.611 12.83 14.743C13.151 14.875 13.34 14.856 13.568 14.613C13.797 14.368 14.441 13.621 14.713 13.313C14.985 13.003 15.241 13.041 15.526 13.144C15.811 13.248 17.324 13.996 17.625 14.145C17.925 14.295 18.125 14.369 18.196 14.494C18.267 14.618 18.267 15.308 17.965 15.939L17.152 16.315Z" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Shipping + Guarantee */}
-      <div className="grid grid-cols-2 gap-1.5">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-success">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
-          <p className="text-xs text-gray-500 leading-tight"><span className="font-bold text-black">Garantía</span> · 7 días</p>
-        </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-2 flex items-center gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-accent-hover">
-            <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-            <circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
-          </svg>
-          <p className="text-xs text-gray-500 leading-tight"><span className="font-bold text-black">Envío</span> · desde $3</p>
-        </div>
-      </div>
-
-      {/* Payment */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500 font-medium">Pago:</span>
-        <div className="flex gap-1">
-          <div className="h-5 border border-gray-200 rounded px-1.5 flex items-center bg-orange-500 text-white font-bold text-xs italic">PayPhone</div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-blue-800 font-bold text-xs italic">VISA</span></div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-white"><span className="text-error font-bold text-xs">MC</span></div>
-          <div className="h-5 w-8 border border-gray-200 rounded flex items-center justify-center bg-blue-500"><span className="text-white font-bold text-xs">AMEX</span></div>
-        </div>
-      </div>
-
+      {/* Caja "curado bajo pedido" — SOLO productos bajo pedido */}
       {isBajoPedido && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 flex items-start gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-amber-600 mt-0.5">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <p className="text-xs text-amber-800 leading-snug">
-            <span className="font-bold">Producto bajo pedido.</span> Demora estimada de entrega: aproximadamente 2 semanas tras la confirmación del pago.
+        <div className="border-l-2 border-accent bg-bg-alt px-5 py-5">
+          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Curado bajo pedido</span>
+          <p className="mt-2.5 font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
+            Entrega estimada
+            <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
+          </p>
+          <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
+            Curado especialmente para ti. Verificado por NönDecants antes de llegar a tus manos.
           </p>
         </div>
       )}
 
+      {/* Selector de formato */}
+      <div>
+        <p className="eyebrow mb-3">Selecciona tu formato</p>
+        <div className="grid grid-cols-3 gap-2">
+          {fullBottlePrice > 0 && (
+            <SizeCard
+              ml={fullBottleMl}
+              type={canBuyFullBottle ? 'Sellada' : 'Agotada'}
+              price={fullBottlePrice}
+              active={isFullSelected}
+              disabled={!canBuyFullBottle}
+              onClick={canBuyFullBottle ? handleSelectFull : undefined}
+            />
+          )}
+          {decants.map((v) => {
+            const available = canBuyDecant(v.ml);
+            return (
+              <SizeCard
+                key={v.id}
+                ml={v.ml}
+                type="Decant"
+                price={v.price}
+                active={selectedDecant?.id === v.id}
+                disabled={!available}
+                onClick={available ? () => handleSelectDecant(v) : undefined}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Precio + CTA */}
+      <div className="flex items-baseline gap-3">
+        <p className="font-display text-3xl text-text">{formatCurrency(discountedPrice)}</p>
+        {hasDiscount && (
+          <>
+            <p className="font-body text-sm text-text-muted line-through">{formatCurrency(currentPrice)}</p>
+            <span className="bg-accent px-1.5 py-px font-body text-[10px] font-medium tracking-wide text-bg">-{discount}%</span>
+          </>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleAddToCart}
+          className="flex w-full items-center justify-center gap-2 bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+        >
+          Añadir — {formatCurrency(discountedPrice)}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
+        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleFastPurchase}
+            className="flex-1 border border-border py-3.5 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text"
+          >
+            Comprar ahora
+          </button>
+          <button
+            onClick={handleWhatsapp}
+            className="flex h-[46px] w-[46px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
+            title="Consultar por WhatsApp"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.996 2C6.474 2 2 6.474 2 11.996C2 13.921 2.548 15.717 3.511 17.25L2.146 22.18L7.204 20.852C8.683 21.688 10.297 22.158 11.996 22.158C17.518 22.158 22 17.684 22 12.162C22 6.64 17.518 2.166 11.996 2.166V2ZM17.152 16.315C16.94 16.91 16.1 17.433 15.441 17.545C14.945 17.625 14.284 17.682 11.838 16.669C8.91 15.452 7.027 12.441 6.884 12.253C6.741 12.064 5.72 10.71 5.72 9.31C5.72 7.91 6.442 7.238 6.741 6.93C6.983 6.681 7.404 6.551 7.82 6.551C7.962 6.551 8.089 6.558 8.199 6.564C8.484 6.577 8.627 6.602 8.814 7.051C9.05 7.618 9.623 9.022 9.693 9.172C9.764 9.322 9.851 9.531 9.742 9.742C9.643 9.941 9.551 10.035 9.408 10.203C9.266 10.372 9.13 10.493 8.979 10.672C8.847 10.832 8.694 10.992 8.865 11.282C9.036 11.571 9.625 12.532 10.489 13.303C11.603 14.298 12.51 14.611 12.83 14.743C13.151 14.875 13.34 14.856 13.568 14.613C13.797 14.368 14.441 13.621 14.713 13.313C14.985 13.003 15.241 13.041 15.526 13.144C15.811 13.248 17.324 13.996 17.625 14.145C17.925 14.295 18.125 14.369 18.196 14.494C18.267 14.618 18.267 15.308 17.965 15.939L17.152 16.315Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Entrega */}
+      <div className="border-t border-border pt-5">
+        <p className="eyebrow mb-3">Entrega</p>
+        <div className="flex flex-col gap-2 font-body text-[13px] text-text-soft">
+          <span className="flex items-center gap-2"><Tick /> Garantía de autenticidad · 7 días</span>
+          <span className="flex items-center gap-2"><Tick /> Envío nacional asegurado · desde $3</span>
+          <span className="flex items-center gap-2"><Tick /> {isBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Preparación en 24 h'}</span>
+        </div>
+      </div>
+
+      {/* Pago */}
+      <div className="flex items-center gap-3 border-t border-border pt-5">
+        <span className="eyebrow">Pago</span>
+        <span className="font-body text-[12px] text-text-soft">Tarjeta · Transferencia · PayPhone</span>
+      </div>
+
       <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       {pendingAction !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={() => setPendingAction(null)}>
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 flex flex-col gap-4 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPendingAction(null)}>
+          <div className="flex w-full max-w-md flex-col gap-4 border border-border bg-surface p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-amber-600">
-                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-              </div>
+              <span className="mt-2 h-[7px] w-[7px] shrink-0 rounded-full bg-accent" />
               <div>
-                <h3 className="font-heading text-lg font-bold text-black">Producto bajo pedido</h3>
-                <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                  Este producto se importa bajo pedido. Tras confirmar el pago, la demora estimada de entrega es de <span className="font-bold">aproximadamente 2 semanas</span>. ¿Deseas continuar?
+                <h3 className="font-display text-xl text-text">Producto bajo pedido</h3>
+                <p className="mt-1 font-body text-sm leading-relaxed text-text-soft">
+                  Este producto se importa bajo pedido. Tras confirmar el pago, la entrega estimada es de <span className="text-text">13–17 días</span>. ¿Deseas continuar?
                 </p>
               </div>
             </div>
-            <div className="flex gap-2 justify-end">
-              <button onClick={() => setPendingAction(null)} className="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setPendingAction(null)} className="border border-border px-5 py-2.5 font-body text-xs uppercase tracking-[0.16em] text-text-soft hover:border-text hover:text-text">
                 Cancelar
               </button>
-              <button onClick={confirmBajoPedido} className="px-4 py-2 rounded-full bg-accent text-white text-sm font-bold hover:bg-accent-hover">
+              <button onClick={confirmBajoPedido} className="bg-text px-5 py-2.5 font-body text-xs uppercase tracking-[0.16em] text-bg hover:bg-accent">
                 Continuar
               </button>
             </div>
@@ -387,5 +333,40 @@ export default function ProductPurchaseOptions({
         </div>
       )}
     </div>
+  );
+}
+
+/* Tarjeta de formato (ml + tipo + precio) — estilo editorial Noir */
+function SizeCard({ ml, type, price, active, disabled, onClick }: {
+  ml: number; type: string; price: number; active: boolean; disabled?: boolean; onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex flex-col items-start p-4 text-left transition-all ${
+        disabled
+          ? 'cursor-not-allowed border border-border opacity-40'
+          : active
+            ? 'bg-text text-bg'
+            : 'border border-border text-text hover:border-text'
+      }`}
+    >
+      <span className="font-display text-2xl leading-none">
+        {ml}<span className="ml-1 font-body text-xs opacity-70">ml</span>
+      </span>
+      <span className={`mt-2 font-body text-[9px] uppercase tracking-[0.18em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
+        {type}
+      </span>
+      <span className="mt-1 font-body text-xs">{formatCurrency(price)}</span>
+    </button>
+  );
+}
+
+function Tick() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="shrink-0 text-accent">
+      <path d="M5 12.5L10 17.5L20 7" />
+    </svg>
   );
 }

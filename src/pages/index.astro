@@ -1,9 +1,7 @@
 ---
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import BannerCarouselIsland from '@/app/features/landing/components/sections-home/BannerCarouselIsland';
-import FeatureStrip from '@/app/features/landing/components/sections-home/FeatureStrip.astro';
 import Home from '@/app/features/landing/pages/home/Home';
-import BlogSection from '@/app/features/landing/components/sections-home/BlogSection.astro';
 ---
 
 <PublicLayout
@@ -11,7 +9,5 @@ import BlogSection from '@/app/features/landing/components/sections-home/BlogSec
   description="Compra perfumes sellados originales, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega."
 >
   <BannerCarouselIsland client:load />
-  <FeatureStrip />
   <Home client:load />
-  <BlogSection />
 </PublicLayout>

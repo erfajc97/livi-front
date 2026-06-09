@@ -20,21 +20,21 @@ export default function CartDrawer() {
 
       {/* Drawer */}
       <div
-        className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white flex flex-col shadow-2xl"
+        className="fixed top-0 right-0 z-50 flex h-full w-full max-w-md flex-col bg-bg text-text shadow-2xl"
         role="dialog"
         aria-label="Carrito de compras"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200">
-          <h2 className="font-heading text-xl font-bold text-black">
+        <div className="flex items-center justify-between border-b border-border px-6 py-5">
+          <h2 className="font-display text-2xl font-normal italic text-text">
             Tu pedido
           </h2>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-2 text-gray-400 hover:text-black transition-colors"
+            className="p-2 text-text-muted transition-colors hover:text-text"
             aria-label="Cerrar carrito"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -44,30 +44,26 @@ export default function CartDrawer() {
         {/* Items */}
         <div className="flex-1 overflow-y-auto px-6">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-gray-400">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
+            <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-text-muted">
+                <path d="M5 8h14l-1 12H6L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>
               </svg>
-              <p className="text-gray-500 text-sm">Tu carrito está vacío.</p>
+              <p className="text-sm text-text-soft">Tu carrito está vacío.</p>
               <a
-                href="/catalogo"
+                href="/catalogo/perfumes"
                 onClick={() => setDrawerOpen(false)}
-                className="text-accent text-sm font-medium hover:underline"
+                className="font-body text-[11px] uppercase tracking-[0.2em] text-accent hover:text-text"
               >
-                Explorar catálogo
+                Explorar catálogo →
               </a>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-border">
               {items.some((i) => i.bajoPedido) && (
-                <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 my-3 flex items-start gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-amber-600 mt-0.5">
-                    <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                  </svg>
-                  <p className="text-xs text-amber-800 leading-snug">
-                    Tu pedido incluye productos <span className="font-bold">bajo pedido</span>. Demora estimada de entrega: aproximadamente 2 semanas tras confirmación del pago.
+                <div className="my-3 flex items-start gap-2 border border-accent/40 bg-surface-raised px-3 py-2.5">
+                  <span className="mt-0.5 h-[6px] w-[6px] shrink-0 rounded-full bg-accent" />
+                  <p className="text-xs leading-snug text-text-soft">
+                    Tu pedido incluye productos <span className="text-accent">bajo pedido</span>. Demora estimada: ~2 semanas tras confirmación del pago.
                   </p>
                 </div>
               )}

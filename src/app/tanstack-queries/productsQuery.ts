@@ -64,6 +64,8 @@ export const mapProduct = (raw: any): Product => {
     })(),
     stock: raw.stock != null ? Number(raw.stock) : undefined,
     price: raw.price ? Number(raw.price) : undefined,
+    categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
+    marcaId: raw.marcaId != null ? Number(raw.marcaId) : undefined,
     createdAt: raw.createdAt ?? '',
   };
 };

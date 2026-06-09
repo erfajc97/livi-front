@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   // ── Banners ─────────────────────────────────────
   BANNERS:                    '/banners',
   BANNERS_VISIBLE:            '/banners/visible',
+  BANNERS_BY_TYPE:            '/banners/by-type',      // ?type=hero|category|brand|navbar
   BANNERS_BY_CATEGORY:        '/banners/category',     // + /:categoryId
   BANNERS_BY_MARCA:           '/banners/marca',        // + /:marcaId
 

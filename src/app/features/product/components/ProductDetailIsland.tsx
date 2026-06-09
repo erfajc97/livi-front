@@ -9,15 +9,19 @@ interface ProductDetailIslandProps {
 function ProductGallery({
   images,
   name,
+  bajoPedido,
 }: {
   images: string[];
   name: string;
+  bajoPedido?: boolean;
 }) {
-  const src = images.length > 0 ? images[0] : '';
+  const [active, setActive] = useState(0);
+  const list = images.filter(Boolean);
+  const idx = Math.min(active, Math.max(0, list.length - 1));
 
-  if (!src) {
+  if (list.length === 0) {
     return (
-      <div className="aspect-square bg-gray-100 flex items-center justify-center text-gray-400 rounded-xl">
+      <div className="flex aspect-[5/6] items-center justify-center bg-surface-raised text-text-muted">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
@@ -28,12 +32,32 @@ function ProductGallery({
   }
 
   return (
-    <div className="overflow-hidden bg-gray-100 rounded-2xl flex items-center justify-center aspect-square">
-      <img
-        src={src}
-        alt={name}
-        className="w-full h-full object-cover transition-all duration-300"
-      />
+    <div>
+      <div className="relative aspect-[4/5] overflow-hidden bg-surface-raised md:aspect-[5/6]">
+        <img src={list[idx]} alt={name} className="h-full w-full object-cover transition-opacity duration-300" />
+        {bajoPedido && (
+          <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text">
+            <span className="h-[5px] w-[5px] rounded-full bg-accent" />
+            Bajo Pedido
+          </span>
+        )}
+      </div>
+      {list.length > 1 && (
+        <div className="mt-3 grid grid-cols-3 gap-3">
+          {list.slice(0, 3).map((img, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`aspect-square overflow-hidden border transition-colors ${
+                idx === i ? 'border-text' : 'border-border opacity-90 hover:opacity-100'
+              }`}
+            >
+              <img src={img} alt={`${name} ${i + 1}`} className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -52,11 +76,11 @@ export default function ProductDetailIsland({ product }: ProductDetailIslandProp
   }, [selectedVariant, product.images, product.image]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-4">
+    <div className="mt-4 grid grid-cols-1 items-start gap-12 md:grid-cols-[1.05fr_1fr] md:gap-20">
       <div className="max-w-full overflow-hidden">
-        <ProductGallery images={galleryImages} name={product.name} />
+        <ProductGallery images={galleryImages} name={product.name} bajoPedido={product.bajoPedido} />
       </div>
-      <div>
+      <div className="md:sticky md:top-24">
         <ProductPurchaseOptions
           product={product}
           selectedVariant={selectedVariant}

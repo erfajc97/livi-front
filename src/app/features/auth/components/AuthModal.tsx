@@ -36,26 +36,28 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         aria-modal="true"
       >
         <div
-          className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
+          className="relative flex w-full max-w-4xl flex-col overflow-hidden bg-bg shadow-2xl md:flex-row"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 z-10 p-1.5 text-gray-400 hover:text-black transition-colors"
+            className="absolute right-4 top-4 z-10 p-1.5 text-text-muted transition-colors hover:text-text"
             aria-label="Cerrar"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
 
           {/* Left: Form side */}
-          <div className="flex-1 px-8 py-10 sm:px-12 sm:py-12 overflow-y-auto max-h-[90vh]">
-            {/* Logo */}
-            <div className="flex justify-center mb-6">
-              <span className="font-heading text-2xl tracking-wide text-black">NönDecants</span>
+          <div className="max-h-[90vh] flex-1 overflow-y-auto px-8 py-10 sm:px-12 sm:py-14">
+            {/* Wordmark */}
+            <div className="mb-8 flex justify-center">
+              <span className="font-display text-2xl italic tracking-[0.06em] text-text">
+                Nön<span className="not-italic">decants</span>
+              </span>
             </div>
 
             {mode === 'login' && (
@@ -86,10 +88,10 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
               className="absolute inset-0 w-full h-full object-cover"
             />
             {/* Overlay with brand text */}
-            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-between py-8 px-6">
+            <div className="absolute inset-0 flex flex-col items-center justify-between bg-black/40 px-6 py-10">
               <img src="/logo.svg" alt="NönDecants" className="h-6" />
-              <p className="text-white/90 text-xs text-center font-medium leading-relaxed">
-                100% Compra segura aprovecha nuestros descuentos, compra con confianza
+              <p className="max-w-[260px] text-center font-display text-sm italic leading-relaxed text-white/90">
+                Compra 100% segura — aprovecha nuestros descuentos y compra con confianza.
               </p>
             </div>
           </div>

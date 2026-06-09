@@ -14,19 +14,20 @@ function ProfileContent() {
   const ActiveComponent = TAB_CONTENT[activeTab];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-bg">
       {/* Header */}
-      <div className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-          <h1 className="text-center text-xl font-heading font-bold tracking-wider text-black uppercase">
-            Mi Cuenta — {user?.name ?? ''}
+      <div className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-6 py-8 md:px-8">
+          <span className="eyebrow">— Mi cuenta</span>
+          <h1 className="mt-2 font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-4xl">
+            {user?.name ?? 'Hola'}
           </h1>
         </div>
       </div>
 
       {/* Layout: sidebar + content */}
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="flex flex-col md:flex-row gap-8">
+      <div className="mx-auto max-w-6xl px-6 py-10 md:px-8">
+        <div className="flex flex-col gap-10 md:flex-row md:gap-14">
           {/* Sidebar */}
           <aside className="md:w-56 shrink-0">
             <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />

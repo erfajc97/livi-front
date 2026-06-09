@@ -1,27 +1,33 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Colores de marca ───────────────────────────── */
-  --color-bg:              #1B1919;
-  --color-surface:         #252222;
-  --color-surface-raised:  #2E2B2B;
-  --color-accent:          #CCB377;
-  --color-accent-hover:    #CDB989;
-  --color-text:            #FFFFFF;
-  --color-text-muted:      #A09A9A;
-  --color-border:          #3A3636;
-  --color-border-accent:   #CCB377;
-  --color-error:           #E05252;
-  --color-error-muted:     #E0525233;
-  --color-success:         #4CAF50;
-  --color-success-muted:   #4CAF5033;
-  --color-warning:         #E8A838;
-  --color-warning-muted:   #E8A83833;
-  --color-info:            #5B9BD5;
+  /* ── Colores de marca · Dirección ATELIER ───────── */
+  /* Marfil suave + tinta cálida + bronce. Editorial, galería, luz. */
+  --color-bg:              #F6F3EE;   /* marfil suave */
+  --color-bg-alt:          #EFEAE2;   /* beige cálido (paneles / barras) */
+  --color-surface:         #FFFFFF;
+  --color-surface-raised:  #FBFAF7;   /* surfaceTint */
+  --color-accent:          #8A7A66;   /* bronce apagado */
+  --color-accent-hover:    #6F6152;   /* bronce más oscuro (sobre fondo claro) */
+  --color-text:            #1C1A17;   /* negro cálido (ink) */
+  --color-text-soft:       #5C544B;   /* cuerpo */
+  --color-text-muted:      #8A8278;   /* metadata */
+  --color-border:          #E4DED4;   /* hairlines */
+  --color-border-soft:     #EEE9DF;
+  --color-border-accent:   #8A7A66;
+  --color-error:           #B23B3B;
+  --color-error-muted:     #B23B3B22;
+  --color-success:         #5A6B4E;
+  --color-success-muted:   #5A6B4E22;
+  --color-warning:         #B07A1E;
+  --color-warning-muted:   #B07A1E22;
+  --color-info:            #3E6E99;
 
   /* ── Tipografía ────────────────────────────────── */
-  --font-heading: "Oswald", sans-serif;
-  --font-body:    "Inter", sans-serif;
+  /* Display serif editorial (Cormorant Garamond) + sans neutra (DM Sans). */
+  --font-heading: "Cormorant Garamond", "Cormorant", serif;
+  --font-display: "Cormorant Garamond", "Cormorant", serif;
+  --font-body:    "DM Sans", system-ui, sans-serif;
 
   /* ── Radios ────────────────────────────────────── */
   --radius-sm: 4px;
@@ -53,12 +59,37 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  /* Noir: display serif en caja normal/itálica — sin uppercase forzado. */
+}
+
+/* Etiquetas / eyebrows editoriales — DM Sans en versalitas con tracking.
+   Aplicar con la clase .eyebrow donde el diseño usa labels uppercase. */
+.eyebrow {
+  font-family: var(--font-body);
   text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
 }
 
 /* ── Loader animation ──────────────────────────── */
 @keyframes loader-spin {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
+}
+
+/* ── Marquee infinito (casas que curamos) ──────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+.marquee-wrap:hover .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
 }

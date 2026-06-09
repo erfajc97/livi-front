@@ -1,11 +1,37 @@
-import LogoIconSvg from '@/assets/LogoIconSvg';
 import CartDrawerIsland from '@/app/features/cart/CartDrawerIsland';
 import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
 import AppProviders from '@/app/providers/AppProviders';
-import { useNavbarHook, NAV_LINKS, isLinkActive } from '../../hooks/useNavbarHook';
-import PerfumeDropdown from './PerfumeDropdown';
-import PerfumesMenuDropdown from './PerfumesMenuDropdown';
+import { useNavbarHook } from '../../hooks/useNavbarHook';
+import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
+
+/* ── Wordmark NönDecants — serif display, la "ö" es intencional ───────── */
+function Wordmark({ size = 26 }: { size?: number }) {
+  return (
+    <span
+      className="font-display italic"
+      style={{ fontSize: size, fontWeight: 500, letterSpacing: '0.16em' }}
+    >
+      Nön<span className="not-italic font-normal">decants</span>
+    </span>
+  );
+}
+
+/* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
+const ico = 'h-[18px] w-[18px]';
+const IconSearch = () => (
+  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
+);
+const IconUser = () => (
+  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="12" cy="9" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
+);
+const IconHeart = () => (
+  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M12 20s-7-4.5-9-9.5C1.5 6.5 4.5 4 7.5 5 9 5.5 12 8 12 8s3-2.5 4.5-3c3-1 6 1.5 4.5 6.5-2 5-9 9.5-9 9.5z" /></svg>
+);
+const IconBag = () => (
+  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
+);
+
 
 export default function Navbar() {
   const {
@@ -18,182 +44,142 @@ export default function Navbar() {
     setMobileOpen,
     openDropdown,
     setOpenDropdown,
-    activeCategory,
-    setActiveCategory,
     dropdownRef,
     pathname,
-    isScrolled,
     handleDropdownEnter,
     handleDropdownLeave,
     handleDropdownContentEnter,
     handleDropdownContentLeave,
   } = useNavbarHook();
 
-  // Determinar si usar tema claro (dorado sobre oscuro)
-  const isLightTheme = pathname === '/' && !isScrolled;
-  const iconColor = isLightTheme ? '#E5E7EB' : '#CCB377';
+  const megaMode =
+    openDropdown === 'perfumes' ? 'perfumes'
+    : openDropdown === 'bajoPedido' ? 'bajoPedido'
+    : null;
+
+  // Enlace simple — DM Sans en versalitas, sin cambio de fuente/color al hover (ref. Atelier)
+  const NavLink = ({ label, href, muted = false }: { label: string; href: string; muted?: boolean }) => (
+    <a
+      href={href}
+      onMouseEnter={() => setOpenDropdown(null)}
+      className={`cursor-pointer ${muted ? 'text-text-soft' : 'text-text'}`}
+    >
+      {label}
+    </a>
+  );
+
+  // Trigger para items con mega menú (Perfumes / Bajo Pedido).
+  // Solo el subrayado aparece al abrir el mega — la tipografía nunca cambia.
+  const MegaTrigger = ({ id, label, href }: { id: string; label: string; href: string }) => (
+    <span
+      onMouseEnter={() => handleDropdownEnter(id)}
+      onMouseLeave={handleDropdownLeave}
+      className="relative flex cursor-pointer items-center gap-2 text-text"
+    >
+      <a href={href}>{label}</a>
+      <svg
+        className={`h-2.5 w-2.5 transition-transform ${openDropdown === id ? 'rotate-180' : ''}`}
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+      <span className={`absolute -bottom-2 left-0 right-4 h-px bg-text transition-opacity ${openDropdown === id ? 'opacity-100' : 'opacity-0'}`} />
+    </span>
+  );
 
   return (
     <AppProviders withToaster>
-      <header
-        className={`sticky top-0 z-40 transition-all duration-300 ${
-          isLightTheme
-            ? 'bg-transparent'
-            : 'bg-[--color-bg]/95 backdrop-blur-md shadow-sm border-b border-white/5'
-        }`}
-      >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6">
-
-          {/* Logo */}
-          <a href="/" className="shrink-0" aria-label="NönDecants — Inicio">
-            <LogoIconSvg
-              width={200}
-              height={32}
-              color={isLightTheme ? 'white' : '#CCB377'}
-            />
-          </a>
-
-          {/* Desktop nav */}
-          <nav
-            className="hidden md:flex items-center gap-0.5 rounded-full bg-surface-raised px-1.5 py-1.5"
-            aria-label="Navegación principal"
-          >
-            {NAV_LINKS.map((link) => {
-              const active = isLinkActive(link.href, pathname, link.exact);
-
-              if (link.dropdown) {
-                const isOpen = openDropdown === link.dropdownId;
-                return (
-                  <div
-                    key={link.label}
-                    className="relative"
-                    onMouseEnter={() => handleDropdownEnter(link.dropdownId)}
-                    onMouseLeave={handleDropdownLeave}
-                  >
-                    <button
-                      className={[
-                        'flex items-center gap-1 rounded-full px-4 py-1.5 font-heading text-sm font-medium transition-colors',
-                        active || isOpen ? 'bg-accent text-bg' : 'text-white hover:text-accent',
-                      ].join(' ')}
-                    >
-                      {link.label}
-                      <svg
-                        width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                        className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                      >
-                        <polyline points="6 9 12 15 18 9"/>
-                      </svg>
-                    </button>
-                  </div>
-                );
-              }
-
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setOpenDropdown(null)}
-                  className={[
-                    'flex items-center gap-1 rounded-full px-4 py-1.5 font-heading text-sm font-medium transition-colors',
-                    active && !openDropdown ? 'bg-accent text-bg' : 'text-white hover:text-accent',
-                  ].join(' ')}
-                >
-                  {link.label}
-                </a>
-              );
-            })}
-          </nav>
-
-          {/* Dropdown: Perfumes (dynamic categories) */}
-          {openDropdown === 'perfumes' && (
-            <PerfumesMenuDropdown
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-              onClose={() => setOpenDropdown(null)}
-              dropdownRef={dropdownRef}
-              onMouseEnter={handleDropdownContentEnter}
-              onMouseLeave={handleDropdownContentLeave}
-            />
-          )}
-
-          {/* Dropdown: Bajo Pedido (static categories) */}
-          {openDropdown === 'bajoPedido' && (
-            <PerfumeDropdown
-              activeCategory={activeCategory}
-              setActiveCategory={setActiveCategory}
-              onClose={() => setOpenDropdown(null)}
-              dropdownRef={dropdownRef}
-              onMouseEnter={handleDropdownContentEnter}
-              onMouseLeave={handleDropdownContentLeave}
-            />
-          )}
-
-          {/* Right actions */}
-          <div className="flex items-center gap-0.5">
-            {/* User */}
-            {isAuthenticated ? (
-              <a
-                href="/mi-cuenta"
-                className="hidden md:flex p-2.5 transition-colors hover:opacity-80"
-                style={{ color: iconColor }}
-                aria-label="Mi cuenta"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </a>
-            ) : (
-              <button
-                onClick={() => setAuthOpen(true)}
-                className="hidden md:flex p-2.5 transition-colors hover:opacity-80"
-                style={{ color: iconColor }}
-                aria-label="Ingresar"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-              </button>
-            )}
-
-            {/* Cart */}
-            <button
-              onClick={() => setDrawerOpen(true)}
-              className="relative p-2.5 transition-colors hover:opacity-80"
-              style={{ color: iconColor }}
-              aria-label="Carrito"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
-              </svg>
-              {itemCount > 0 && (
-                <span className="absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-brand-gold font-bold text-xs text-brand-black">
-                  {itemCount > 9 ? '9+' : itemCount}
-                </span>
-              )}
-            </button>
-
-            {/* Mobile hamburger */}
-            <button
-              className="p-2.5 transition-colors hover:opacity-80 md:hidden"
-              style={{ color: iconColor }}
-              onClick={() => setMobileOpen((o) => !o)}
-              aria-label="Menú"
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                {mobileOpen
-                  ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>
-                  : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>
-                }
-              </svg>
-            </button>
+      <header className="sticky top-0 z-40 bg-bg text-text">
+        {/* Utility row — calma, editorial */}
+        <div className="hidden items-center justify-between border-b border-border bg-bg-alt px-14 py-2 font-body text-[11px] tracking-[0.04em] text-text-soft md:flex">
+          <span>Envíos a todo el Ecuador · Servientrega 24–72h</span>
+          <div className="flex gap-6">
+            <a href="/rastrear" className="hover:text-text">Rastrear pedido</a>
+            <a href="/contacto" className="hover:text-text">Acerca de</a>
+            <span className="text-text">ES · USD</span>
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Fila principal */}
+        <div className="relative">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-4 md:grid-cols-[1fr_auto_1fr] md:gap-8 md:px-14 md:py-6">
+            {/* Izquierda: nav desktop + hamburguesa móvil */}
+            <div className="flex items-center">
+              <button
+                className="p-1 md:hidden"
+                onClick={() => setMobileOpen((o) => !o)}
+                aria-label="Menú"
+              >
+                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+                  {mobileOpen
+                    ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                    : <><path d="M3 7h18" /><path d="M3 17h18" /></>}
+                </svg>
+              </button>
+
+              <nav
+                className="hidden items-center gap-9 font-body text-xs uppercase tracking-[0.18em] md:flex"
+                aria-label="Navegación principal"
+              >
+                <MegaTrigger id="perfumes" label="Perfumes" href="/catalogo/perfumes" />
+                <NavLink label="Combos" href="/catalogo/combos" />
+                <MegaTrigger id="bajoPedido" label="Bajo Pedido" href="/bajo-pedido" />
+                <NavLink label="Journal" href="/blog" muted />
+              </nav>
+            </div>
+
+            {/* Centro: wordmark */}
+            <a href="/" className="justify-self-center text-text" aria-label="NönDecants — Inicio">
+              <Wordmark />
+            </a>
+
+            {/* Derecha: iconos */}
+            <div
+              className="flex items-center justify-end gap-5 text-text md:gap-6"
+              onMouseEnter={() => setOpenDropdown(null)}
+            >
+              <a href="/catalogo/perfumes" className="hidden p-0.5 hover:text-accent md:block" aria-label="Buscar">
+                <IconSearch />
+              </a>
+              {isAuthenticated ? (
+                <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Mi cuenta">
+                  <IconUser />
+                </a>
+              ) : (
+                <button onClick={() => setAuthOpen(true)} className="hidden p-0.5 hover:text-accent md:block" aria-label="Ingresar">
+                  <IconUser />
+                </button>
+              )}
+              <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Favoritos">
+                <IconHeart />
+              </a>
+              <button onClick={() => setDrawerOpen(true)} className="relative p-0.5 hover:text-accent" aria-label="Carrito">
+                <IconBag />
+                {itemCount > 0 && (
+                  <span className="absolute -right-2 -top-1.5 flex items-center justify-center rounded-full bg-text px-[5px] py-[1px] font-body text-[9px] font-medium text-bg">
+                    {itemCount > 9 ? '9+' : itemCount}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="h-px bg-border" />
+
+          {/* Mega menú — Perfumes o Bajo Pedido */}
+          {megaMode && (
+            <PerfumesMegaMenu
+              key={megaMode}
+              mode={megaMode}
+              onClose={() => setOpenDropdown(null)}
+              dropdownRef={dropdownRef}
+              onMouseEnter={handleDropdownContentEnter}
+              onMouseLeave={handleDropdownContentLeave}
+            />
+          )}
+        </div>
+
+        {/* Menú móvil */}
         {mobileOpen && (
           <MobileMenu
             pathname={pathname}

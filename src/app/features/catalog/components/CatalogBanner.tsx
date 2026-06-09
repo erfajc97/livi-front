@@ -48,27 +48,21 @@ export default function CatalogBanner({ defaultTitle, defaultDescription }: Cata
   const bannerSrc = imageUrl || '/banner-catalog.png';
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-8">
-      <div className="relative overflow-hidden rounded-2xl h-40 sm:h-52 md:h-64">
-        <img
-          src={bannerSrc}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center gap-2 px-4 text-center">
-          <img
-            src="/box-catalog.svg"
-            alt=""
-            className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"
-            aria-hidden="true"
-          />
-          <h1 className="font-heading text-2xl sm:text-3xl md:text-5xl text-white uppercase tracking-widest">
-            {title}
-          </h1>
-          <p className="text-white/70 text-xs sm:text-sm md:text-base tracking-wide">
-            {description}
-          </p>
-        </div>
+    <div className="relative h-56 w-full overflow-hidden sm:h-72 md:h-80">
+      <img
+        src={bannerSrc}
+        alt={title}
+        className="absolute inset-0 h-full w-full object-cover brightness-[0.6]"
+      />
+      <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
+      <div className="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
+        <span className="eyebrow text-white/80">Selección curada</span>
+        <h1 className="font-display text-4xl font-light italic leading-none text-white sm:text-5xl md:text-6xl">
+          {title}
+        </h1>
+        <p className="max-w-md font-body text-xs tracking-wide text-white/80 sm:text-sm">
+          {description}
+        </p>
       </div>
     </div>
   );

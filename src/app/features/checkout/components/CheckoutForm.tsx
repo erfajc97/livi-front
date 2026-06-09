@@ -71,7 +71,7 @@ export default function CheckoutForm({
           />
           <button
             type="submit"
-            className="w-full bg-black text-white font-bold text-sm py-3.5 rounded-full mt-2 hover:bg-neutral-800 transition-colors"
+            className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
           >
             Continuar
           </button>
@@ -84,7 +84,7 @@ export default function CheckoutForm({
           <button
             type="submit"
             disabled={isPending || !paymentMethod}
-            className="w-full bg-black text-white font-bold text-sm py-3.5 rounded-full mt-2 hover:bg-neutral-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? (
               <Loader size={18} color="#fff" className="mx-auto" />

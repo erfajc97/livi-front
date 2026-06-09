@@ -3,8 +3,14 @@ import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { secureStorage } from '@/app/helpers/secureStorage';
 import { useAuthStore } from '@/app/store/auth/authStore';
 
+// En dev, si no carga VITE_API_BASE_URL, pega al backend LOCAL (no a staging).
+// En build/prod el fallback sigue siendo staging.
+const FALLBACK_BASE_URL = import.meta.env.DEV
+  ? 'http://localhost:4001/api'
+  : 'https://stgapi.nondecants.com/api';
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://stgapi.nondecants.com/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || FALLBACK_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

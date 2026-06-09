@@ -1,5 +1,5 @@
 import { useForgotPasswordHook } from '../hooks/useForgotPasswordHook';
-import { AUTH_INPUT_CLASS, AUTH_SUBMIT_CLASS } from '../data';
+import { AUTH_INPUT_CLASS, AUTH_SUBMIT_CLASS, AUTH_LABEL_CLASS } from '../data';
 import Loader from '@/app/components/Loader';
 
 interface ForgotPasswordFormProps {
@@ -12,8 +12,8 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
   return (
     <div>
       {/* Title */}
-      <h2 className="font-heading text-xl font-bold text-black text-center mb-1">Recuperar contraseña</h2>
-      <p className="text-sm text-gray-500 text-center mb-6">
+      <h2 className="mb-1 text-center font-display text-3xl font-light text-text">Recuperar contraseña</h2>
+      <p className="mb-8 text-center font-body text-sm text-text-soft">
         {sent
           ? 'Revisa tu bandeja de entrada'
           : 'Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña'}
@@ -27,8 +27,8 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <p className="text-sm text-gray-500 text-center max-w-xs">
-            Si el email <span className="font-medium text-black">{email}</span> está registrado, recibirás un enlace para restablecer tu contraseña.
+          <p className="max-w-xs text-center font-body text-sm text-text-soft">
+            Si el email <span className="text-text">{email}</span> está registrado, recibirás un enlace para restablecer tu contraseña.
           </p>
           <button type="button" onClick={onSwitchToLogin} className={AUTH_SUBMIT_CLASS}>
             Volver al login
@@ -38,7 +38,7 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+            <label className={AUTH_LABEL_CLASS}>Email</label>
             <input
               type="email"
               value={email}
@@ -58,7 +58,7 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-black transition-colors"
+            className="flex w-full items-center justify-center gap-2 font-body text-sm text-text-soft transition-colors hover:text-accent"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6"/>

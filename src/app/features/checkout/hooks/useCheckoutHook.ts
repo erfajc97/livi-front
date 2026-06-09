@@ -121,6 +121,12 @@ export function useCheckoutHook() {
 
   const clearCart = useCartStore((s) => s.clearCart);
 
+  // ¿El carrito tiene productos bajo pedido? (demoran 13–17 días)
+  const hasBajoPedido = items.some((i) => i.bajoPedido);
+  const [bajoConfirm, setBajoConfirm] = useState<
+    null | { kind: 'submit' } | { kind: 'transfer'; file: File }
+  >(null);
+
   const handleCustomerChange = (field: keyof CustomerFormData, value: string) => {
     setCustomer((prev) => ({ ...prev, [field]: value }));
     if (field === 'city') setDeliveryMethod(null);
@@ -375,6 +381,37 @@ export function useCheckoutHook() {
     }
   };
 
+  // Gate de confirmación: si hay bajo pedido, pedir confirmación antes de enviar
+  const requestSubmit = () => {
+    if (!paymentMethod) {
+      sonnerResponse('Selecciona un método de pago.', 'error');
+      return;
+    }
+    if (hasBajoPedido) {
+      setBajoConfirm({ kind: 'submit' });
+      return;
+    }
+    handleSubmit();
+  };
+
+  const requestTransferSubmit = (file: File) => {
+    if (hasBajoPedido) {
+      setBajoConfirm({ kind: 'transfer', file });
+      return;
+    }
+    handleTransferSubmit(file);
+  };
+
+  const confirmBajoPedido = () => {
+    const pending = bajoConfirm;
+    setBajoConfirm(null);
+    if (!pending) return;
+    if (pending.kind === 'submit') handleSubmit();
+    else handleTransferSubmit(pending.file);
+  };
+
+  const cancelBajoPedido = () => setBajoConfirm(null);
+
   return {
     step,
     setStep,
@@ -403,7 +440,12 @@ export function useCheckoutHook() {
     setDeliveryMethod,
     setPaymentMethod,
     handleNextStep,
-    handleSubmit,
-    handleTransferSubmit,
+    handleSubmit: requestSubmit,
+    handleTransferSubmit: requestTransferSubmit,
+    // Confirmación bajo pedido
+    hasBajoPedido,
+    bajoConfirmOpen: bajoConfirm != null,
+    confirmBajoPedido,
+    cancelBajoPedido,
   };
 }

@@ -11,23 +11,23 @@ interface DeliverySectionProps {
 export default function DeliverySection({ options, isLoading, selected, onSelect }: DeliverySectionProps) {
   return (
     <section>
-      <h2 className="font-heading font-bold text-black text-lg mb-4">Método de envío</h2>
-      <div className="flex flex-col divide-y divide-gray-200">
+      <h2 className="eyebrow mb-4">Método de envío</h2>
+      <div className="flex flex-col divide-y divide-border border-y border-border">
         {isLoading ? (
-          <p className="text-sm text-gray-500 py-3">Cargando opciones...</p>
+          <p className="py-4 font-body text-sm text-text-muted">Cargando opciones...</p>
         ) : options.length === 0 ? (
-          <p className="text-sm text-gray-500 py-3">Selecciona una ciudad primero para ver las opciones disponibles.</p>
+          <p className="py-4 font-body text-sm text-text-muted">Selecciona una ciudad primero para ver las opciones disponibles.</p>
         ) : (
           options.map((opt) => (
-            <label key={opt.id} onClick={() => onSelect(opt.method)} className="flex items-center justify-between cursor-pointer group py-4">
+            <label key={opt.id} onClick={() => onSelect(opt.method)} className="group flex cursor-pointer items-center justify-between py-4">
               <div className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${selected === opt.method ? 'border-black' : 'border-gray-300 group-hover:border-black'}`}>
-                  {selected === opt.method && <div className="w-2.5 h-2.5 bg-black rounded-full" />}
+                <div className={`flex h-5 w-5 items-center justify-center rounded-full border transition-colors ${selected === opt.method ? 'border-text' : 'border-border group-hover:border-text'}`}>
+                  {selected === opt.method && <div className="h-2.5 w-2.5 rounded-full bg-text" />}
                 </div>
-                <span className="text-sm text-black">{opt.label}</span>
+                <span className="font-body text-sm text-text">{opt.label}</span>
               </div>
-              <span className="text-sm font-bold text-black">
-                {opt.cost === 0 ? 'Grátis' : formatCurrency(opt.cost)}
+              <span className="font-body text-sm text-text">
+                {opt.cost === 0 ? 'Gratis' : formatCurrency(opt.cost)}
               </span>
             </label>
           ))

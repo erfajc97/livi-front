@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useLoginMutation } from '../mutations/useLoginMutation';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
-import { AUTH_INPUT_CLASS, AUTH_SUBMIT_CLASS, AUTH_GOOGLE_BTN_CLASS } from '../data';
+import { AUTH_INPUT_CLASS, AUTH_SUBMIT_CLASS, AUTH_LABEL_CLASS } from '../data';
 import EyeIcon from '@/assets/svg/EyeIcon';
 import EyeOffIcon from '@/assets/svg/EyeOffIcon';
 import GoogleIcon from '@/assets/svg/GoogleIcon';
@@ -31,13 +31,13 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
   return (
     <div>
       {/* Title */}
-      <h2 className="font-heading text-xl font-bold text-black text-center mb-1">Iniciar Sesión</h2>
-      <p className="text-sm text-gray-500 text-center mb-6">Para poder comprar logueate con tu cuenta</p>
+      <h2 className="mb-1 text-center font-display text-3xl font-light text-text">Iniciar sesión</h2>
+      <p className="mb-8 text-center font-body text-sm text-text-soft">Ingresa para comprar con tu cuenta</p>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Email</label>
+          <label className={AUTH_LABEL_CLASS}>Email</label>
           <input
             type="email"
             value={email}
@@ -50,7 +50,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
 
         {/* Password */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5">Password</label>
+          <label className={AUTH_LABEL_CLASS}>Contraseña</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -63,7 +63,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+              className="absolute right-1 top-1/2 -translate-y-1/2 text-text-muted transition-colors hover:text-text"
             >
               {showPassword ? <EyeOffIcon /> : <EyeIcon />}
             </button>
@@ -72,19 +72,19 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
 
         {/* Keep session + Forgot */}
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
               checked={keepSession}
               onChange={(e) => setKeepSession(e.target.checked)}
-              className="w-4 h-4 accent-black rounded"
+              className="h-4 w-4 accent-accent"
             />
-            <span className="text-xs text-gray-500">Mantenerme conectad@</span>
+            <span className="font-body text-xs text-text-soft">Mantenerme conectad@</span>
           </label>
           <button
             type="button"
             onClick={onSwitchToForgot}
-            className="text-xs text-gray-500 hover:text-black transition-colors"
+            className="font-body text-xs text-text-soft transition-colors hover:text-accent"
           >
             Olvidé mi contraseña
           </button>
@@ -100,10 +100,10 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
         </button>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 my-2">
-          <div className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-500">or</span>
-          <div className="flex-1 h-px bg-gray-200" />
+        <div className="my-2 flex items-center gap-4">
+          <div className="h-px flex-1 bg-border" />
+          <span className="font-body text-[10px] uppercase tracking-[0.2em] text-text-muted">o</span>
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         {/* Google */}
@@ -118,9 +118,9 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
         </div>
 
         {/* Switch to register */}
-        <p className="text-center text-sm text-gray-500 mt-2">
+        <p className="mt-2 text-center font-body text-sm text-text-soft">
           ¿No tienes cuenta?{' '}
-          <button type="button" onClick={onSwitchToRegister} className="text-black font-medium hover:underline">
+          <button type="button" onClick={onSwitchToRegister} className="border-b border-text pb-0.5 text-text transition-colors hover:border-accent hover:text-accent">
             Regístrate
           </button>
         </p>

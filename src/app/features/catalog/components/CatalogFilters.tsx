@@ -1,19 +1,13 @@
 import {
-  CATALOG_GENDERS,
-  CATALOG_TIME_OF_DAY,
   CATALOG_CONCENTRATIONS,
   CATALOG_PROJECTIONS,
 } from '../data';
 import FilterPillGroup from './FilterPillGroup';
 import FilterPriceRange from './FilterPriceRange';
 import { useCategoriesWithMarcasQuery } from '@/app/tanstack-queries/categoriesQuery';
-import type { Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
+import type { Concentration, Projection } from '@/app/types/global.types';
 
 interface CatalogFiltersProps {
-  gender: Gender | '';
-  onGenderChange: (v: Gender | '') => void;
-  timeOfDay: TimeOfDay | '';
-  onTimeOfDayChange: (v: TimeOfDay | '') => void;
   concentration: Concentration | '';
   onConcentrationChange: (v: Concentration | '') => void;
   projection: Projection | '';
@@ -31,13 +25,9 @@ interface CatalogFiltersProps {
 }
 
 const selectClass =
-  'w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-black bg-white focus:border-black focus:outline-none transition-colors appearance-none cursor-pointer';
+  'w-full border border-border px-3 py-2.5 text-sm text-text bg-surface focus:border-text focus:outline-none transition-colors appearance-none cursor-pointer';
 
 export default function CatalogFilters({
-  gender,
-  onGenderChange,
-  timeOfDay,
-  onTimeOfDayChange,
   concentration,
   onConcentrationChange,
   projection,
@@ -56,11 +46,11 @@ export default function CatalogFilters({
   const filteredCategories = categories.filter((c) => c.name.toLowerCase() !== 'all');
 
   return (
-    <aside className="border border-gray-200 bg-white rounded-xl p-5 space-y-6">
+    <div className="space-y-9">
       {hasActiveFilters && (
         <button
           onClick={onClearFilters}
-          className="text-xs font-heading uppercase tracking-wider text-gray-500 hover:text-black transition-colors underline"
+          className="font-body text-[10px] uppercase tracking-[0.18em] text-text-muted hover:text-text transition-colors border-b border-border pb-0.5"
         >
           Limpiar filtros
         </button>
@@ -69,9 +59,7 @@ export default function CatalogFilters({
       {/* Categorías — select */}
       {!hideCategories && filteredCategories.length > 0 && (
         <div>
-          <p className="font-heading text-base font-semibold text-black mb-3 italic">
-            Categoría
-          </p>
+          <p className="eyebrow mb-3">Categoría</p>
           <select
             value={categoryId ?? ''}
             onChange={(e) =>
@@ -89,33 +77,11 @@ export default function CatalogFilters({
         </div>
       )}
 
-      <FilterPillGroup
-        label="Género"
-        options={CATALOG_GENDERS}
-        selected={gender ? [gender] : []}
-        onChange={(values) => {
-          const newVal = values.find((v) => v !== gender) || '';
-          onGenderChange(newVal as Gender | '');
-        }}
-        singleSelect
-      />
-
-      <FilterPillGroup
-        label="Hora del día"
-        options={CATALOG_TIME_OF_DAY}
-        selected={timeOfDay ? [timeOfDay] : []}
-        onChange={(values) => {
-          const newVal = values.find((v) => v !== timeOfDay) || '';
-          onTimeOfDayChange(newVal as TimeOfDay | '');
-        }}
-        singleSelect
-      />
+      {/* Género y Hora del día viven en los chips rápidos de arriba (no duplicar) */}
 
       {/* Concentración — radio buttons */}
       <div>
-        <p className="font-heading text-base font-semibold text-black mb-3 italic">
-          Concentración
-        </p>
+        <p className="eyebrow mb-3">Concentración</p>
         <div className="space-y-2.5">
           {CATALOG_CONCENTRATIONS.map((opt) => (
             <label
@@ -131,9 +97,9 @@ export default function CatalogFilters({
                     concentration === opt.value ? '' : (opt.value as Concentration)
                   )
                 }
-                className="w-4 h-4 accent-black cursor-pointer"
+                className="w-4 h-4 accent-accent cursor-pointer"
               />
-              <span className="text-sm text-gray-500 group-hover:text-black transition-colors">
+              <span className="font-body text-sm text-text-soft group-hover:text-text transition-colors">
                 {opt.label}
               </span>
             </label>
@@ -159,9 +125,9 @@ export default function CatalogFilters({
             type="checkbox"
             checked={hasDiscount}
             onChange={(e) => onHasDiscountChange(e.target.checked)}
-            className="w-4 h-4 accent-black cursor-pointer rounded"
+            className="w-4 h-4 accent-accent cursor-pointer"
           />
-          <span className="font-heading text-sm font-semibold text-black group-hover:text-black transition-colors">
+          <span className="font-body text-sm uppercase tracking-[0.12em] text-text-soft group-hover:text-text transition-colors">
             Con descuento
           </span>
         </label>
@@ -174,6 +140,6 @@ export default function CatalogFilters({
         value={maxPrice ?? 500}
         onChange={(val) => onPriceRangeChange(undefined, val < 500 ? val : undefined)}
       />
-    </aside>
+    </div>
   );
 }

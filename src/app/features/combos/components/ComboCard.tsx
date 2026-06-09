@@ -1,5 +1,4 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
-import { useCartStore } from '@/app/store/cart/cartStore';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboCardProps {
@@ -7,9 +6,6 @@ interface ComboCardProps {
 }
 
 export default function ComboCard({ combo }: ComboCardProps) {
-  const addItem = useCartStore((s) => s.addItem);
-  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
-
   const comboImage = combo.imageUrl;
   const products = combo.comboProducts ?? [];
 
@@ -18,7 +14,6 @@ export default function ComboCard({ combo }: ComboCardProps) {
   const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
   const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
 
-  // Check stock for all products in combo
   const comboInStock = products.every((cp) => {
     const prod = cp.product;
     if (!prod) return false;
@@ -32,129 +27,72 @@ export default function ComboCard({ combo }: ComboCardProps) {
     return sealedStock >= cp.quantity;
   });
 
-  const comboHasBajoPedido = products.some((cp) => cp.product?.bajoPedido);
-
-  const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const comboProducts = products.map((cp) => {
-      const variant = cp.productVariation;
-      if (variant) {
-        return { productVariationId: parseInt(String(variant.id), 10), quantity: cp.quantity };
-      }
-      return { productId: parseInt(String(cp.productId), 10), quantity: cp.quantity };
-    });
-
-    addItem({
-      productId: `combo-${combo.id}`,
-      variantId: `combo-${combo.id}`,
-      name: combo.name,
-      image: comboImage || products[0]?.product?.image || '',
-      ml: 0,
-      price: actualPrice,
-      quantity: 1,
-      comboId: combo.id,
-      comboProducts,
-      bajoPedido: comboHasBajoPedido,
-    });
-    setDrawerOpen(true);
-  };
-
   return (
-    <a href={`/combo/${combo.id}`} className="group relative flex flex-col bg-white border border-gray-200 rounded-xl overflow-hidden w-full hover:shadow-md transition-shadow">
-      {/* Discount badge */}
-      {discountPercent > 0 && (
-        <div className="absolute top-3 left-3 z-10 bg-error text-white text-xs font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-          -{discountPercent}%
-        </div>
-      )}
-
-      {/* Image */}
-      <div className="block overflow-hidden">
+    <a href={`/combo/${combo.id}`} className="group/card flex flex-col">
+      {/* Imagen — formato editorial alargado (≈2:3, igual que ProductCard) */}
+      <div className="relative aspect-2/3 overflow-hidden bg-surface-raised">
         {comboImage ? (
           <img
             src={comboImage}
             alt={combo.name}
-            className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover/card:scale-[1.04]"
           />
         ) : (
-          <div className="w-full aspect-square bg-gray-100 flex items-center justify-center text-gray-400">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
-              <rect x="2" y="7" width="20" height="14" rx="2" />
-              <path d="M16 7V5a4 4 0 0 0-8 0v2" />
+          <div className="flex h-full w-full items-center justify-center text-text-muted">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
+              <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a4 4 0 0 0-8 0v2" />
             </svg>
           </div>
         )}
-      </div>
 
-      {/* Info */}
-      <div className="flex flex-col gap-2 p-4">
-        <h3 className="font-heading font-semibold text-base text-black leading-snug line-clamp-2 tracking-wide">
-          {combo.name}
-        </h3>
-
-        {combo.description && (
-          <p className="text-gray-500 text-xs line-clamp-2">{combo.description}</p>
-        )}
-
-        {/* Included products */}
-        {products.length > 0 && (
-          <div className="flex flex-col gap-0.5">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Incluye:
-            </span>
-            <ul className="space-y-0.5">
-              {products.slice(0, 4).map((cp) => {
-                const isFullBottle = cp.productVariation?.isFullBottle;
-                const mlSize = cp.productVariation?.mlSize;
-                return (
-                  <li key={cp.id} className="text-sm text-gray-500 leading-tight">
-                    {cp.quantity > 1 && <span className="font-medium">{cp.quantity}x </span>}
-                    {cp.product?.name ?? 'Producto'}
-                    {mlSize && ` (${mlSize}ml${isFullBottle ? ' - Botella' : ''})`}
-                  </li>
-                );
-              })}
-              {products.length > 4 && (
-                <li className="text-sm text-gray-500">
-                  +{products.length - 4} producto{products.length - 4 > 1 ? 's' : ''} más
-                </li>
-              )}
-            </ul>
-          </div>
-        )}
-
-        {/* Pricing */}
-        <div className="flex flex-col gap-1 mt-1">
-          {hasDiscount && (
-            <span className="font-body text-xs text-error line-through">
-              {formatCurrency(combo.finalPrice)}
-            </span>
-          )}
-          <span className={`font-heading text-lg font-bold ${hasDiscount ? 'text-success' : 'text-black'}`}>
-            {formatCurrency(actualPrice)}
+        {/* Descuento — abajo izq. */}
+        {discountPercent > 0 && (
+          <span className="absolute bottom-4 left-4 bg-accent px-2.5 py-1 font-body text-[9px] font-medium uppercase tracking-[0.18em] text-bg">
+            -{discountPercent}%
           </span>
+        )}
+
+        {/* Vista rápida — barra inferior al hover */}
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-2 items-center justify-between bg-bg px-3.5 py-3 font-body text-[11px] uppercase tracking-[0.18em] text-text opacity-0 transition-all duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100">
+          <span>Ver combo</span>
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14" /><path d="M13 6l6 6-6 6" />
+          </svg>
         </div>
       </div>
 
-      {/* CTAs */}
-      <div className="px-4 pb-4 mt-auto flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={!comboInStock}
-          className={`flex items-center justify-center w-full py-2.5 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full ${
-            comboInStock
-              ? 'bg-black text-white hover:bg-neutral-800'
-              : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-          }`}
-        >
-          {comboInStock ? 'Agregar al carrito' : 'Agotado'}
-        </button>
-        <span className="flex items-center justify-center w-full py-2 font-heading text-xs font-bold uppercase tracking-wider transition-colors rounded-full border border-gray-200 text-gray-500 group-hover:text-black group-hover:border-black">
-          Ver Combo
-        </span>
+      {/* Info */}
+      <div className="flex flex-col gap-1.5 pt-4">
+        {products.length > 0 && (
+          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
+            {products.length} {products.length === 1 ? 'producto' : 'productos'}
+          </span>
+        )}
+
+        <h3 className="font-display text-[22px] font-normal leading-tight tracking-[-0.005em] text-text">
+          {combo.name}
+        </h3>
+
+        <div className="mt-3 flex items-baseline justify-between">
+          <span className="font-body text-xs tracking-[0.04em] text-text">
+            {hasDiscount ? (
+              <>
+                <span className="mr-2 text-text-muted line-through">{formatCurrency(combo.finalPrice)}</span>
+                {formatCurrency(actualPrice)}
+              </>
+            ) : (
+              formatCurrency(actualPrice)
+            )}
+          </span>
+          <span
+            className={`font-body text-[9px] uppercase tracking-[0.18em] ${
+              comboInStock ? 'text-text-muted' : 'text-error'
+            }`}
+          >
+            {comboInStock ? 'En stock' : 'Agotado'}
+          </span>
+        </div>
       </div>
     </a>
   );

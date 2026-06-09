@@ -8,12 +8,12 @@ import { API_ENDPOINTS } from '@/app/api/endpoints';
 import Loader from '@/app/components/Loader';
 
 const INPUT =
-  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors';
+  'w-full border border-border bg-surface px-3.5 py-3 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:outline-none transition-colors';
 const INPUT_RO =
-  'w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2.5 text-sm text-black cursor-default';
+  'w-full border border-border bg-bg-alt px-3.5 py-3 font-body text-sm text-text-soft cursor-default';
 const SELECT =
-  'w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-black focus:outline-none focus:border-black transition-colors cursor-pointer';
-const LABEL = 'block text-xs text-gray-500 mb-1';
+  'w-full cursor-pointer appearance-none border border-border bg-surface px-3.5 py-3 font-body text-sm text-text focus:border-text focus:outline-none transition-colors';
+const LABEL = 'mb-2 block font-body text-[10px] uppercase tracking-[0.18em] text-text-muted';
 
 export default function ProfileTab() {
   const user = useAuthStore((s) => s.user);
@@ -109,25 +109,25 @@ export default function ProfileTab() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-black font-heading uppercase">Mi Perfil</h2>
-        <p className="text-xs text-gray-500 mt-0.5">Administra tu información personal y de envío</p>
+        <h2 className="font-display text-2xl font-light text-text">Mi perfil</h2>
+        <p className="mt-1 font-body text-sm text-text-soft">Administra tu información personal y de envío</p>
       </div>
 
       {/* Email verification warning */}
       {user && !user.isEmailVerified && (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+        <div className="border border-warning/40 bg-warning-muted p-4">
           <div className="flex items-start gap-3">
-            <div className="text-yellow-600 mt-0.5">
+            <div className="mt-0.5 text-warning">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-xs text-yellow-800 mb-2">Verifica tu email para desbloquear todas las funciones.</p>
+              <p className="mb-3 font-body text-xs text-text-soft">Verifica tu email para desbloquear todas las funciones.</p>
               <button
                 onClick={() => user.email && resendVerification(user.email)}
                 disabled={isResending}
-                className="px-3 py-1 bg-yellow-600 text-white text-xs font-semibold rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50"
+                className="bg-text px-4 py-2 font-body text-[11px] uppercase tracking-[0.16em] text-bg transition-colors hover:bg-accent disabled:opacity-50"
               >
                 {isResending ? <Loader size={14} color="#fff" /> : 'Reenviar correo'}
               </button>
@@ -137,8 +137,8 @@ export default function ProfileTab() {
       )}
 
       {/* Personal data */}
-      <div className="rounded-xl border border-gray-200 p-5">
-        <h3 className="font-heading font-bold text-black text-sm mb-4">Datos personales</h3>
+      <div className="border border-border bg-surface p-6">
+        <span className="eyebrow mb-5 block">Datos personales</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Nombre</label>
@@ -151,7 +151,7 @@ export default function ProfileTab() {
           <div>
             <label className={LABEL}>
               Email
-              {isGoogleUser && <span className="ml-1.5 text-xs text-gray-500">(Google — no editable)</span>}
+              {isGoogleUser && <span className="ml-1.5 normal-case text-text-muted">(Google — no editable)</span>}
             </label>
             <input type="email" value={email} readOnly className={INPUT_RO} />
           </div>
@@ -163,8 +163,8 @@ export default function ProfileTab() {
       </div>
 
       {/* Contact & shipping */}
-      <div className="rounded-xl border border-gray-200 p-5">
-        <h3 className="font-heading font-bold text-black text-sm mb-4">Contacto y envío</h3>
+      <div className="border border-border bg-surface p-6">
+        <span className="eyebrow mb-5 block">Contacto y envío</span>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Teléfono</label>
@@ -222,20 +222,20 @@ export default function ProfileTab() {
       </div>
 
       {/* Save + Logout */}
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex flex-wrap items-center gap-3 pt-2">
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="px-6 py-2.5 bg-accent text-white text-sm font-semibold rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
+          className="bg-text px-8 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:opacity-50"
         >
           {isSaving ? <Loader size={16} color="#fff" /> : 'Guardar cambios'}
         </button>
         <button
           onClick={() => logout()}
           disabled={isLoggingOut}
-          className="px-6 py-2.5 bg-black text-white text-sm font-semibold rounded-lg hover:bg-neutral-900 transition-colors disabled:opacity-50"
+          className="border border-border px-8 py-3.5 font-body text-xs uppercase tracking-[0.2em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
         >
-          {isLoggingOut ? <Loader size={16} color="#fff" /> : 'Cerrar sesión'}
+          {isLoggingOut ? <Loader size={16} /> : 'Cerrar sesión'}
         </button>
       </div>
     </div>

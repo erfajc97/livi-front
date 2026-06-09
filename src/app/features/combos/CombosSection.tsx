@@ -6,7 +6,7 @@ function CombosContent() {
   const { data: combos = [], isLoading } = useActiveCombosQuery();
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <div className="px-6 pb-20 pt-10 md:px-14">
       <ComboGrid combos={combos} isLoading={isLoading} />
     </div>
   );

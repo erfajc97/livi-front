@@ -18,7 +18,13 @@ export interface CartItem {
   comboId?: number;
   comboProducts?: ComboProduct[];
   bajoPedido?: boolean;
+  /** Máximo de unidades que se pueden pedir (stock). undefined = sin límite
+   *  (ej. frasco completo bajo pedido). Los decants SIEMPRE traen este tope. */
+  maxQty?: number;
 }
+
+const clampQty = (qty: number, max?: number) =>
+  max != null ? Math.max(1, Math.min(qty, max)) : Math.max(1, qty);
 
 interface CartState {
   items: CartItem[];
@@ -55,15 +61,16 @@ export const useCartStore = create<CartState>()(
         set((state) => {
           const existing = state.items.find((i) => i.variantId === newItem.variantId);
           if (existing) {
+            const max = newItem.maxQty ?? existing.maxQty;
             return {
               items: state.items.map((i) =>
                 i.variantId === newItem.variantId
-                  ? { ...i, quantity: i.quantity + newItem.quantity }
+                  ? { ...i, maxQty: max, quantity: clampQty(i.quantity + newItem.quantity, max) }
                   : i
               ),
             };
           }
-          return { items: [...state.items, newItem] };
+          return { items: [...state.items, { ...newItem, quantity: clampQty(newItem.quantity, newItem.maxQty) }] };
         });
       },
 
@@ -80,7 +87,7 @@ export const useCartStore = create<CartState>()(
         }
         set((state) => ({
           items: state.items.map((i) =>
-            i.variantId === variantId ? { ...i, quantity } : i
+            i.variantId === variantId ? { ...i, quantity: clampQty(quantity, i.maxQty) } : i
           ),
         }));
       },
