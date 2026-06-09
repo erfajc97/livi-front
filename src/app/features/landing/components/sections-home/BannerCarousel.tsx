@@ -53,7 +53,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                   src={banner.imageUrl ?? banner.image ?? ''}
                   alt={banner.title}
                   className="absolute inset-0 h-full w-full object-cover object-center"
-                  fetchpriority="high"
+                  fetchPriority="high"
                 />
                 {/* Gradiente sutil — solo abajo, deja apreciar la foto (ref. Atelier) */}
                 <div

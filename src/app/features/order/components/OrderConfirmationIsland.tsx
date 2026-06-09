@@ -33,14 +33,6 @@ function OrderConfirmationContent() {
     const orderId = params.get('orderId');
     const method = params.get('method');
 
-    console.log('[OrderConfirmation] URL params:', {
-      paymentId,
-      clientTransactionId,
-      orderId,
-      method,
-      fullSearch: window.location.search,
-    });
-
     if (method === 'TRANSFERENCIA' && orderId) {
       setStatus('transfer');
       setOrder({ orderNumber: String(orderId), total: 0, id: Number(orderId) || undefined });

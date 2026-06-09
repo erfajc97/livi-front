@@ -20,7 +20,7 @@ export type OrderStatus =
 
 export type PaymentMethod = 'PAYPHONE' | 'TRANSFERENCIA' | 'EFECTIVO';
 
-export type DeliveryMethod = 'ENTREGA_PERSONAL' | 'RETIRO_PIWU' | 'SERVIENTREGA_GYE' | 'SERVIENTREGA_NACIONAL';
+export type DeliveryMethod = 'RETIRO' | 'ENTREGA_PERSONAL' | 'RETIRO_PIWU' | 'SERVIENTREGA_GYE' | 'SERVIENTREGA_NACIONAL';
 
 // ── Enums de producto ────────────────────────────────────
 export type Gender = 'HOMBRE' | 'MUJER' | 'UNISEX';

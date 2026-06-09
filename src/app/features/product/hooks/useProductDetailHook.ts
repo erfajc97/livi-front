@@ -25,7 +25,7 @@ export function useProductDetailHook(productId: string) {
       productId: product.id,
       variantId: selectedVariant.id,
       name:      product.name,
-      image:     selectedVariant.images?.[0] || product.image,
+      image:     selectedVariant.images?.[0] || product.image || '',
       ml:        selectedVariant.ml,
       price:     selectedVariant.price,
       quantity,

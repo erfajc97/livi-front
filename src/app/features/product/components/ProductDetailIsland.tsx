@@ -71,7 +71,9 @@ export default function ProductDetailIsland({ product }: ProductDetailIslandProp
     if (selectedVariant?.images && selectedVariant.images.length > 0) {
       return selectedVariant.images;
     }
-    const productImages = product.images?.length ? product.images : [product.image].filter(Boolean);
+    const productImages = product.images?.length
+      ? product.images
+      : [product.image].filter((img): img is string => Boolean(img));
     return productImages;
   }, [selectedVariant, product.images, product.image]);
 

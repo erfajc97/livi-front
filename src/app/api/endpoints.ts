@@ -63,6 +63,7 @@ export const API_ENDPOINTS = {
 
   // ── Orders ──────────────────────────────────────
   ORDERS:                     '/orders',               // GET all (auth: clients see own, admins see all)
+  MY_ORDERS:                  '/orders',               // GET own orders (auth) — backend scopes to current client
   ORDER:                      '/orders',               // + /:id GET/PATCH/DELETE
   ORDERS_FROM_CART:           '/orders/from-cart',     // POST create from cart (auth)
 

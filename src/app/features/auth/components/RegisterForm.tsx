@@ -202,7 +202,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             onError={handleGoogleError}
             text="signup_with"
             size="large"
-            theme="light"
+            theme="outline"
           />
         </div>
 

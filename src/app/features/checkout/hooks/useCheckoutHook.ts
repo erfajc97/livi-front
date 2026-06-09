@@ -57,6 +57,13 @@ interface CouponResult {
   message: string;
 }
 
+interface OrderItemPayload {
+  productId?: number | string;
+  productVariationId?: number | string;
+  quantity: number;
+  priceOverride?: number;
+}
+
 export function useCheckoutHook() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [customer, setCustomer] = useState<CustomerFormData>(buildInitialCustomer);
@@ -220,7 +227,7 @@ export function useCheckoutHook() {
       }
 
       // Expand combo items into individual products for the backend
-      const orderItems = items.flatMap((item) => {
+      const orderItems = items.flatMap((item): OrderItemPayload | OrderItemPayload[] => {
         if (item.comboProducts && item.comboProducts.length > 0) {
           // Distribute combo price proportionally across items
           const comboPrice = item.price; // This is the combo's actual price (finalPrice - discount)
@@ -312,7 +319,7 @@ export function useCheckoutHook() {
       }
 
       // Build order items (same logic as handleSubmit)
-      const orderItems = items.flatMap((item) => {
+      const orderItems = items.flatMap((item): OrderItemPayload | OrderItemPayload[] => {
         if (item.comboProducts && item.comboProducts.length > 0) {
           const comboPrice = item.price;
           const numProducts = item.comboProducts.length;

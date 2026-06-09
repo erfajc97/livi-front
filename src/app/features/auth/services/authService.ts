@@ -50,16 +50,9 @@ export const authService = {
       firstName: payload.firstName,
       lastName: payload.lastName,
     };
-    console.log('[DEBUG register] URL:', API_ENDPOINTS.REGISTER, 'body:', body);
 
-    try {
-      const { data } = await axiosInstance.post(API_ENDPOINTS.REGISTER, body);
-      console.log('[DEBUG register] response:', data);
-      return data?.data ?? data;
-    } catch (err: any) {
-      console.error('[DEBUG register] error:', err?.response?.status, err?.response?.data, err?.message);
-      throw err;
-    }
+    const { data } = await axiosInstance.post(API_ENDPOINTS.REGISTER, body);
+    return data?.data ?? data;
   },
 
   logout: async (): Promise<void> => {

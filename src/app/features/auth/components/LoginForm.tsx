@@ -113,7 +113,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
             onError={handleGoogleError}
             text="signin_with"
             size="large"
-            theme="light"
+            theme="outline"
           />
         </div>
 
