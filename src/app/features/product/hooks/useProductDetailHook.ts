@@ -10,7 +10,6 @@ export function useProductDetailHook(productId: string) {
 
   const { data: product, isLoading } = useProductByIdQuery(productId);
   const addItem = useCartStore((s) => s.addItem);
-  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
@@ -31,7 +30,7 @@ export function useProductDetailHook(productId: string) {
       quantity,
     });
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
-    setDrawerOpen(true);
+    window.location.href = '/carrito';
   };
 
   return {

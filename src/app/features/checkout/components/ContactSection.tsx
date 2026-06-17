@@ -39,7 +39,10 @@ export default function ContactSection({ customer, onChange }: ContactSectionPro
         />
         <input
           type="text"
-          placeholder="Cédula"
+          inputMode="numeric"
+          autoComplete="off"
+          maxLength={13}
+          placeholder="Cédula / RUC"
           value={customer.cedula}
           onChange={(e) => onChange('cedula', e.target.value)}
           className={INPUT_CLASS}

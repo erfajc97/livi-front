@@ -15,7 +15,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
   const { data: bajoPedidoCategories = [] } = useBajoPedidoCategoriesQuery();
 
   return (
-    <div className="border-t border-[--color-border] bg-[--color-surface] px-4 py-4 md:hidden max-h-[70vh] overflow-y-auto">
+    <div className="border-t border-border bg-bg px-4 py-4 md:hidden max-h-[70vh] overflow-y-auto">
       <div className="flex flex-col gap-1">
         {NAV_LINKS.map((link) => {
           const active = isLinkActive(link.href, pathname, link.exact);
@@ -33,7 +33,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
                   onClick={() => setExpandedDropdown(isExpanded ? null : link.dropdownId!)}
                   className={[
                     'flex w-full items-center justify-between rounded-lg px-3 py-2.5 font-heading text-sm transition-colors',
-                    active || isExpanded ? 'bg-accent text-bg' : 'text-white hover:text-accent',
+                    active || isExpanded ? 'bg-accent text-bg' : 'text-text hover:text-accent',
                   ].join(' ')}
                 >
                   {link.label}
@@ -56,7 +56,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
                     </a>
                     {categories.map((cat) => (
                       <div key={cat.id}>
-                        <span className="block px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white/60">
+                        <span className="block px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
                           {cat.name}
                         </span>
                         {cat.marcas.map((sub) => (
@@ -64,7 +64,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
                             key={sub.id}
                             href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
                             onClick={onClose}
-                            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-white/80 hover:text-accent transition-colors"
+                            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-text-soft hover:text-accent transition-colors"
                           >
                             <span className="w-1 h-1 rounded-full bg-accent/50 shrink-0" />
                             {sub.name}
@@ -85,7 +85,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
               onClick={onClose}
               className={[
                 'flex items-center gap-2 rounded-lg px-3 py-2.5 font-heading text-sm transition-colors',
-                active ? 'bg-accent text-bg' : 'text-white hover:text-accent',
+                active ? 'bg-accent text-bg' : 'text-text hover:text-accent',
               ].join(' ')}
             >
               {link.label}
@@ -93,15 +93,15 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
           );
         })}
       </div>
-      <div className="mt-3 border-t border-[--color-border] pt-3">
+      <div className="mt-3 border-t border-border pt-3">
         {isAuthenticated ? (
-          <a href="/mi-cuenta" className="block font-heading text-xs uppercase tracking-wider text-[--color-accent]">
+          <a href="/mi-cuenta" className="block font-heading text-xs uppercase tracking-wider text-accent">
             Mi cuenta
           </a>
         ) : (
           <button
             onClick={() => { onAuthOpen(); onClose(); }}
-            className="font-heading text-xs uppercase tracking-wider text-[--color-accent]"
+            className="font-heading text-xs uppercase tracking-wider text-accent"
           >
             Ingresar
           </button>

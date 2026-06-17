@@ -21,6 +21,10 @@ export interface CartItem {
   /** Máximo de unidades que se pueden pedir (stock). undefined = sin límite
    *  (ej. frasco completo bajo pedido). Los decants SIEMPRE traen este tope. */
   maxQty?: number;
+  /** Unidades realmente en stock (frasco sellado). Si la cantidad pedida supera
+   *  este número, el excedente pasa a "bajo pedido" en el desglose del carrito.
+   *  undefined = no aplica split (decant topado, o producto 100% bajo pedido). */
+  stockAvailable?: number;
 }
 
 const clampQty = (qty: number, max?: number) =>

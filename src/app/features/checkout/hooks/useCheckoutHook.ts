@@ -6,6 +6,7 @@ import { calcPayphoneSurcharge } from '@/app/helpers/calcPayphoneSurcharge';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
+import { normalizeCustomerField, validateContact } from '../validators';
 import type { CustomerFormData, PaymentMethod, DeliveryMethod } from '../types';
 
 const PREFS_KEY = 'nondecants-checkout-prefs';
@@ -135,7 +136,8 @@ export function useCheckoutHook() {
   >(null);
 
   const handleCustomerChange = (field: keyof CustomerFormData, value: string) => {
-    setCustomer((prev) => ({ ...prev, [field]: value }));
+    const next = normalizeCustomerField(field, value);
+    setCustomer((prev) => ({ ...prev, [field]: next }));
     if (field === 'city') setDeliveryMethod(null);
   };
 
@@ -179,8 +181,9 @@ export function useCheckoutHook() {
   };
 
   const handleNextStep = () => {
-    if (!customer.name || !customer.email || !customer.phone || !customer.city) {
-      sonnerResponse('Completa los datos de contacto.', 'error');
+    const contactError = validateContact(customer);
+    if (contactError) {
+      sonnerResponse(contactError, 'error');
       return;
     }
     if (!deliveryMethod) {

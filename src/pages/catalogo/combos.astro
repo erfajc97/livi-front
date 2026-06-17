@@ -8,25 +8,6 @@ import CombosSection from '@/app/features/combos/CombosSection';
   description="Explora nuestros combos especiales de perfumes en Ecuador."
 >
   <div class="bg-bg">
-    <!-- Banner full-width (Astro estático, zero JS) -->
-    <div class="relative h-56 w-full overflow-hidden sm:h-72 md:h-80">
-      <img
-        src="/banner-catalog.png"
-        alt="Combos de perfumes NönDecants"
-        class="absolute inset-0 h-full w-full object-cover brightness-[0.6]"
-      />
-      <div class="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent"></div>
-      <div class="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
-        <span class="eyebrow text-white/80">Selección curada</span>
-        <h1 class="font-display text-4xl font-light italic leading-none text-white sm:text-5xl md:text-6xl">
-          Combos
-        </h1>
-        <p class="max-w-md font-body text-xs tracking-wide text-white/80 sm:text-sm">
-          Descubre nuestros combos especiales de perfumes
-        </p>
-      </div>
-    </div>
-
     <CombosSection client:load />
   </div>
 </PublicLayout>

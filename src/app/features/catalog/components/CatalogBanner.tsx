@@ -48,11 +48,13 @@ export default function CatalogBanner({ defaultTitle, defaultDescription }: Cata
   const bannerSrc = imageUrl || '/banner-catalog.png';
 
   return (
-    <div className="relative h-56 w-full overflow-hidden sm:h-72 md:h-80">
+    /* Banner-strip: alto moderado en todos los breakpoints (antes quedaba
+       demasiado alto y "desbordaba" la vista). */
+    <div className="relative h-48 w-full overflow-hidden sm:h-60 md:h-72">
       <img
         src={bannerSrc}
         alt={title}
-        className="absolute inset-0 h-full w-full object-cover brightness-[0.6]"
+        className="absolute inset-0 h-full w-full object-cover object-center brightness-[0.6]"
       />
       <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
       <div className="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">

@@ -41,10 +41,12 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const pad = (n: number) => String(n).padStart(2, '0');
 
   return (
-    /* Hero + promesas caben en el primer viewport (descontando la navbar) */
-    <section className="flex flex-col bg-bg h-[calc(100svh-4.5rem)] md:h-[calc(100svh-7.7rem)]">
+    /* Desktop: hero + promesas llenan el primer viewport (menos navbar).
+       Mobile: hero como banner-strip (altura fija, igual que los otros
+       banners) en vez de casi-fullscreen — la sección crece natural. */
+    <section className="flex flex-col bg-bg md:h-[calc(100svh-7.7rem)]">
       {/* ── Hero (carousel de banners) ── */}
-      <div className="group relative min-h-0 flex-1">
+      <div className="group relative h-80 sm:h-96 md:h-auto md:min-h-0 md:flex-1">
         <div className="h-full overflow-hidden" ref={emblaRef}>
           <div className="flex h-full">
             {banners.map((banner) => (
@@ -52,27 +54,32 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                 <img
                   src={banner.imageUrl ?? banner.image ?? ''}
                   alt={banner.title}
-                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  /* Mobile: encuadra hacia el centro-alto (no corta caras/frascos);
+                     desktop vuelve a centro. */
+                  className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
                   fetchPriority="high"
                 />
-                {/* Gradiente sutil — solo abajo, deja apreciar la foto (ref. Atelier) */}
+                {/* Desktop: gradiente sutil, deja apreciar la foto (ref. Atelier).
+                    Mobile: scrim oscuro real para que el texto blanco se lea sobre
+                    fotos de tono medio (antes el titular ink quedaba ilegible). */}
                 <div
-                  className="absolute inset-0"
+                  className="absolute inset-0 hidden md:block"
                   style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.12) 100%)' }}
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-black/10 md:hidden" />
 
                 {/* Composición editorial: contador arriba · titular medio · texto izq + botones derecha */}
                 <div className="absolute inset-0 grid grid-rows-[auto_1fr_auto] px-6 py-6 text-text md:px-12 md:py-10">
                   {/* Contador de slides (funcional, sin texto quemado) */}
                   <div className="flex items-start justify-end">
-                    <span className="font-body text-[11px] tabular-nums tracking-[0.28em] text-text-soft">
+                    <span className="font-body text-[11px] tabular-nums tracking-[0.28em] text-white/80 md:text-text-soft">
                       {pad(selected + 1)} / {pad(banners.length)}
                     </span>
                   </div>
 
                   {/* Titular — desde el back */}
                   <div className="flex items-end">
-                    <h1 className="max-w-[16ch] font-display text-[clamp(2.6rem,7vw,6.5rem)] font-light leading-[0.98] tracking-[-0.025em] text-text">
+                    <h1 className="max-w-[16ch] font-display text-[clamp(2.4rem,7vw,6.5rem)] font-light leading-[0.98] tracking-[-0.025em] text-white drop-shadow-sm md:text-text md:drop-shadow-none">
                       {banner.title}
                     </h1>
                   </div>
@@ -80,7 +87,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                   {/* Texto (back) a la izquierda · botones a la derecha */}
                   <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                     {banner.subtitle ? (
-                      <p className="max-w-[340px] font-body text-sm leading-[1.65] text-text/85">
+                      <p className="max-w-[340px] font-body text-sm leading-[1.65] text-white/90 md:text-text/85">
                         {banner.subtitle}
                       </p>
                     ) : (
@@ -137,14 +144,16 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
             <span className="eyebrow">La promesa NönDecants</span>
             <span className="h-px w-8 bg-border" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-4">
             {PROMISES.map((p, i) => (
               <div
                 key={p.title}
-                className={`flex flex-col items-center gap-2 px-3 py-2 text-center md:px-6 ${i > 0 ? 'md:border-l md:border-border' : ''}`}
+                className={`flex flex-col items-center gap-1.5 px-1 py-2 text-center md:gap-2 md:px-6 ${i > 0 ? 'border-l border-border' : ''}`}
               >
-                <p.Icon width={26} height={26} />
-                <span className="font-body text-[10px] uppercase tracking-[0.18em] text-text md:text-[11px]">{p.title}</span>
+                <span className="[&>svg]:h-5 [&>svg]:w-5 md:[&>svg]:h-[26px] md:[&>svg]:w-[26px]">
+                  <p.Icon width={26} height={26} />
+                </span>
+                <span className="font-body text-[8px] leading-tight tracking-[0.12em] text-text uppercase md:text-[11px] md:tracking-[0.18em]">{p.title}</span>
                 <span className="hidden font-display text-xs italic text-text-muted md:block">{p.sub}</span>
               </div>
             ))}

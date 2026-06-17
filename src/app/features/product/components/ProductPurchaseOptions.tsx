@@ -35,7 +35,6 @@ export default function ProductPurchaseOptions({
   const [showAuth, setShowAuth] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
-  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Sync external variant prop
@@ -106,8 +105,10 @@ export default function ProductPurchaseOptions({
         price: hasDiscount ? discountedPrice : fullBottlePrice,
         quantity: 1,
         bajoPedido: isBajoPedido,
-        // Frasco completo: si es bajo pedido no hay tope; si no, lo limita el stock.
-        maxQty: isBajoPedido ? undefined : fullBottleStock,
+        // Frasco completo: el usuario PUEDE pedir más de lo que hay en stock; el
+        // excedente se desglosa como "bajo pedido" en el carrito. Sin tope duro.
+        maxQty: undefined,
+        stockAvailable: isBajoPedido ? 0 : fullBottleStock,
       };
     }
     if (selectedDecant) {
@@ -134,7 +135,7 @@ export default function ProductPurchaseOptions({
     if (!item) return;
     addItem(item);
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
-    setDrawerOpen(true);
+    window.location.href = '/carrito';
   };
 
   const proceedFastPurchase = () => {
@@ -185,7 +186,7 @@ export default function ProductPurchaseOptions({
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
-    <div className="flex flex-col gap-5 text-text">
+    <div className="flex flex-col gap-4 text-text">
       {/* Title */}
       <div>
         {detailTags.length > 0 && (
@@ -193,15 +194,15 @@ export default function ProductPurchaseOptions({
             {detailTags.map((t) => t.value).join(' · ')}
           </span>
         )}
-        <div className="mt-2 flex items-start justify-between gap-3">
-          <h1 className="font-display text-5xl font-light leading-[0.95] tracking-[-0.025em] text-text md:text-6xl">{product.name}</h1>
+        <div className="mt-1.5 flex items-start justify-between gap-3">
+          <h1 className="font-display text-3xl font-light leading-[0.98] tracking-[-0.025em] text-text md:text-4xl">{product.name}</h1>
           <button className="mt-1 shrink-0 text-text-muted transition-colors hover:text-accent" aria-label="Favorito">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
               <path d="M12 20s-7-4.5-9-9.5C1.5 6.5 4.5 4 7.5 5 9 5.5 12 8 12 8s3-2.5 4.5-3c3-1 6 1.5 4.5 6.5-2 5-9 9.5-9 9.5z" />
             </svg>
           </button>
         </div>
-        <div className="mt-3">
+        <div className="mt-2">
           <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${hasAnyStock ? 'text-text-muted' : 'text-error'}`}>
             {hasAnyStock ? 'En stock' : 'Agotado'}
           </span>
@@ -210,21 +211,17 @@ export default function ProductPurchaseOptions({
 
       {/* Caja "curado bajo pedido" — SOLO productos bajo pedido */}
       {isBajoPedido && (
-        <div className="border-l-2 border-accent bg-bg-alt px-5 py-5">
-          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Curado bajo pedido</span>
-          <p className="mt-2.5 font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
-            Entrega estimada
-            <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
-          </p>
-          <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
-            Curado especialmente para ti. Verificado por NönDecants antes de llegar a tus manos.
+        <div className="border-l-2 border-accent bg-bg-alt px-4 py-3.5">
+          <p className="font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
+            <span className="text-text-muted">Bajo pedido ·</span> Entrega
+            <span className="ml-2 font-display text-lg italic normal-case tracking-normal text-text">13–17 días</span>
           </p>
         </div>
       )}
 
       {/* Selector de formato */}
       <div>
-        <p className="eyebrow mb-3">Selecciona tu formato</p>
+        <p className="eyebrow mb-2.5">Selecciona tu formato</p>
         <div className="grid grid-cols-3 gap-2">
           {fullBottlePrice > 0 && (
             <SizeCard
@@ -255,7 +252,7 @@ export default function ProductPurchaseOptions({
 
       {/* Precio + CTA */}
       <div className="flex items-baseline gap-3">
-        <p className="font-display text-3xl text-text">{formatCurrency(discountedPrice)}</p>
+        <p className="font-display text-2xl text-text">{formatCurrency(discountedPrice)}</p>
         {hasDiscount && (
           <>
             <p className="font-body text-sm text-text-muted line-through">{formatCurrency(currentPrice)}</p>
@@ -267,7 +264,7 @@ export default function ProductPurchaseOptions({
       <div className="flex flex-col gap-2">
         <button
           onClick={handleAddToCart}
-          className="flex w-full items-center justify-center gap-2 bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          className="flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
         >
           Añadir — {formatCurrency(discountedPrice)}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
@@ -275,13 +272,13 @@ export default function ProductPurchaseOptions({
         <div className="flex gap-2">
           <button
             onClick={handleFastPurchase}
-            className="flex-1 border border-border py-3.5 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text"
+            className="flex-1 border border-border py-3 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text"
           >
             Comprar ahora
           </button>
           <button
             onClick={handleWhatsapp}
-            className="flex h-[46px] w-[46px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
+            className="flex h-[42px] w-[42px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
             title="Consultar por WhatsApp"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -292,9 +289,8 @@ export default function ProductPurchaseOptions({
       </div>
 
       {/* Entrega */}
-      <div className="border-t border-border pt-5">
-        <p className="eyebrow mb-3">Entrega</p>
-        <div className="flex flex-col gap-2 font-body text-[13px] text-text-soft">
+      <div className="border-t border-border pt-4">
+        <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
           <span className="flex items-center gap-2"><Tick /> Garantía de autenticidad · 7 días</span>
           <span className="flex items-center gap-2"><Tick /> Envío nacional asegurado · desde $3</span>
           <span className="flex items-center gap-2"><Tick /> {isBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Preparación en 24 h'}</span>
@@ -302,7 +298,7 @@ export default function ProductPurchaseOptions({
       </div>
 
       {/* Pago */}
-      <div className="flex items-center gap-3 border-t border-border pt-5">
+      <div className="flex items-center gap-3 border-t border-border pt-4">
         <span className="eyebrow">Pago</span>
         <span className="font-body text-[12px] text-text-soft">Tarjeta · Transferencia · PayPhone</span>
       </div>
@@ -344,7 +340,7 @@ function SizeCard({ ml, type, price, active, disabled, onClick }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col items-start p-4 text-left transition-all ${
+      className={`flex flex-col items-start p-3 text-left transition-all ${
         disabled
           ? 'cursor-not-allowed border border-border opacity-40'
           : active
@@ -352,13 +348,13 @@ function SizeCard({ ml, type, price, active, disabled, onClick }: {
             : 'border border-border text-text hover:border-text'
       }`}
     >
-      <span className="font-display text-2xl leading-none">
-        {ml}<span className="ml-1 font-body text-xs opacity-70">ml</span>
+      <span className="font-display text-xl leading-none">
+        {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
       </span>
-      <span className={`mt-2 font-body text-[9px] uppercase tracking-[0.18em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
+      <span className={`mt-1.5 font-body text-[9px] uppercase tracking-[0.18em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
         {type}
       </span>
-      <span className="mt-1 font-body text-xs">{formatCurrency(price)}</span>
+      <span className="mt-1 font-body text-[11px]">{formatCurrency(price)}</span>
     </button>
   );
 }

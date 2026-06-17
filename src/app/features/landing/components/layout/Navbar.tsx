@@ -1,9 +1,9 @@
-import CartDrawerIsland from '@/app/features/cart/CartDrawerIsland';
 import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
 import AppProviders from '@/app/providers/AppProviders';
 import { useNavbarHook } from '../../hooks/useNavbarHook';
 import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
+import NavbarSearch from './NavbarSearch';
 
 /* ── Wordmark NönDecants — serif display, la "ö" es intencional ───────── */
 function Wordmark({ size = 26 }: { size?: number }) {
@@ -19,9 +19,6 @@ function Wordmark({ size = 26 }: { size?: number }) {
 
 /* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
 const ico = 'h-[18px] w-[18px]';
-const IconSearch = () => (
-  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" /></svg>
-);
 const IconUser = () => (
   <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="12" cy="9" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
 );
@@ -36,7 +33,6 @@ const IconBag = () => (
 export default function Navbar() {
   const {
     itemCount,
-    setDrawerOpen,
     isAuthenticated,
     authOpen,
     setAuthOpen,
@@ -138,9 +134,7 @@ export default function Navbar() {
               className="flex items-center justify-end gap-5 text-text md:gap-6"
               onMouseEnter={() => setOpenDropdown(null)}
             >
-              <a href="/catalogo/perfumes" className="hidden p-0.5 hover:text-accent md:block" aria-label="Buscar">
-                <IconSearch />
-              </a>
+              <NavbarSearch />
               {isAuthenticated ? (
                 <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Mi cuenta">
                   <IconUser />
@@ -153,14 +147,14 @@ export default function Navbar() {
               <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Favoritos">
                 <IconHeart />
               </a>
-              <button onClick={() => setDrawerOpen(true)} className="relative p-0.5 hover:text-accent" aria-label="Carrito">
+              <a href="/carrito" className="relative p-0.5 hover:text-accent" aria-label="Carrito">
                 <IconBag />
                 {itemCount > 0 && (
                   <span className="absolute -right-2 -top-1.5 flex items-center justify-center rounded-full bg-text px-[5px] py-[1px] font-body text-[9px] font-medium text-bg">
                     {itemCount > 9 ? '9+' : itemCount}
                   </span>
                 )}
-              </button>
+              </a>
             </div>
           </div>
 
@@ -190,7 +184,6 @@ export default function Navbar() {
         )}
       </header>
 
-      <CartDrawerIsland />
       <AuthModalIsland open={authOpen} onClose={() => setAuthOpen(false)} />
     </AppProviders>
   );

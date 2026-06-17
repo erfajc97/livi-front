@@ -19,6 +19,8 @@ interface CatalogFiltersProps {
   onPriceRangeChange: (min?: number, max?: number) => void;
   categoryId?: number;
   onCategoryChange: (v?: number) => void;
+  marcaId?: number;
+  onMarcaChange: (v?: number) => void;
   hasActiveFilters: boolean;
   onClearFilters: () => void;
   hideCategories?: boolean;
@@ -38,12 +40,21 @@ export default function CatalogFilters({
   onPriceRangeChange,
   categoryId,
   onCategoryChange,
+  marcaId,
+  onMarcaChange,
   hasActiveFilters,
   onClearFilters,
   hideCategories,
 }: CatalogFiltersProps) {
   const { data: categories = [] } = useCategoriesWithMarcasQuery();
   const filteredCategories = categories.filter((c) => c.name.toLowerCase() !== 'all');
+
+  // Marcas para el select: las de la categoría elegida; si no hay categoría,
+  // todas las marcas (dedupe por id).
+  const marcaSource = categoryId
+    ? (filteredCategories.find((c) => Number(c.id) === categoryId)?.marcas ?? [])
+    : filteredCategories.flatMap((c) => c.marcas);
+  const marcas = Array.from(new Map(marcaSource.map((m) => [String(m.id), m])).values());
 
   return (
     <div className="space-y-9">
@@ -71,6 +82,27 @@ export default function CatalogFilters({
             {filteredCategories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {/* Marca — select (depende de la categoría elegida) */}
+      {marcas.length > 0 && (
+        <div>
+          <p className="eyebrow mb-3">Marca</p>
+          <select
+            value={marcaId ?? ''}
+            onChange={(e) =>
+              onMarcaChange(e.target.value ? Number(e.target.value) : undefined)
+            }
+            className={selectClass}
+          >
+            <option value="">Todas las marcas</option>
+            {marcas.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.name}
               </option>
             ))}
           </select>

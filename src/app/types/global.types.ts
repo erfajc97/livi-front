@@ -64,6 +64,16 @@ export interface Product {
   categoryId?: number;
   marcaId?: number;
   createdAt: string;
+  // ── PDP editorial ──
+  scentProfileTitle?: string;
+  scentSections?: { title: string; notes: { name: string; color: string }[]; description: string }[];
+  mood?: string[];
+  occasion?: string[];
+  longevity?: number;
+  projectionScore?: number;
+  signatureTitle?: string;
+  signatureDescription?: string;
+  signatureImageUrl?: string;
 }
 
 export interface Banner {
@@ -147,6 +157,10 @@ export interface Combo {
   discount?: number;
   isActive: boolean;
   comboProducts: ComboProduct[];
+  /** Si es una versión, ID del combo base. */
+  parentComboId?: number | null;
+  /** Versiones del combo (mismo nombre, otros productos/precio). Solo en el base. */
+  versions?: Combo[];
 }
 
 // ── Parámetros de query comunes ─────────────────────────

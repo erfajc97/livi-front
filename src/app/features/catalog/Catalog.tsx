@@ -52,11 +52,11 @@ function CatalogContent({
     setHasDiscount,
     setPriceRange,
     setCategoryId,
+    setMarcaId,
     clearFilters,
   } = useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMarcaId });
 
   const { data: categories = [] } = useCategoriesWithMarcasQuery();
-  const hideCategories = !!filters.marcaId;
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const resultCount = pagination?.total ?? products.length;
@@ -77,9 +77,13 @@ function CatalogContent({
     activeChips.push({ key: 'price', label: `Hasta $${filters.maxPrice}`, onRemove: () => setPriceRange(undefined, undefined) });
   if (filters.search)
     activeChips.push({ key: 'search', label: `“${filters.search}”`, onRemove: () => setSearch('') });
-  if (filters.categoryId && filters.categoryId !== initialCategoryId && !filters.marcaId) {
+  if (filters.categoryId && filters.categoryId !== initialCategoryId) {
     const cat = categories.find((c) => Number(c.id) === filters.categoryId);
     if (cat) activeChips.push({ key: 'cat', label: cat.name, onRemove: () => setCategoryId(initialCategoryId) });
+  }
+  if (filters.marcaId && filters.marcaId !== initialMarcaId) {
+    const marca = categories.flatMap((c) => c.marcas).find((m) => Number(m.id) === filters.marcaId);
+    if (marca) activeChips.push({ key: 'marca', label: marca.name, onRemove: () => setMarcaId(initialMarcaId) });
   }
 
   // Chips rápidos (género + momento) — valores reales del back
@@ -111,9 +115,10 @@ function CatalogContent({
       onPriceRangeChange={setPriceRange}
       categoryId={filters.categoryId}
       onCategoryChange={setCategoryId}
+      marcaId={filters.marcaId}
+      onMarcaChange={setMarcaId}
       hasActiveFilters={hasActiveFilters}
       onClearFilters={clearFilters}
-      hideCategories={hideCategories}
     />
   );
 

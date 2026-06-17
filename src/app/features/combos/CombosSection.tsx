@@ -1,13 +1,13 @@
 import AppProviders from '@/app/providers/AppProviders';
 import { useActiveCombosQuery } from '@/app/tanstack-queries/combosQuery';
-import ComboGrid from './components/ComboGrid';
+import ComboEditorialList from './components/ComboEditorialList';
 
 function CombosContent() {
   const { data: combos = [], isLoading } = useActiveCombosQuery();
 
   return (
-    <div className="px-6 pb-20 pt-10 md:px-14">
-      <ComboGrid combos={combos} isLoading={isLoading} />
+    <div className="pb-20">
+      <ComboEditorialList combos={combos} isLoading={isLoading} />
     </div>
   );
 }

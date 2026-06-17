@@ -67,6 +67,16 @@ export const mapProduct = (raw: any): Product => {
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
     marcaId: raw.marcaId != null ? Number(raw.marcaId) : undefined,
     createdAt: raw.createdAt ?? '',
+    // ── PDP editorial ──
+    scentProfileTitle: raw.scentProfileTitle ?? undefined,
+    scentSections: Array.isArray(raw.scentSections) ? raw.scentSections : undefined,
+    mood: Array.isArray(raw.mood) ? raw.mood : undefined,
+    occasion: Array.isArray(raw.occasion) ? raw.occasion : undefined,
+    longevity: raw.longevity != null ? Number(raw.longevity) : undefined,
+    projectionScore: raw.projectionScore != null ? Number(raw.projectionScore) : undefined,
+    signatureTitle: raw.signatureTitle ?? undefined,
+    signatureDescription: raw.signatureDescription ?? undefined,
+    signatureImageUrl: raw.signatureImageUrl ?? undefined,
   };
 };
 

@@ -60,40 +60,45 @@ export default function ProductCard({ product }: ProductCardProps) {
     <a href={productUrl} className="group/card flex flex-col">
       {/* Imagen — formato editorial alargado (≈2:3, igual que la referencia) */}
       <div className="relative aspect-2/3 overflow-hidden bg-surface-raised">
-        {productImage ? (
-          <>
-            <img
-              src={productImage}
-              alt={product.name}
-              loading="lazy"
-              className={`h-full w-full object-cover transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
-            />
-            {hoverImage && (
-              <img
-                src={hoverImage}
-                alt={product.name}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 group-hover/card:opacity-100"
-              />
+        {/* Frame con padding (más en eje Y) — la imagen no queda pegada al borde */}
+        <div className="absolute inset-0 overflow-hidden px-3 py-5">
+          <div className="relative h-full w-full overflow-hidden">
+            {productImage ? (
+              <>
+                <img
+                  src={productImage}
+                  alt={product.name}
+                  loading="lazy"
+                  className={`h-full w-full object-cover transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
+                />
+                {hoverImage && (
+                  <img
+                    src={hoverImage}
+                    alt={product.name}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-700 group-hover/card:opacity-100"
+                  />
+                )}
+              </>
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-text-muted">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
+                  <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                </svg>
+              </div>
             )}
-          </>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-text-muted">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
-              <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
-            </svg>
           </div>
-        )}
+        </div>
 
         {/* Descuento — sobre la imagen, abajo izq. */}
         {hasDiscount && (
-          <span className="absolute bottom-4 left-4 bg-accent px-2.5 py-1 font-body text-[9px] font-medium uppercase tracking-[0.18em] text-bg">
+          <span className="absolute bottom-5 left-3 bg-accent px-2.5 py-1 font-body text-[9px] font-medium uppercase tracking-[0.18em] text-bg">
             -{discount}%
           </span>
         )}
 
         {/* Vista rápida — barra inferior que se revela al hover (ref. Atelier) */}
-        <div className="pointer-events-none absolute inset-x-4 bottom-4 flex translate-y-2 items-center justify-between bg-bg px-3.5 py-3 font-body text-[11px] uppercase tracking-[0.18em] text-text opacity-0 transition-all duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100">
+        <div className="pointer-events-none absolute inset-x-3 bottom-5 flex translate-y-2 items-center justify-between bg-bg px-3.5 py-3 font-body text-[11px] uppercase tracking-[0.18em] text-text opacity-0 transition-all duration-300 ease-out group-hover/card:translate-y-0 group-hover/card:opacity-100">
           <span>Vista rápida</span>
           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14" /><path d="M13 6l6 6-6 6" />

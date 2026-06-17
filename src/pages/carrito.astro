@@ -1,0 +1,13 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import CartPageIsland from '@/app/features/cart/CartPageIsland';
+
+export const prerender = false; // el carrito vive en localStorage (cliente)
+---
+
+<PublicLayout
+  title="Carrito — NönDecants"
+  description="Revisa tu selección de perfumes: envío inmediato y referencias bajo pedido."
+>
+  <CartPageIsland client:load />
+</PublicLayout>

@@ -33,6 +33,7 @@ function getUrlParams() {
   return {
     categoryId: catId ? Number(catId) : undefined,
     marcaId: subId ? Number(subId) : undefined,
+    search: params.get('search') ?? undefined,
   };
 }
 
@@ -43,6 +44,7 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
 
   const [filters, setFilters] = useState<CatalogFilters>({
     ...defaultFilters,
+    search: urlParams.search ?? '',
     categoryId: catId,
     marcaId: subId,
   });

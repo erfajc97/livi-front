@@ -21,15 +21,19 @@ function TrustRow({ label, value }: { label: string; value: string }) {
 
 function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const [showAuth, setShowAuth] = useState(false);
 
-  const products = combo.comboProducts ?? [];
-  const discount = combo.discount ?? 0;
+  // Versiones: combo base + sus versiones (mismo nombre, otros productos/precio).
+  const variants = [combo, ...(combo.versions ?? [])];
+  const [activeId, setActiveId] = useState<number>(combo.id);
+  const active = variants.find((v) => v.id === activeId) ?? combo;
+
+  const products = active.comboProducts ?? [];
+  const discount = active.discount ?? 0;
   const hasDiscount = discount > 0;
-  const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
-  const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
+  const actualPrice = hasDiscount ? active.finalPrice - discount : active.finalPrice;
+  const discountPercent = hasDiscount ? Math.round((discount / active.finalPrice) * 100) : 0;
 
   const comboInStock = products.every((cp) => {
     const prod = cp.product;
@@ -59,14 +63,14 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
       return { productId: parseInt(String(cp.productId), 10), quantity: cp.quantity };
     });
     return {
-      productId: `combo-${combo.id}`,
-      variantId: `combo-${combo.id}`,
+      productId: `combo-${active.id}`,
+      variantId: `combo-${active.id}`,
       name: combo.name,
-      image: combo.imageUrl || products[0]?.product?.image || '',
+      image: active.imageUrl || combo.imageUrl || products[0]?.product?.image || '',
       ml: 0,
       price: actualPrice,
       quantity: 1,
-      comboId: combo.id,
+      comboId: active.id,
       comboProducts,
       bajoPedido: comboHasBajoPedido,
     };
@@ -74,7 +78,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
   const handleAddToCart = () => {
     addItem(buildComboCartItem());
-    setDrawerOpen(true);
+    window.location.href = '/carrito';
   };
 
   const handleBuyNow = () => {
@@ -90,11 +94,11 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[1.05fr_1fr] md:gap-20">
-      {/* Imagen */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-surface-raised md:aspect-[5/6]">
-        {combo.imageUrl ? (
-          <img src={combo.imageUrl} alt={combo.name} className="h-full w-full object-cover" />
+    <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[0.8fr_1fr] md:gap-12">
+      {/* Imagen — compacta, cabe en el viewport */}
+      <div className="relative h-[46svh] overflow-hidden bg-surface-raised sm:h-[54svh] md:h-[calc(100svh-13rem)] md:max-h-[560px]">
+        {(active.imageUrl || combo.imageUrl) ? (
+          <img src={active.imageUrl || combo.imageUrl} alt={combo.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-text-muted">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
@@ -116,37 +120,61 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
       </div>
 
       {/* Info */}
-      <div className="md:sticky md:top-24">
+      <div className="md:sticky md:top-20">
         <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
           Combo · {products.length} {products.length === 1 ? 'producto' : 'productos'}
         </span>
-        <h1 className="mt-3 font-display text-5xl font-light leading-[0.95] tracking-[-0.025em] text-text md:text-6xl">
+        <h1 className="mt-1.5 font-display text-3xl font-light leading-[1.0] tracking-[-0.025em] text-text md:text-4xl">
           {combo.name}
         </h1>
-        {combo.description && (
-          <p className="mt-5 max-w-md font-body text-sm leading-relaxed text-text-soft">{combo.description}</p>
+        {active.description && (
+          <p className="mt-3 max-w-md font-body text-sm leading-relaxed text-text-soft">{active.description}</p>
+        )}
+
+        {/* Selector de versión — mismo combo, otra composición/precio */}
+        {variants.length > 1 && (
+          <div className="mt-5">
+            <span className="eyebrow">Elige tu versión</span>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              {variants.map((v, i) => {
+                const vDisc = v.discount ?? 0;
+                const vPrice = vDisc > 0 ? v.finalPrice - vDisc : v.finalPrice;
+                const isActive = v.id === activeId;
+                return (
+                  <button
+                    key={v.id}
+                    onClick={() => setActiveId(v.id)}
+                    className={`flex flex-col items-start border px-3 py-2 text-left transition-colors ${
+                      isActive ? 'border-text bg-text text-bg' : 'border-border text-text hover:border-text'
+                    }`}
+                  >
+                    <span className={`font-body text-[9px] uppercase tracking-[0.18em] ${isActive ? 'text-bg/70' : 'text-text-muted'}`}>
+                      Opción {i + 1} · {(v.comboProducts ?? []).length} prod
+                    </span>
+                    <span className="mt-0.5 font-display text-base leading-none">{formatCurrency(vPrice)}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         )}
 
         {comboHasBajoPedido && (
-          <div className="mt-7 border-l-2 border-accent bg-bg-alt px-5 py-5">
-            <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Curado bajo pedido</span>
-            <p className="mt-2.5 font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
-              Entrega estimada
-              <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
-            </p>
-            <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
-              Curado especialmente para ti. Verificado por NönDecants antes de llegar a tus manos.
+          <div className="mt-5 border-l-2 border-accent bg-bg-alt px-4 py-3">
+            <p className="font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
+              <span className="text-text-muted">Bajo pedido ·</span> Entrega
+              <span className="ml-2 font-display text-lg italic normal-case tracking-normal text-text">13–17 días</span>
             </p>
           </div>
         )}
 
-        <div className="my-9 h-px bg-border" />
+        <div className="my-5 h-px bg-border" />
 
         {/* Precio */}
         <div className="flex items-baseline gap-3">
-          <span className="font-display text-3xl text-text">{formatCurrency(actualPrice)}</span>
+          <span className="font-display text-2xl text-text">{formatCurrency(actualPrice)}</span>
           {hasDiscount && (
-            <span className="font-body text-sm text-text-muted line-through">{formatCurrency(combo.finalPrice)}</span>
+            <span className="font-body text-sm text-text-muted line-through">{formatCurrency(active.finalPrice)}</span>
           )}
           {discountPercent > 0 && (
             <span className="bg-accent px-1.5 py-px font-body text-[10px] font-medium tracking-wide text-bg">-{discountPercent}%</span>
@@ -159,20 +187,20 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
         )}
 
         {/* Incluidos */}
-        <div className="mt-8">
+        <div className="mt-5">
           <span className="eyebrow">Incluye</span>
-          <div className="mt-4 divide-y divide-border border-y border-border">
+          <div className="mt-2.5 divide-y divide-border border-y border-border">
             {products.map((cp) => {
               const variant = cp.productVariation;
               const productPrice = Number(variant?.price ?? cp.product?.price ?? 0);
               const img = cp.product?.imageUrl || cp.product?.image || (cp.product as any)?.images?.[0]?.url;
               return (
-                <div key={cp.id} className="flex items-center gap-4 py-3">
-                  <div className="h-12 w-12 shrink-0 overflow-hidden bg-surface-raised">
+                <div key={cp.id} className="flex items-center gap-3 py-2">
+                  <div className="h-10 w-10 shrink-0 overflow-hidden bg-surface-raised">
                     {img ? <img src={img} alt="" className="h-full w-full object-cover" /> : null}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-display text-base text-text">{cp.product?.name ?? 'Producto'}</p>
+                    <p className="truncate font-display text-sm text-text">{cp.product?.name ?? 'Producto'}</p>
                     <p className="font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
                       {variant?.mlSize ? `${variant.mlSize}ml · ` : ''}{variant?.isFullBottle ? 'Sellado' : variant?.mlSize ? 'Decant' : ''}
                       {cp.quantity > 1 ? ` · ${cp.quantity}x` : ''}
@@ -186,11 +214,11 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
         </div>
 
         {/* CTAs */}
-        <div className="mt-8 flex flex-col gap-2">
+        <div className="mt-5 flex flex-col gap-2">
           <button
             onClick={comboInStock ? handleBuyNow : undefined}
             disabled={!comboInStock}
-            className="flex w-full items-center justify-between bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex w-full items-center justify-between bg-text px-6 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
           >
             <span>{comboInStock ? `Comprar — ${formatCurrency(actualPrice)}` : 'Combo agotado'}</span>
             {comboInStock && (
@@ -201,13 +229,13 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
             <button
               onClick={comboInStock ? handleAddToCart : undefined}
               disabled={!comboInStock}
-              className="flex-1 border border-border py-3.5 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex-1 border border-border py-3 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text disabled:cursor-not-allowed disabled:opacity-40"
             >
               Agregar al carrito
             </button>
             <button
               onClick={handleWhatsapp}
-              className="flex h-[46px] w-[46px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
+              className="flex h-[42px] w-[42px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
               title="Consultar por WhatsApp"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -218,7 +246,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
         </div>
 
         {/* Confianza */}
-        <div className="mt-9 space-y-5 border-t border-border pt-7">
+        <div className="mt-5 space-y-2.5 border-t border-border pt-4">
           <TrustRow label="Autenticidad" value="Verificado por NönDecants" />
           <TrustRow label="Entrega" value={comboHasBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Servientrega 24–72h · todo el Ecuador'} />
           <TrustRow label="Pago" value="Tarjeta · Transferencia · PayPhone" />

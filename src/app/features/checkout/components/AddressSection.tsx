@@ -61,7 +61,10 @@ export default function AddressSection({ customer, onChange }: AddressSectionPro
         </select>
         <input
           type="tel"
-          placeholder="Número telefónico"
+          inputMode="numeric"
+          autoComplete="tel"
+          maxLength={10}
+          placeholder="Número telefónico (10 dígitos)"
           value={customer.phone}
           onChange={(e) => onChange('phone', e.target.value)}
           className={`${INPUT_CLASS} md:col-span-2`}
