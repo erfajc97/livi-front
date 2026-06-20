@@ -82,17 +82,28 @@ export default function ProductPurchaseOptions({
   // Stock — use available ml to determine what's purchasable
   const openMl = product.openBottleMlRemaining ?? 0;
   const availableMl = openMl + fullBottleStock * fullBottleMl;
-  const isBajoPedido = !!product.bajoPedido;
-  // El frasco completo SÍ puede ir bajo pedido (importación). Los decants NO:
-  // un decant requiere abrir un frasco real, así que se topan por ml disponible.
-  const canBuyFullBottle = isBajoPedido || fullBottleStock > 0;
+  // El flag `bajoPedido` define SOLO la sección (importación exclusiva). El
+  // frasco completo SIEMPRE se puede comprar: si no queda stock sellado, se
+  // importa bajo pedido. Los decants NO: requieren abrir un frasco real, así
+  // que se topan por ml disponible.
+  const isBajoPedidoFlag = !!product.bajoPedido;
+  const canBuyFullBottle = fullBottlePrice > 0;
   const canBuyDecant = (ml: number) => availableMl >= ml;
+  // El frasco va "bajo pedido" cuando está marcado como tal o cuando no queda
+  // stock sellado (todas las unidades se importan).
+  const fullIsBackorder = isBajoPedidoFlag || fullBottleStock <= 0;
+  // Sólo la opción seleccionada determina el tag/modal de bajo pedido.
+  const selectedIsBajoPedido = isFullSelected ? fullIsBackorder : false;
 
   const inStock = isFullSelected
     ? canBuyFullBottle
     : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
 
-  const hasAnyStock = isBajoPedido || canBuyFullBottle || availableMl > 0;
+  const hasImmediateStock = fullBottleStock > 0 || availableMl > 0;
+  const statusLabel = hasImmediateStock
+    ? 'En stock'
+    : canBuyFullBottle || isBajoPedidoFlag ? 'Bajo pedido' : 'Agotado';
+  const statusIsBad = statusLabel === 'Agotado';
 
   const getCartItem = () => {
     if (isFullSelected) {
@@ -104,11 +115,13 @@ export default function ProductPurchaseOptions({
         ml: fullBottleMl,
         price: hasDiscount ? discountedPrice : fullBottlePrice,
         quantity: 1,
-        bajoPedido: isBajoPedido,
+        bajoPedido: fullIsBackorder,
         // Frasco completo: el usuario PUEDE pedir más de lo que hay en stock; el
         // excedente se desglosa como "bajo pedido" en el carrito. Sin tope duro.
         maxQty: undefined,
-        stockAvailable: isBajoPedido ? 0 : fullBottleStock,
+        // Sin stock sellado → todo bajo pedido (stockAvailable undefined). Con
+        // stock parcial → el carrito parte el excedente a bajo pedido.
+        stockAvailable: fullIsBackorder ? undefined : fullBottleStock,
       };
     }
     if (selectedDecant) {
@@ -120,8 +133,9 @@ export default function ProductPurchaseOptions({
         ml: selectedDecant.ml,
         price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
         quantity: 1,
-        bajoPedido: isBajoPedido,
-        // Decant: SIEMPRE topado por las unidades disponibles (ml / mlSize).
+        // Decant NUNCA va bajo pedido: se topa por las unidades disponibles
+        // (ml / mlSize), nunca se importa.
+        bajoPedido: false,
         maxQty: selectedDecant.availableQuantity,
       };
     }
@@ -150,7 +164,7 @@ export default function ProductPurchaseOptions({
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    if (isBajoPedido) { setPendingAction('add'); return; }
+    if (selectedIsBajoPedido) { setPendingAction('add'); return; }
     proceedAdd();
   };
 
@@ -160,7 +174,7 @@ export default function ProductPurchaseOptions({
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    if (isBajoPedido) { setPendingAction('fast'); return; }
+    if (selectedIsBajoPedido) { setPendingAction('fast'); return; }
     proceedFastPurchase();
   };
 
@@ -203,14 +217,14 @@ export default function ProductPurchaseOptions({
           </button>
         </div>
         <div className="mt-2">
-          <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${hasAnyStock ? 'text-text-muted' : 'text-error'}`}>
-            {hasAnyStock ? 'En stock' : 'Agotado'}
+          <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${statusIsBad ? 'text-error' : 'text-text-muted'}`}>
+            {statusLabel}
           </span>
         </div>
       </div>
 
-      {/* Caja "curado bajo pedido" — SOLO productos bajo pedido */}
-      {isBajoPedido && (
+      {/* Caja "curado bajo pedido" — frasco importado (flag) o sin stock sellado */}
+      {selectedIsBajoPedido && (
         <div className="border-l-2 border-accent bg-bg-alt px-4 py-3.5">
           <p className="font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
             <span className="text-text-muted">Bajo pedido ·</span> Entrega
@@ -226,7 +240,7 @@ export default function ProductPurchaseOptions({
           {fullBottlePrice > 0 && (
             <SizeCard
               ml={fullBottleMl}
-              type={canBuyFullBottle ? 'Sellada' : 'Agotada'}
+              type={fullBottleStock > 0 ? 'Sellada' : 'Bajo pedido'}
               price={fullBottlePrice}
               active={isFullSelected}
               disabled={!canBuyFullBottle}
@@ -293,7 +307,7 @@ export default function ProductPurchaseOptions({
         <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
           <span className="flex items-center gap-2"><Tick /> Garantía de autenticidad · 7 días</span>
           <span className="flex items-center gap-2"><Tick /> Envío nacional asegurado · desde $3</span>
-          <span className="flex items-center gap-2"><Tick /> {isBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Preparación en 24 h'}</span>
+          <span className="flex items-center gap-2"><Tick /> {selectedIsBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Preparación en 24 h'}</span>
         </div>
       </div>
 

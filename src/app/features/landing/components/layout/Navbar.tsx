@@ -5,18 +5,6 @@ import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
 import NavbarSearch from './NavbarSearch';
 
-/* ── Wordmark NönDecants — serif display, la "ö" es intencional ───────── */
-function Wordmark({ size = 26 }: { size?: number }) {
-  return (
-    <span
-      className="font-display italic"
-      style={{ fontSize: size, fontWeight: 500, letterSpacing: '0.16em' }}
-    >
-      Nön<span className="not-italic font-normal">decants</span>
-    </span>
-  );
-}
-
 /* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
 const ico = 'h-[18px] w-[18px]';
 const IconUser = () => (
@@ -124,9 +112,15 @@ export default function Navbar() {
               </nav>
             </div>
 
-            {/* Centro: wordmark */}
+            {/* Centro: logo */}
             <a href="/" className="justify-self-center text-text" aria-label="NönDecants — Inicio">
-              <Wordmark />
+              <img
+                src="/logonondecants.png"
+                alt="NönDecants"
+                width={543}
+                height={127}
+                className="h-6 w-auto sm:h-7 md:h-9"
+              />
             </a>
 
             {/* Derecha: iconos */}
