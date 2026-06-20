@@ -101,3 +101,7 @@ export const useNormalCategoriesQuery = () => useAllCategories(selectPerfumes)
 
 /** Bajo Pedido dropdown — marcas con bajoPedido=true. */
 export const useBajoPedidoCategoriesQuery = () => useAllCategories(selectBajoPedido)
+
+/** Sin filtrar — todas las categorías y todas sus marcas (banner: resolver una
+ *  marca por id aunque esté inactiva, p. ej. una marca solo de bajo pedido). */
+export const useRawCategoriesQuery = () => useAllCategories((cats) => cats)

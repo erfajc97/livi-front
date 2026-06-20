@@ -1,4 +1,4 @@
-import { useCategoriesWithMarcasQuery } from '@/app/tanstack-queries/categoriesQuery';
+import { useRawCategoriesQuery } from '@/app/tanstack-queries/categoriesQuery';
 import type { NavCategory } from '@/app/tanstack-queries/categoriesQuery';
 
 interface CatalogBannerProps {
@@ -12,7 +12,7 @@ function useBannerData(defaultTitle: string, defaultDescription: string) {
   const categoryId = params.get('category');
   const marcaId = params.get('marca');
 
-  const { data: categories = [] } = useCategoriesWithMarcasQuery();
+  const { data: categories = [] } = useRawCategoriesQuery();
 
   if (!categoryId || categories.length === 0) {
     return { title: defaultTitle, description: defaultDescription, imageUrl: null };
@@ -31,7 +31,8 @@ function useBannerData(defaultTitle: string, defaultDescription: string) {
       return {
         title: marca.name,
         description: `Explora nuestra selección de ${marca.name}`,
-        imageUrl: marca.imageUrl,
+        // Imagen de la marca; si no tuviera, cae a la de la categoría.
+        imageUrl: marca.imageUrl || category.imageUrl,
       };
     }
   }
