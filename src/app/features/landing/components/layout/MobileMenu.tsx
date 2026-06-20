@@ -9,69 +9,80 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
+/**
+ * Menú móvil — misma dirección editorial (Atelier) que la navbar de escritorio:
+ * tipografía DM Sans en versalitas con tracking, nombres de marca en serif
+ * display, líneas finas `border-border`, sin píldoras ni acentos rellenos.
+ */
 export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onClose }: MobileMenuProps) {
-  const [expandedDropdown, setExpandedDropdown] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const { data: normalCategories = [] } = useNormalCategoriesQuery();
   const { data: bajoPedidoCategories = [] } = useBajoPedidoCategoriesQuery();
 
   return (
-    <div className="border-t border-border bg-bg px-4 py-4 md:hidden max-h-[70vh] overflow-y-auto">
-      <div className="flex flex-col gap-1">
+    <div className="border-t border-border bg-bg md:hidden max-h-[80vh] overflow-y-auto">
+      <nav className="flex flex-col px-6" aria-label="Navegación móvil">
         {NAV_LINKS.map((link) => {
           const active = isLinkActive(link.href, pathname, link.exact);
 
           if (link.dropdown) {
-            const isExpanded = expandedDropdown === link.dropdownId;
-            const categories = link.dropdownId === 'perfumes'
-              ? normalCategories.filter((c) => c.name.toLowerCase() !== 'all')
-              : bajoPedidoCategories.filter((c) => c.name.toLowerCase() !== 'all');
+            const isOpen = expanded === link.dropdownId;
+            const categories = (link.dropdownId === 'perfumes' ? normalCategories : bajoPedidoCategories)
+              .filter((c) => c.name.toLowerCase() !== 'all');
             const basePath = link.dropdownId === 'perfumes' ? '/catalogo/perfumes' : '/bajo-pedido';
 
             return (
-              <div key={link.label}>
+              <div key={link.label} className="border-b border-border">
                 <button
-                  onClick={() => setExpandedDropdown(isExpanded ? null : link.dropdownId!)}
-                  className={[
-                    'flex w-full items-center justify-between rounded-lg px-3 py-2.5 font-heading text-sm transition-colors',
-                    active || isExpanded ? 'bg-accent text-bg' : 'text-text hover:text-accent',
-                  ].join(' ')}
+                  onClick={() => setExpanded(isOpen ? null : link.dropdownId!)}
+                  className="flex w-full items-center justify-between py-4 font-body text-xs uppercase tracking-[0.18em]"
+                  aria-expanded={isOpen}
                 >
-                  {link.label}
+                  <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
                   <svg
-                    width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-                    className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    className={`h-3 w-3 text-text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
                   >
-                    <polyline points="6 9 12 15 18 9"/>
+                    <path d="M6 9l6 6 6-6" />
                   </svg>
                 </button>
 
-                {isExpanded && (
-                  <div className="ml-3 mt-1 flex flex-col gap-0.5 border-l-2 border-accent/30 pl-3">
+                {isOpen && (
+                  <div className="pb-6 pl-1">
                     <a
                       href={basePath}
                       onClick={onClose}
-                      className="rounded-md px-3 py-2 text-sm font-semibold text-accent"
+                      className="eyebrow mb-6 inline-block border-b border-text pb-1 text-text transition-colors hover:text-accent"
                     >
-                      Ver Todos
+                      Ver todo →
                     </a>
-                    {categories.map((cat) => (
-                      <div key={cat.id}>
-                        <span className="block px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-muted">
-                          {cat.name}
-                        </span>
-                        {cat.marcas.map((sub) => (
-                          <a
-                            key={sub.id}
-                            href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
-                            onClick={onClose}
-                            className="flex items-center gap-2 rounded-md px-3 py-1.5 text-sm text-text-soft hover:text-accent transition-colors"
-                          >
-                            <span className="w-1 h-1 rounded-full bg-accent/50 shrink-0" />
-                            {sub.name}
-                          </a>
+
+                    {categories.length === 0 ? (
+                      <p className="font-body text-sm text-text-muted">No hay casas disponibles</p>
+                    ) : (
+                      <div className="flex flex-col gap-7">
+                        {categories.map((cat) => (
+                          <div key={cat.id}>
+                            <div className="flex items-baseline gap-3 pb-3">
+                              <span className="eyebrow">{cat.name}</span>
+                              <span className="h-px flex-1 bg-border" />
+                            </div>
+                            <div className="flex flex-col gap-3.5">
+                              {cat.marcas.map((sub) => (
+                                <a
+                                  key={sub.id}
+                                  href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
+                                  onClick={onClose}
+                                  className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent"
+                                >
+                                  {sub.name}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 )}
               </div>
@@ -83,29 +94,35 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={[
-                'flex items-center gap-2 rounded-lg px-3 py-2.5 font-heading text-sm transition-colors',
-                active ? 'bg-accent text-bg' : 'text-text hover:text-accent',
-              ].join(' ')}
+              className={`border-b border-border py-4 font-body text-xs uppercase tracking-[0.18em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
             >
               {link.label}
             </a>
           );
         })}
-      </div>
-      <div className="mt-3 border-t border-border pt-3">
+      </nav>
+
+      {/* Cuenta + fila de utilidades (espejo de la barra superior de escritorio) */}
+      <div className="flex flex-col gap-4 bg-bg-alt px-6 py-7">
         {isAuthenticated ? (
-          <a href="/mi-cuenta" className="block font-heading text-xs uppercase tracking-wider text-accent">
+          <a href="/mi-cuenta" onClick={onClose} className="eyebrow self-start text-text transition-colors hover:text-accent">
             Mi cuenta
           </a>
         ) : (
           <button
             onClick={() => { onAuthOpen(); onClose(); }}
-            className="font-heading text-xs uppercase tracking-wider text-accent"
+            className="eyebrow self-start text-text transition-colors hover:text-accent"
           >
             Ingresar
           </button>
         )}
+        <div className="flex flex-col gap-2.5 font-body text-[11px] tracking-[0.04em] text-text-soft">
+          <a href="/rastrear" onClick={onClose} className="hover:text-text">Rastrear pedido</a>
+          <a href="/contacto" onClick={onClose} className="hover:text-text">Acerca de</a>
+        </div>
+        <span className="font-body text-[11px] tracking-[0.04em] text-text-muted">
+          Envíos a todo el Ecuador · Servientrega 24–72h · ES · USD
+        </span>
       </div>
     </div>
   );

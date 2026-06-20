@@ -7,6 +7,8 @@ export interface NavMarca {
   name: string
   slug: string
   imageUrl: string | null
+  isActive: boolean
+  bajoPedido: boolean
 }
 
 export interface NavCategory {
@@ -15,50 +17,87 @@ export interface NavCategory {
   slug: string
   description: string
   imageUrl: string | null
+  isActive: boolean
   bajoPedido: boolean
   marcas: NavMarca[]
 }
 
-function mapCategories(raw: any[], bajoPedido?: boolean): NavCategory[] {
+function mapCategories(raw: any[]): NavCategory[] {
+  if (!Array.isArray(raw)) return []
   return raw.map((c: any) => ({
     id: String(c.id),
     name: c.name,
     slug: c.slug ?? c.name.toLowerCase(),
     description: c.description ?? '',
     imageUrl: c.imageUrl ?? null,
+    isActive: c.isActive !== false,
     bajoPedido: c.bajoPedido ?? false,
-    marcas: (c.marcas ?? [])
-      .filter((s: any) => s.isActive !== false)
-      .filter((s: any) => bajoPedido === undefined || (s.bajoPedido ?? false) === bajoPedido)
-      .map((s: any) => ({
-        id: String(s.id),
-        name: s.name,
-        slug: s.slug ?? s.name.toLowerCase(),
-        imageUrl: s.imageUrl ?? null,
-      })),
+    marcas: (c.marcas ?? []).map((s: any) => ({
+      id: String(s.id),
+      name: s.name,
+      slug: s.slug ?? s.name.toLowerCase(),
+      imageUrl: s.imageUrl ?? null,
+      isActive: s.isActive !== false,
+      bajoPedido: s.bajoPedido ?? false,
+    })),
   }))
 }
 
-export const useCategoriesQuery = (bajoPedido?: boolean) =>
-  useQuery<NavCategory[]>({
-    queryKey: ['categories', bajoPedido ?? 'all'],
+/**
+ * Fuente única: TODAS las categorías con TODAS sus marcas (incluyendo sus flags
+ * `isActive` y `bajoPedido`). El backend filtra por categoría cuando se le pasa
+ * `?bajoPedido`, así que NO se le pasa: el filtrado por sección se hace en
+ * cliente con `select`, para respetar la regla por marca:
+ *   · Perfumes    → marca.isActive  (independiente de bajoPedido)
+ *   · Bajo Pedido → marca.bajoPedido (independiente de isActive)
+ * Así: activa+bajoPedido → ambos lados · inactiva+bajoPedido → solo bajo pedido
+ *      · activa+!bajoPedido → solo perfumes · inactiva+!bajoPedido → ninguno.
+ */
+function useAllCategories<T>(select: (cats: NavCategory[]) => T) {
+  return useQuery<NavCategory[], unknown, T>({
+    queryKey: ['categories', 'all'],
     queryFn: async () => {
-      const params: Record<string, string> = {}
-      if (bajoPedido !== undefined) params.bajoPedido = String(bajoPedido)
-      const { data } = await axiosInstance.get(API_ENDPOINTS.CATEGORIES, { params })
+      const { data } = await axiosInstance.get(API_ENDPOINTS.CATEGORIES)
       const raw = data?.data?.data ?? data?.data ?? data ?? []
-      if (!Array.isArray(raw)) return []
-      return mapCategories(raw, bajoPedido)
+      return mapCategories(raw)
     },
+    select,
     staleTime: 5 * 60_000,
     retry: 1,
   })
+}
 
-/** All categories (no filter) — used by CatalogBanner */
-export const useCategoriesWithMarcasQuery = () => useCategoriesQuery()
+/** Perfumes: categorías activas → solo marcas activas (cualquier bajoPedido). */
+const selectPerfumes = (cats: NavCategory[]): NavCategory[] =>
+  cats
+    .map((c) => ({ ...c, marcas: c.marcas.filter((m) => m.isActive) }))
+    .filter((c) => c.isActive && c.marcas.length > 0)
 
-/** All active categories — Perfumes dropdown (isActive categories appear here regardless of bajoPedido) */
-export const useNormalCategoriesQuery = () => useCategoriesQuery()
+/** Bajo Pedido: solo marcas con bajoPedido=true (cualquier isActive). */
+const selectBajoPedido = (cats: NavCategory[]): NavCategory[] =>
+  cats
+    .map((c) => ({ ...c, marcas: c.marcas.filter((m) => m.bajoPedido) }))
+    .filter((c) => c.marcas.length > 0)
 
-/** Only bajo pedido categories (bajoPedido=true) — Bajo Pedido dropdown */
-export const useBajoPedidoCategoriesQuery = () => useCategoriesQuery(true)
+/** Catálogo (filtros/banner/home): todas las categorías, solo marcas activas. */
+const selectActiveMarcas = (cats: NavCategory[]): NavCategory[] =>
+  cats.map((c) => ({ ...c, marcas: c.marcas.filter((m) => m.isActive) }))
+
+/** Compat: `true` → bajo pedido · `false` → perfumes · undefined → activas. */
+export const useCategoriesQuery = (bajoPedido?: boolean) =>
+  useAllCategories(
+    bajoPedido === true
+      ? selectBajoPedido
+      : bajoPedido === false
+        ? selectPerfumes
+        : selectActiveMarcas,
+  )
+
+/** Todas las categorías con marcas activas — usado por CatalogBanner/filtros. */
+export const useCategoriesWithMarcasQuery = () => useAllCategories(selectActiveMarcas)
+
+/** Perfumes dropdown — categorías activas con sus marcas activas. */
+export const useNormalCategoriesQuery = () => useAllCategories(selectPerfumes)
+
+/** Bajo Pedido dropdown — marcas con bajoPedido=true. */
+export const useBajoPedidoCategoriesQuery = () => useAllCategories(selectBajoPedido)

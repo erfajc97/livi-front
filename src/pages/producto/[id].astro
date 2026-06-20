@@ -4,7 +4,6 @@ export const prerender = false;
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/productsQuery';
 import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
-import ProductShippingTimeline from '@/app/features/product/components/ProductShippingTimeline.astro';
 import ProductEditorial from '@/app/features/product/components/ProductEditorial.astro';
 import ExploreCategoriesCarousel from '@/app/features/product/components/ExploreCategoriesCarousel';
 
@@ -38,9 +37,6 @@ const relatedProducts = product.categoryId
       </nav>
 
       <ProductDetailIsland product={product} client:load />
-
-      {/* Línea de tiempo 24-72h: solo para productos en stock (no bajo pedido) */}
-      {!product.bajoPedido && <ProductShippingTimeline />}
     </div>
 
     {/* Secciones editoriales (perfil olfativo · carácter/ocasión · firma · promesas) */}
