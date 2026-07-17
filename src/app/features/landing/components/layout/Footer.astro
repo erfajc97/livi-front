@@ -23,7 +23,7 @@ const PAYMENT_ICONS = [
   { src: discoverSvg.src, alt: 'Discover' },
 ];
 
-const CONTACT = ['+593 99 000 0000', 'contacto@nondecants.ec', 'Daule, Ecuador', 'Lun–Sáb · 9–18h'];
+const CONTACT = ['+593 99 230 5463', 'contacto@nondecants.com', 'Daule, Ecuador', 'Lun–Sáb · 9–18h'];
 
 const year = new Date().getFullYear();
 ---
@@ -89,9 +89,9 @@ const year = new Date().getFullYear();
     <div class="mt-6 flex flex-col items-start justify-between gap-4 font-body text-[11px] tracking-[0.04em] text-text-muted sm:flex-row sm:items-center">
       <span>© {year} NönDecants · Daule, Ecuador</span>
       <div class="flex flex-wrap items-center gap-5">
-        <span>Términos</span>
-        <span>Privacidad</span>
-        <span>Cookies</span>
+        <a href="/terminos" class="transition-colors hover:text-text">Términos</a>
+        <a href="/privacidad" class="transition-colors hover:text-text">Privacidad</a>
+        <a href="/privacidad" class="transition-colors hover:text-text">Cookies</a>
         <div class="flex items-center gap-2">
           {PAYMENT_ICONS.map((icon) => (
             <img src={icon.src} alt={icon.alt} class="h-5 w-auto opacity-80" />

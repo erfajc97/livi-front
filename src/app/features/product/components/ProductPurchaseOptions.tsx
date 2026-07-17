@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
-import { useAuthStore } from '@/app/store/auth/authStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
-import AuthModal from '@/app/features/auth/components/AuthModal';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
 type SelectedOption = { type: 'full' } | { type: 'decant'; variant: ProductVariant };
@@ -32,10 +30,8 @@ export default function ProductPurchaseOptions({
     return { type: 'full' };
   });
   const [hasHydrated, setHasHydrated] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Sync external variant prop
   useEffect(() => {
@@ -169,7 +165,6 @@ export default function ProductPurchaseOptions({
   };
 
   const handleFastPurchase = () => {
-    if (!isAuthenticated) { setShowAuth(true); return; }
     if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
     const item = getCartItem();
     if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
@@ -185,11 +180,12 @@ export default function ProductPurchaseOptions({
   };
 
   const handleWhatsapp = () => {
-    const ml = isFullSelected ? fullBottleMl : selectedDecant?.ml;
-    const price = isFullSelected ? fullBottlePrice : selectedDecant?.price;
-    if (!ml || !price) return;
-    const msg = `Hola, quiero comprar el perfume ${product.name} de ${ml}ml por ${formatCurrency(price)}.`;
-    window.open(`https://wa.me/593999707768?text=${encodeURIComponent(msg)}`, '_blank');
+    const url =
+      typeof window !== 'undefined'
+        ? window.location.href
+        : `https://www.nondecants.com/producto/${product.id}`;
+    const msg = `Hola, estoy interesado/a en el perfume ${product.name}: ${url}`;
+    window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const detailTags = [
@@ -316,8 +312,6 @@ export default function ProductPurchaseOptions({
         <span className="eyebrow">Pago</span>
         <span className="font-body text-[12px] text-text-soft">Tarjeta · Transferencia · PayPhone</span>
       </div>
-
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
 
       {pendingAction !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPendingAction(null)}>

@@ -1,8 +1,5 @@
-import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
-import { useAuthStore } from '@/app/store/auth/authStore';
-import AuthModal from '@/app/features/auth/components/AuthModal';
 
 interface CartPageSummaryProps {
   immediateSubtotal: number;
@@ -27,16 +24,6 @@ export default function CartPageSummary({
   immediateCount,
   bajoCount,
 }: CartPageSummaryProps) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [showAuth, setShowAuth] = useState(false);
-
-  const handleCheckout = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      setShowAuth(true);
-    }
-  };
-
   return (
     <div className="flex flex-col gap-6">
       {/* ── Resumen ── */}
@@ -73,7 +60,6 @@ export default function CartPageSummary({
         {/* CTA */}
         <a
           href="/checkout"
-          onClick={handleCheckout}
           className="mt-6 flex w-full items-center justify-between gap-2 bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
         >
           <span>Pagar — {formatCurrency(total)}</span>
@@ -118,8 +104,6 @@ export default function CartPageSummary({
           )}
         </div>
       </div>
-
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }

@@ -2,8 +2,6 @@ import { useState } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
-import { useAuthStore } from '@/app/store/auth/authStore';
-import AuthModal from '@/app/features/auth/components/AuthModal';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboDetailIslandProps {
@@ -21,8 +19,6 @@ function TrustRow({ label, value }: { label: string; value: string }) {
 
 function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const [showAuth, setShowAuth] = useState(false);
 
   // Versiones: combo base + sus versiones (mismo nombre, otros productos/precio).
   const variants = [combo, ...(combo.versions ?? [])];
@@ -82,15 +78,18 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   };
 
   const handleBuyNow = () => {
-    if (!isAuthenticated) { setShowAuth(true); return; }
     addItem(buildComboCartItem());
     window.location.href = '/checkout';
   };
 
   const handleWhatsapp = () => {
+    const url =
+      typeof window !== 'undefined'
+        ? window.location.href
+        : `https://www.nondecants.com/combo/${combo.id}`;
     const productList = products.map((cp) => cp.product?.name ?? 'Producto').join(', ');
-    const msg = `Hola, me interesa el combo "${combo.name}" (${productList}) por ${formatCurrency(actualPrice)}.`;
-    window.open(`https://wa.me/593999707768?text=${encodeURIComponent(msg)}`, '_blank');
+    const msg = `Hola, estoy interesado/a en el combo "${combo.name}" (${productList}): ${url}`;
+    window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (
@@ -252,8 +251,6 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           <TrustRow label="Pago" value="Tarjeta · Transferencia · PayPhone" />
         </div>
       </div>
-
-      <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }

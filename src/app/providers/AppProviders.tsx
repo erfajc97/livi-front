@@ -8,7 +8,7 @@ interface AppProvidersProps {
   withToaster?: boolean;
 }
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1082604572108-1ev4perc730lgn8hqv2blqdii2vut5h2.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '119360093820-04jejigudrvho560gtnof02vnn71cqkj.apps.googleusercontent.com';
 
 // Envuelve cada island con QueryClientProvider usando el singleton.
 // withToaster=true solo en el island raíz de cada página (ej. Navbar)
