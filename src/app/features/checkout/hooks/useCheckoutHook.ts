@@ -280,16 +280,18 @@ export function useCheckoutHook() {
       const { data } = await axiosInstance.post(API_ENDPOINTS.CREATE_TRANSACTION, payload);
       const result = data?.data ?? data;
 
-      if (result.paymentUrl) {
-        // PayPhone: redirect to payment page
+      // handleSubmit SOLO corre para PAYPHONE (transferencia usa
+      // handleTransferSubmit). La pasarela devuelve payWithCard (paymentUrl)
+      // y/o payWithPayPhone. Si no hay enlace, NO fingir compra exitosa: el
+      // pedido pudo crearse sin poder iniciar el pago con tarjeta.
+      const gatewayUrl = result.paymentUrl || result.payWithPayPhone;
+      if (gatewayUrl) {
         clearCart();
-        window.location.href = result.paymentUrl;
+        window.location.href = gatewayUrl;
       } else {
-        // Transferencia: redirect to confirmation page
-        clearCart();
-        const orderId = result.order?.id || result.order?.orderNumber;
-        sonnerResponse('¡Orden creada exitosamente!', 'success');
-        window.location.href = `/orden/confirmacion?orderId=${orderId}&method=TRANSFERENCIA`;
+        throw new Error(
+          'No se pudo iniciar el pago con tarjeta. Vuelve a intentarlo o escríbenos por WhatsApp para completar tu pedido.',
+        );
       }
     } catch (error: any) {
       const msg =
