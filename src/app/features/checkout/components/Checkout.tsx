@@ -1,5 +1,5 @@
 import AppProviders from '@/app/providers/AppProviders';
-import { useCheckoutHook } from '../hooks/useCheckoutHook';
+import { useCheckoutHook, type BackorderLine } from '../hooks/useCheckoutHook';
 import CheckoutForm from './CheckoutForm';
 import CheckoutOrderSummary from './CheckoutOrderSummary';
 
@@ -34,6 +34,7 @@ function CheckoutContent() {
       {checkoutData.bajoConfirmOpen && (
         <BajoPedidoConfirmModal
           isPending={checkoutData.isPending}
+          items={checkoutData.backorderItems}
           onConfirm={checkoutData.confirmBajoPedido}
           onCancel={checkoutData.cancelBajoPedido}
         />
@@ -44,13 +45,18 @@ function CheckoutContent() {
 
 function BajoPedidoConfirmModal({
   isPending,
+  items,
   onConfirm,
   onCancel,
 }: {
   isPending: boolean;
+  items: BackorderLine[];
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  // ¿Hay al menos un frasco con stock parcial (algo inmediato + algo bajo pedido)?
+  const hasPartial = items.some((i) => i.inStock > 0 && i.bajo > 0);
+
   return (
     <div className="fixed inset-0 z-80 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-bg/70 backdrop-blur-sm" onClick={isPending ? undefined : onCancel} />
@@ -61,16 +67,48 @@ function BajoPedidoConfirmModal({
           </svg>
           <div>
             <p className="eyebrow mb-2 text-accent">Pedido bajo demanda</p>
-            <h3 className="font-display text-2xl font-light leading-tight text-text">¿Confirmas tu pedido?</h3>
+            <h3 className="font-display text-2xl font-light leading-tight text-text">
+              {hasPartial ? 'Stock parcial disponible' : '¿Confirmas tu pedido?'}
+            </h3>
           </div>
         </div>
 
-        <p className="mb-2 font-body text-sm leading-relaxed text-text-soft">
-          Tu pedido incluye productos <span className="text-text">bajo pedido</span> que importamos especialmente para ti.
+        <p className="mb-4 font-body text-sm leading-relaxed text-text-soft">
+          {hasPartial
+            ? 'Algunas unidades salen de stock de inmediato y el resto se importa bajo pedido:'
+            : 'Tu pedido incluye productos bajo pedido que importamos especialmente para ti:'}
         </p>
-        <p className="mb-7 font-body text-sm leading-relaxed text-text-soft">
-          La entrega estimada es de <span className="text-text">13 a 17 días</span> tras confirmar el pago. El resto de tus productos en stock se preparan de inmediato.
-        </p>
+
+        {/* Desglose por producto */}
+        <div className="mb-5 divide-y divide-border border border-border">
+          {items.map((it, idx) => (
+            <div key={idx} className="flex flex-col gap-1 px-4 py-3">
+              <p className="font-body text-sm text-text">
+                {it.name}
+                {it.ml ? <span className="text-text-muted"> · {it.ml}ml</span> : null}
+              </p>
+              <p className="font-body text-xs text-text-soft">
+                {it.inStock > 0 && (
+                  <span className="text-text">
+                    {it.inStock} en stock
+                  </span>
+                )}
+                {it.inStock > 0 && it.bajo > 0 && <span className="text-text-muted"> · </span>}
+                {it.bajo > 0 && (
+                  <span className="text-accent">
+                    {it.bajo} bajo pedido
+                  </span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-7 border-l-2 border-accent bg-bg-alt px-4 py-3">
+          <p className="font-body text-xs leading-relaxed text-text-soft">
+            Las unidades bajo pedido llegan en <span className="text-text">13 a 17 días</span> tras confirmar el pago. El resto se prepara de inmediato. Se cobra el total ahora y generamos tu orden.
+          </p>
+        </div>
 
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <button

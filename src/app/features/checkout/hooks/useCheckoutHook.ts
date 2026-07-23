@@ -65,6 +65,40 @@ interface OrderItemPayload {
   priceOverride?: number;
 }
 
+export interface BackorderLine {
+  name: string;
+  ml?: number;
+  /** Unidades que salen de stock inmediato. */
+  inStock: number;
+  /** Unidades que entran bajo pedido (13–17 días). */
+  bajo: number;
+}
+
+/**
+ * Divide la cantidad de un item entre stock inmediato y bajo pedido.
+ * - Combo / item marcado bajoPedido → 100% bajo pedido.
+ * - Frasco con stockAvailable definido y cantidad > stock → excedente bajo
+ *   pedido (caso "tenemos X en stock, el resto bajo pedido").
+ * - Resto (decants topados / sin límite) → todo en stock.
+ */
+function splitCartQty(item: {
+  quantity: number;
+  bajoPedido?: boolean;
+  stockAvailable?: number;
+  comboId?: number;
+}): { inStock: number; bajo: number } {
+  const qty = item.quantity;
+  if (item.comboId != null) {
+    return item.bajoPedido ? { inStock: 0, bajo: qty } : { inStock: qty, bajo: 0 };
+  }
+  if (item.bajoPedido) return { inStock: 0, bajo: qty };
+  if (item.stockAvailable != null) {
+    const inStock = Math.min(qty, item.stockAvailable);
+    return { inStock, bajo: qty - inStock };
+  }
+  return { inStock: qty, bajo: 0 };
+}
+
 export function useCheckoutHook() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [customer, setCustomer] = useState<CustomerFormData>(buildInitialCustomer);
@@ -129,8 +163,16 @@ export function useCheckoutHook() {
 
   const clearCart = useCartStore((s) => s.clearCart);
 
-  // ¿El carrito tiene productos bajo pedido? (demoran 13–17 días)
-  const hasBajoPedido = items.some((i) => i.bajoPedido);
+  // Desglose bajo pedido: incluye tanto items 100% bajo pedido como frascos
+  // con stock PARCIAL (piden más de lo disponible → excedente bajo pedido,
+  // 13–17 días). Se usa para el modal de confirmación con detalle por producto.
+  const backorderItems: BackorderLine[] = items
+    .map((i) => {
+      const s = splitCartQty(i);
+      return { name: i.name, ml: i.ml, inStock: s.inStock, bajo: s.bajo };
+    })
+    .filter((b) => b.bajo > 0);
+  const hasBajoPedido = backorderItems.length > 0;
   const [bajoConfirm, setBajoConfirm] = useState<
     null | { kind: 'submit' } | { kind: 'transfer'; file: File }
   >(null);
@@ -456,6 +498,7 @@ export function useCheckoutHook() {
     handleTransferSubmit: requestTransferSubmit,
     // Confirmación bajo pedido
     hasBajoPedido,
+    backorderItems,
     bajoConfirmOpen: bajoConfirm != null,
     confirmBajoPedido,
     cancelBajoPedido,
