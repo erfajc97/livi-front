@@ -55,9 +55,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
           <div className="max-h-[90vh] flex-1 overflow-y-auto px-8 py-10 sm:px-12 sm:py-14">
             {/* Wordmark */}
             <div className="mb-8 flex justify-center">
-              <span className="font-display text-2xl italic tracking-[0.06em] text-text">
-                Nön<span className="not-italic">decants</span>
-              </span>
+              <img src="/logonondecants.png" alt="NönDecants" width={543} height={127} className="h-8 w-auto" />
             </div>
 
             {mode === 'login' && (

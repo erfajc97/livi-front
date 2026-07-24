@@ -29,10 +29,10 @@ export default function ProductCarouselSection({
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <section className="bg-bg px-4 pb-20 pt-28 md:pt-32">
+    <section className="bg-bg px-4 pb-14 pt-14 md:pt-20">
       <div className="mx-auto max-w-7xl">
         {/* Header editorial — — {num} · {label} · Ver todo */}
-        <div className="mb-10 flex items-baseline justify-between px-2 sm:px-12 md:mb-12">
+        <div className="mb-8 flex items-baseline justify-between px-2 sm:px-12 md:mb-9">
           <div className="flex items-baseline gap-4">
             <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">
               — {num}
@@ -72,10 +72,10 @@ export default function ProductCarouselSection({
             </button>
 
             {/* Contenedor del carrusel */}
-            <div className="w-full overflow-hidden px-2 sm:px-12" ref={emblaRef}>
+            <div className="w-full overflow-hidden px-3 sm:px-12" ref={emblaRef}>
               <div className="flex">
                 {products.map((p) => (
-                  <div key={p.id} className="shrink-0 basis-1/2 px-2 md:basis-1/3 md:px-3 lg:basis-1/4">
+                  <div key={p.id} className="shrink-0 basis-1/2 px-2.5 md:basis-1/3 md:px-3 lg:basis-1/4">
                     <ProductCard product={p} />
                   </div>
                 ))}

@@ -7,7 +7,7 @@ const STEPS = [
 /** "Cómo funciona" — tres pasos editoriales (ref. DecantStory). */
 export default function HowItWorksSection() {
   return (
-    <section className="border-y border-border bg-surface-raised px-6 py-24 md:px-14 md:py-40">
+    <section className="border-y border-border bg-surface-raised px-6 py-16 md:px-14 md:py-24">
       <div className="mx-auto max-w-[720px] text-center">
         <span className="eyebrow">— Cómo funciona</span>
         <h2 className="mt-6 font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-7xl">

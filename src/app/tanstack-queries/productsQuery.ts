@@ -46,6 +46,7 @@ export const mapProduct = (raw: any): Product => {
       availableQuantity: v.availableQuantity ?? 0,
       images: extractImages(v.images),
     })),
+    variationsCount: raw.variationsCount ?? (raw.variations ?? raw.variants ?? []).length,
     totalMl: raw.totalMl ?? 100,
     openBottleMlRemaining: raw.openBottleMlRemaining ?? 0,
     availableMl: raw.availableMl ?? 0,

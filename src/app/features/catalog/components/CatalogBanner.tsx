@@ -4,29 +4,34 @@ import type { NavCategory } from '@/app/tanstack-queries/categoriesQuery';
 interface CatalogBannerProps {
   defaultTitle: string;
   defaultDescription: string;
+  /** Categoría/marca SELECCIONADA (estado del filtro). El banner reacciona a
+   *  estos, no a la URL, para que cambie al usar el filtro sin recargar. */
+  categoryId?: number;
+  marcaId?: number;
 }
 
-function useBannerData(defaultTitle: string, defaultDescription: string) {
-  const isClient = typeof window !== 'undefined';
-  const params = isClient ? new URLSearchParams(window.location.search) : new URLSearchParams();
-  const categoryId = params.get('category');
-  const marcaId = params.get('marca');
-
+function useBannerData(
+  defaultTitle: string,
+  defaultDescription: string,
+  categoryId?: number,
+  marcaId?: number,
+) {
   const { data: categories = [] } = useRawCategoriesQuery();
 
-  if (!categoryId || categories.length === 0) {
+  if (categoryId == null || categories.length === 0) {
     return { title: defaultTitle, description: defaultDescription, imageUrl: null };
   }
 
-  const category = categories.find((c: NavCategory) => c.id === categoryId) ?? null;
+  const category =
+    categories.find((c: NavCategory) => Number(c.id) === Number(categoryId)) ?? null;
 
   if (!category) {
     return { title: defaultTitle, description: defaultDescription, imageUrl: null };
   }
 
-  // When a marca is selected, show its name and image
-  if (marcaId) {
-    const marca = category.marcas.find((s) => s.id === marcaId);
+  // Con marca seleccionada, mostrar su nombre e imagen.
+  if (marcaId != null) {
+    const marca = category.marcas.find((s) => Number(s.id) === Number(marcaId));
     if (marca) {
       return {
         title: marca.name,
@@ -44,8 +49,8 @@ function useBannerData(defaultTitle: string, defaultDescription: string) {
   };
 }
 
-export default function CatalogBanner({ defaultTitle, defaultDescription }: CatalogBannerProps) {
-  const { title, description, imageUrl } = useBannerData(defaultTitle, defaultDescription);
+export default function CatalogBanner({ defaultTitle, defaultDescription, categoryId, marcaId }: CatalogBannerProps) {
+  const { title, description, imageUrl } = useBannerData(defaultTitle, defaultDescription, categoryId, marcaId);
   const bannerSrc = imageUrl || '/banner-catalog.png';
 
   return (

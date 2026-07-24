@@ -16,7 +16,7 @@ export default function EditorialBlogSplit() {
     (post.content ? post.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
 
   return (
-    <section className="bg-bg-alt px-6 py-20 md:px-14 md:py-32">
+    <section className="bg-bg-alt px-6 py-14 md:px-14 md:py-20">
       <div className="mx-auto grid max-w-7xl items-center gap-12 md:grid-cols-[1.1fr_1fr] md:gap-20">
         {/* Imagen editorial */}
         <a href={`/blog/${post.slug}`} className="group relative block">

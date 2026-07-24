@@ -34,7 +34,7 @@ export default function CuratedHousesSection() {
   const duration = Math.max(28, base.length * 3);
 
   return (
-    <section className="border-b border-border bg-bg py-16 md:py-24">
+    <section className="border-b border-border bg-bg py-12 md:py-16">
       <div className="mb-9 text-center md:mb-14">
         <span className="eyebrow">— Casas que curamos</span>
       </div>

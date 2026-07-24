@@ -5,26 +5,6 @@ interface ProductCardProps {
   product: Product;
 }
 
-const CONCENTRATION_SHORT: Record<string, string> = {
-  EAU_DE_PARFUM: 'EDP',
-  EAU_DE_TOILETTE: 'EDT',
-  ELIXIR_DE_PARFUM: 'Elixir',
-  EAU_DE_COLOGNE: 'EDC',
-  BODY_MIST: 'Body Mist',
-  PARFUM_EXTRAIT: 'Extrait',
-};
-
-const GENDER_LABELS: Record<string, string> = {
-  HOMBRE: 'Hombre',
-  MUJER: 'Mujer',
-  UNISEX: 'Unisex',
-};
-
-const TIME_LABELS: Record<string, string> = {
-  DIA: 'Día',
-  NOCHE: 'Noche',
-};
-
 export default function ProductCard({ product }: ProductCardProps) {
   const productImages = (product.images ?? []).map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
   const productImage = productImages[0] || product.image || product.imageUrl;
@@ -45,23 +25,21 @@ export default function ProductCard({ product }: ProductCardProps) {
   const hasDiscount = discount > 0;
   const discountedMin = hasDiscount ? minPrice * (1 - discount / 100) : minPrice;
 
-  const formatCount = variants.length || 1;
-
-  // Línea editorial de atributos (reemplaza "familia olfativa", que no viene del back)
-  const tags = [
-    product.gender && (GENDER_LABELS[product.gender] ?? product.gender),
-    product.timeOfDay && (TIME_LABELS[product.timeOfDay] ?? product.timeOfDay),
-    product.concentration && (CONCENTRATION_SHORT[product.concentration] ?? product.concentration),
-  ].filter(Boolean);
+  // Formatos comprables (frasco + decants). El listado del back trae
+  // variationsCount; si no, cae a las variantes cargadas.
+  const formatCount =
+    product.variationsCount && product.variationsCount > 0
+      ? product.variationsCount
+      : variants.length || 1;
 
   const productUrl = `/producto/${product.id}`;
 
   return (
     <a href={productUrl} className="group/card flex flex-col">
-      {/* Imagen — formato editorial alargado (≈2:3, igual que la referencia) */}
-      <div className="relative aspect-2/3 overflow-hidden bg-surface-raised">
-        {/* Frame con padding (más en eje Y) — la imagen no queda pegada al borde */}
-        <div className="absolute inset-0 overflow-hidden px-3 py-5">
+      {/* Imagen — formato editorial (algo menos alto que 2:3 para apreciar mejor la botella) */}
+      <div className="relative aspect-3/4 overflow-hidden bg-surface-raised">
+        {/* Frame con padding — la imagen no queda pegada al borde */}
+        <div className="absolute inset-0 overflow-hidden px-4 py-4">
           <div className="relative h-full w-full overflow-hidden">
             {productImage ? (
               <>
@@ -106,23 +84,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </div>
 
-      {/* Info */}
+      {/* Info — orden: nombre · precio + estado · formatos */}
       <div className="flex flex-col gap-1.5 pt-4">
-        {tags.length > 0 && (
-          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
-            {tags.join(' · ')}
-          </span>
-        )}
-
         <h3 className="font-display text-[22px] font-normal leading-tight tracking-[-0.005em] text-text">
           {product.name}
         </h3>
 
-        <span className="mt-2 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">
-          {formatCount} {formatCount === 1 ? 'formato disponible' : 'formatos disponibles'}
-        </span>
-
-        <div className="mt-3 flex items-baseline justify-between">
+        <div className="mt-1 flex items-baseline justify-between">
           <span className="font-body text-xs tracking-[0.04em] text-text">
             {hasDiscount ? (
               <>
@@ -141,6 +109,10 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.bajoPedido ? 'Entrega 15–30 días' : hasStock ? 'En stock' : 'Sin stock'}
           </span>
         </div>
+
+        <span className="mt-1 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">
+          {formatCount} {formatCount === 1 ? 'formato disponible' : 'formatos disponibles'}
+        </span>
       </div>
     </a>
   );

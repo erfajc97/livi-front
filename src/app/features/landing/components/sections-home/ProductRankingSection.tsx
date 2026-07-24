@@ -62,7 +62,7 @@ export default function ProductRankingSection({
   const t = derive(top);
 
   return (
-    <section className="bg-bg px-6 py-24 md:px-14 md:py-32">
+    <section className="bg-bg px-6 py-16 md:px-14 md:py-20">
       <div className="mx-auto max-w-7xl">
         {/* Header editorial */}
         <div className="mb-10 flex items-baseline justify-between md:mb-12">

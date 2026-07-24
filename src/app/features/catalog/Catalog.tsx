@@ -124,8 +124,13 @@ function CatalogContent({
 
   return (
     <div className="bg-bg">
-      {/* Banner full-width (imagen de categoría / marca / por defecto) */}
-      <CatalogBanner defaultTitle={bannerTitle} defaultDescription={bannerDescription} />
+      {/* Banner full-width — reacciona a la categoría/marca SELECCIONADA. */}
+      <CatalogBanner
+        defaultTitle={bannerTitle}
+        defaultDescription={bannerDescription}
+        categoryId={filters.categoryId}
+        marcaId={filters.marcaId}
+      />
 
       {/* Búsqueda + chips rápidos */}
       <div className="flex flex-col gap-5 border-b border-border px-6 py-7 md:px-14 md:py-9">

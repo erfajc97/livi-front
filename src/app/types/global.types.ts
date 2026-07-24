@@ -47,6 +47,8 @@ export interface Product {
   imageUrl?: string;
   images?: string[];
   variants: ProductVariant[];
+  /** Nº de formatos comprables (frasco + decants), del backend. */
+  variationsCount?: number;
   totalMl: number;
   openBottleMlRemaining: number;
   availableMl: number;
