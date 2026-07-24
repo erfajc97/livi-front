@@ -32,35 +32,31 @@ function ProductGallery({
   }
 
   return (
-    /* Galería compacta que cabe en el viewport: la imagen principal toma el
-       alto disponible (flex-1) y las miniaturas quedan visibles sin scroll. */
-    <div className="flex h-[58svh] flex-col gap-3 md:h-[calc(100svh-15rem)] md:max-h-[620px]">
-      {/* Imagen principal — llena el marco (cover) con un poco de padding */}
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-surface-raised">
-        <div className="absolute inset-0 p-3 md:p-4">
-          <img src={list[idx]} alt={name} className="h-full w-full object-cover transition-opacity duration-300" />
-        </div>
+    /* Galería compacta. En MÓVIL se limita a ~42svh para que el selector de
+       formatos quede visible casi sin scroll; en desktop usa el alto grande. */
+    <div className="flex h-[42svh] flex-col gap-2.5 sm:h-[50svh] md:h-[calc(100svh-15rem)] md:max-h-[620px]">
+      {/* Imagen principal — botella completa sobre tile blanco (object-contain) */}
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-white">
+        <img src={list[idx]} alt={name} className="h-full w-full object-contain p-3 transition-opacity duration-300 md:p-4" />
         {bajoPedido && (
-          <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text">
+          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text md:left-5 md:top-5">
             <span className="h-[5px] w-[5px] rounded-full bg-accent" />
             Bajo Pedido
           </span>
         )}
       </div>
       {list.length > 1 && (
-        <div className="grid shrink-0 grid-cols-3 gap-3">
+        <div className="grid shrink-0 grid-cols-3 gap-2.5">
           {list.slice(0, 3).map((img, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setActive(i)}
-              className={`relative h-20 overflow-hidden border bg-surface-raised transition-colors md:h-24 ${
+              className={`relative h-14 overflow-hidden border bg-white transition-colors md:h-24 ${
                 idx === i ? 'border-text' : 'border-border opacity-90 hover:opacity-100'
               }`}
             >
-              <div className="absolute inset-0 p-1.5">
-                <img src={img} alt={`${name} ${i + 1}`} className="h-full w-full object-cover" />
-              </div>
+              <img src={img} alt={`${name} ${i + 1}`} className="h-full w-full object-contain p-1.5" />
             </button>
           ))}
         </div>
