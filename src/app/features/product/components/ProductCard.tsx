@@ -54,14 +54,14 @@ export default function ProductCard({ product }: ProductCardProps) {
               src={productImage}
               alt={product.name}
               loading="lazy"
-              className={`h-full w-full object-contain p-4 transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
+              className={`h-full w-full object-contain p-6 sm:p-8 transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
             />
             {hoverImage && (
               <img
                 src={hoverImage}
                 alt={product.name}
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-contain p-4 opacity-0 transition-opacity duration-700 group-hover/card:opacity-100"
+                className="absolute inset-0 h-full w-full object-contain p-6 opacity-0 transition-opacity duration-700 sm:p-8 group-hover/card:opacity-100"
               />
             )}
           </>
