@@ -49,6 +49,9 @@ export interface Product {
   variants: ProductVariant[];
   /** Nº de formatos comprables (frasco + decants), del backend. */
   variationsCount?: number;
+  /** Precio del formato más barato / más caro (del backend). */
+  minFormatPrice?: number;
+  maxFormatPrice?: number;
   totalMl: number;
   openBottleMlRemaining: number;
   availableMl: number;
