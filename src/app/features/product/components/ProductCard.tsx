@@ -44,24 +44,24 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <a href={productUrl} className="group/card flex flex-col">
-      {/* Imagen — tile blanco uniforme; la botella se muestra COMPLETA
-          (object-contain) y centrada con aire, nunca recortada ni pegada a
-          los lados. El fondo blanco de la foto se funde con el tile. */}
-      <div className="group/img relative aspect-3/4 overflow-hidden bg-white">
+      {/* Imagen — tile blanco algo menos alto (4:5); la botella se muestra
+          COMPLETA (object-contain) y llena casi todo el tile con un margen
+          chico, sin tocar los bordes ni recortarse. */}
+      <div className="group/img relative aspect-4/5 overflow-hidden bg-white">
         {productImage ? (
           <>
             <img
               src={productImage}
               alt={product.name}
               loading="lazy"
-              className={`h-full w-full object-contain p-6 sm:p-8 transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
+              className={`h-full w-full object-contain p-3 sm:p-4 transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
             />
             {hoverImage && (
               <img
                 src={hoverImage}
                 alt={product.name}
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-contain p-6 opacity-0 transition-opacity duration-700 sm:p-8 group-hover/card:opacity-100"
+                className="absolute inset-0 h-full w-full object-contain p-3 opacity-0 transition-opacity duration-700 sm:p-4 group-hover/card:opacity-100"
               />
             )}
           </>
