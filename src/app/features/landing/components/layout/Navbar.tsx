@@ -1,9 +1,14 @@
+import { useState, useEffect } from 'react';
 import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
 import AppProviders from '@/app/providers/AppProviders';
+import axiosInstance from '@/app/config/axiosConfig';
+import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { useNavbarHook } from '../../hooks/useNavbarHook';
 import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
 import NavbarSearch from './NavbarSearch';
+
+const ANNOUNCEMENT_DEFAULT = 'Envíos a todo el Ecuador · Servientrega 24–72h';
 
 /* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
 const ico = 'h-[18px] w-[18px]';
@@ -41,6 +46,19 @@ export default function Navbar() {
     : openDropdown === 'bajoPedido' ? 'bajoPedido'
     : null;
 
+  // Texto de la barra superior — editable desde el admin (setting
+  // "announcement_bar"). Si no existe (404), se usa el default.
+  const [announcement, setAnnouncement] = useState(ANNOUNCEMENT_DEFAULT);
+  useEffect(() => {
+    axiosInstance
+      .get(`${API_ENDPOINTS.SETTINGS}/announcement_bar`)
+      .then(({ data }) => {
+        const value = data?.data?.value ?? data?.value;
+        if (value && typeof value === 'string') setAnnouncement(value);
+      })
+      .catch(() => {});
+  }, []);
+
   // Enlace simple — DM Sans en versalitas, sin cambio de fuente/color al hover (ref. Atelier)
   const NavLink = ({ label, href, muted = false }: { label: string; href: string; muted?: boolean }) => (
     <a
@@ -75,9 +93,12 @@ export default function Navbar() {
     <AppProviders withToaster>
       <header className="sticky top-0 z-40 bg-bg text-text">
         {/* Utility row — calma, editorial */}
-        <div className="hidden items-center justify-between border-b border-border bg-bg-alt px-14 py-2 font-body text-[11px] tracking-[0.04em] text-text-soft md:flex">
-          <span>Envíos a todo el Ecuador · Servientrega 24–72h</span>
-          <div className="flex gap-6">
+        <div className="announce-wrap hidden items-center justify-between border-b border-border bg-bg-alt px-14 py-2 font-body text-[11px] tracking-[0.04em] text-text-soft md:flex">
+          {/* Anuncio con marquee: cruza de izquierda a derecha */}
+          <div className="relative flex-1 overflow-hidden">
+            <span className="announce-track block w-full whitespace-nowrap">{announcement}</span>
+          </div>
+          <div className="flex shrink-0 gap-6 pl-6">
             <a href="/rastrear" className="hover:text-text">Rastrear pedido</a>
             <a href="/contacto" className="hover:text-text">Acerca de</a>
             <span className="text-text">ES · USD</span>

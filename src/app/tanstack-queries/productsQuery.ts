@@ -67,6 +67,14 @@ export const mapProduct = (raw: any): Product => {
     price: raw.price ? Number(raw.price) : undefined,
     minFormatPrice: raw.minFormatPrice != null ? Number(raw.minFormatPrice) : undefined,
     maxFormatPrice: raw.maxFormatPrice != null ? Number(raw.maxFormatPrice) : undefined,
+    formats: Array.isArray(raw.formats)
+      ? raw.formats.map((f: any) => ({
+          id: String(f.id),
+          ml: Number(f.ml),
+          price: Number(f.price),
+          isFullBottle: !!f.isFullBottle,
+        }))
+      : undefined,
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
     marcaId: raw.marcaId != null ? Number(raw.marcaId) : undefined,
     createdAt: raw.createdAt ?? '',

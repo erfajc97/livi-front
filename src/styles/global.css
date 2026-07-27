@@ -93,3 +93,21 @@ h1, h2, h3, h4, h5, h6 {
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
 }
+
+/* ── Barra de anuncios: un solo texto que cruza de izq→der, desaparece y
+      reaparece por el otro extremo. translateX en % es relativo al ancho del
+      propio elemento; con block+w-full ese ancho = el del contenedor. ──── */
+@keyframes announce-marquee {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+.announce-track {
+  animation: announce-marquee var(--announce-duration, 14s) linear infinite;
+  will-change: transform;
+}
+.announce-wrap:hover .announce-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .announce-track { animation: none; transform: none; }
+}
