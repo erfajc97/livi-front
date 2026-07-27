@@ -99,7 +99,6 @@ export default function Navbar() {
             <span className="announce-track block w-full whitespace-nowrap">{announcement}</span>
           </div>
           <div className="flex shrink-0 gap-6 pl-6">
-            <a href="/rastrear" className="hover:text-text">Rastrear pedido</a>
             <a href="/contacto" className="hover:text-text">Acerca de</a>
             <span className="text-text">ES · USD</span>
           </div>
