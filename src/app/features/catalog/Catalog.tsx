@@ -238,7 +238,7 @@ function CatalogContent({
           </>
         )}
 
-        <div className="min-w-0 px-6 py-10 md:px-14">
+        <div className="min-w-0 px-6 py-6 md:px-14 md:py-10">
           <ProductGrid products={products} isLoading={isLoading} isFetching={isFetching} />
           {pagination && <CatalogPagination pagination={pagination} onPageChange={setPage} />}
         </div>

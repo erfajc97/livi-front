@@ -1,9 +1,10 @@
 ---
-import payPhoneSvg from '@/assets/svg/payPhone.svg';
 import visaSvg from '@/assets/svg/visa.svg';
+import mastercardSvg from '@/assets/svg/mastercard.svg';
 import discoverSvg from '@/assets/svg/discover.svg';
 import amexSvg from '@/assets/svg/amex.svg';
 import dinnersSvg from '@/assets/svg/dinners.svg';
+import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
 import {
   FOOTER_LINKS_COL1,
   FOOTER_LINKS_COL2,
@@ -15,12 +16,15 @@ const SOCIAL = [
   { label: 'Facebook', href: '#' },
 ];
 
+// Logos oficiales sin marcos: las tarjetas ya traen su propio fondo blanco.
 const PAYMENT_ICONS = [
-  { src: payPhoneSvg.src, alt: 'PayPhone' },
-  { src: visaSvg.src, alt: 'Visa' },
-  { src: dinnersSvg.src, alt: 'Diners Club' },
-  { src: amexSvg.src, alt: 'American Express' },
-  { src: discoverSvg.src, alt: 'Discover' },
+  { src: '/pagos/payphone-icon.png', alt: 'PayPhone', cls: 'h-8' },
+  { src: visaSvg.src, alt: 'Visa', cls: 'h-8' },
+  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-8' },
+  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-8' },
+  { src: amexSvg.src, alt: 'American Express', cls: 'h-8' },
+  { src: discoverSvg.src, alt: 'Discover', cls: 'h-8' },
+  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-5' },
 ];
 
 const CONTACT = ['+593 99 230 5463', 'contacto@nondecants.com', 'Daule, Ecuador', 'Lun–Sáb · 9–18h'];
@@ -29,8 +33,8 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="border-t border-border bg-bg-alt text-text-soft">
-  <div class="mx-auto max-w-[1600px] px-6 pb-14 pt-24 md:px-14">
-    <div class="mb-20 grid grid-cols-1 gap-14 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+  <div class="mx-auto max-w-[1600px] px-6 pb-10 pt-12 md:pb-14 md:pt-24 md:px-14">
+    <div class="mb-10 grid grid-cols-1 gap-8 md:mb-20 md:gap-14 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
 
       <!-- Marca -->
       <div>
@@ -92,9 +96,14 @@ const year = new Date().getFullYear();
         <a href="/terminos" class="transition-colors hover:text-text">Términos</a>
         <a href="/privacidad" class="transition-colors hover:text-text">Privacidad</a>
         <a href="/privacidad" class="transition-colors hover:text-text">Cookies</a>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           {PAYMENT_ICONS.map((icon) => (
-            <img src={icon.src} alt={icon.alt} class="h-5 w-auto opacity-80" />
+            <img
+              src={icon.src}
+              alt={icon.alt}
+              title={icon.alt}
+              class:list={['w-auto object-contain', icon.cls]}
+            />
           ))}
         </div>
       </div>

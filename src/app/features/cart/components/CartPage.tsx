@@ -39,7 +39,7 @@ export default function CartPage() {
   // ── Carrito vacío ──
   if (itemCount === 0) {
     return (
-      <section className="mx-auto flex min-h-[60vh] max-w-[1600px] flex-col items-center justify-center gap-5 px-6 py-24 text-center">
+      <section className="mx-auto flex min-h-[60vh] max-w-[1600px] flex-col items-center justify-center gap-5 px-6 py-16 text-center md:py-24">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-text-muted">
           <path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
         </svg>
@@ -72,9 +72,9 @@ export default function CartPage() {
   );
 
   return (
-    <section className="mx-auto max-w-[1600px] px-6 py-14 md:px-12 md:py-20">
+    <section className="mx-auto max-w-[1600px] px-6 py-8 md:px-12 md:py-20">
       {/* ── Encabezado ── */}
-      <header className="mb-12 md:mb-16">
+      <header className="mb-7 md:mb-16">
         <span className="eyebrow">— Tu selección</span>
         <h1 className="mt-3 font-display text-5xl font-light leading-none tracking-[-0.025em] text-text md:text-7xl">
           Carrito <span className="italic text-text-soft">({itemCount})</span>
@@ -91,11 +91,11 @@ export default function CartPage() {
       </header>
 
       {/* ── Cuerpo: items (izq) + resumen (der) ── */}
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.55fr_1fr] lg:gap-16 xl:gap-24">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.55fr_1fr] lg:gap-16 xl:gap-24">
         {/* Items agrupados */}
         <div>
           {immediate.length > 0 && (
-            <div className="mb-14">
+            <div className="mb-8 md:mb-14">
               <GroupHeader num="01" title="Envío inmediato" meta="Servientrega · 24–72 h" />
               <div>{immediate.map((r) => renderRow(r, 'immediate'))}</div>
             </div>

@@ -1,5 +1,6 @@
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { ESTIMATED_SHIPPING } from '@/app/features/checkout/data';
+import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
 
 export interface CartRow {
   item: CartItem;
@@ -11,28 +12,12 @@ export interface CartRow {
   split: boolean;
 }
 
-/** Divide un item en porción en-stock vs bajo-pedido según la regla de negocio. */
-function splitItem(item: CartItem): { inStock: number; bajo: number } {
-  const qty = item.quantity;
-  // Combos: se tratan completos según su flag (no se parten).
-  if (item.comboId != null) {
-    return item.bajoPedido ? { inStock: 0, bajo: qty } : { inStock: qty, bajo: 0 };
-  }
-  // Producto 100% bajo pedido → todo bajo pedido.
-  if (item.bajoPedido) return { inStock: 0, bajo: qty };
-  // Frasco sellado con stock limitado → excedente bajo pedido.
-  if (item.stockAvailable != null) {
-    const inStock = Math.min(qty, item.stockAvailable);
-    return { inStock, bajo: qty - inStock };
-  }
-  // Decant (topado por maxQty) o sin límite → todo en stock.
-  return { inStock: qty, bajo: 0 };
-}
-
 /**
  * Lógica de la página de carrito: separa los items en dos grupos (envío
  * inmediato vs bajo pedido). Un mismo producto puede aparecer en AMBOS cuando
  * la cantidad pedida supera el stock disponible (excedente bajo pedido).
+ * El reparto es a nivel de carrito: frascos y decants del mismo producto
+ * comparten inventario (ver `splitCartStock`).
  */
 export function useCartPageHook() {
   const items       = useCartStore((s) => s.items);
@@ -45,11 +30,10 @@ export function useCartPageHook() {
   let immediateSubtotal = 0;
   let bajoSubtotal = 0;
 
+  const splits = splitCartStock(items);
+
   for (const item of items) {
-    const { inStock, bajoQty } = (() => {
-      const r = splitItem(item);
-      return { inStock: r.inStock, bajoQty: r.bajo };
-    })();
+    const { inStock, bajo: bajoQty } = getSplit(splits, item);
     const isSplit = inStock > 0 && bajoQty > 0;
     if (inStock > 0) {
       immediate.push({ item, portionQty: inStock, total: item.quantity, split: isSplit });

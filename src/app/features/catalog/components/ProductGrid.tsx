@@ -11,7 +11,7 @@ interface ProductGridProps {
 export default function ProductGrid({ products, isLoading, isFetching }: ProductGridProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-32">
+      <div className="flex items-center justify-center py-16 md:py-32">
         <Loader size={45} />
       </div>
     );
@@ -19,7 +19,7 @@ export default function ProductGrid({ products, isLoading, isFetching }: Product
 
   if (products.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-12 text-center md:py-20">
         <p className="font-body text-sm text-text-muted">
           No se encontraron productos con esos filtros.
         </p>

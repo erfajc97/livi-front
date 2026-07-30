@@ -34,13 +34,13 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="w-full bg-white py-16">
+    <section className="w-full bg-white py-10 md:py-16">
       {/* Imagen full-width con overlay y form encima */}
       <div className="relative overflow-hidden mx-auto">
         <img
           src="/img-subs.png"
           alt=""
-          className="w-full h-96 sm:h-[400px] lg:h-[450px] object-cover"
+          className="w-full h-72 sm:h-[400px] lg:h-[450px] object-cover"
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-black/40" />

@@ -16,15 +16,15 @@ export default function EditorialBlogSplit() {
     (post.content ? post.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
 
   return (
-    <section className="bg-bg-alt px-6 py-14 md:px-14 md:py-20">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 md:grid-cols-[1.1fr_1fr] md:gap-20">
+    <section className="bg-bg-alt px-6 py-10 md:px-14 md:py-20">
+      <div className="mx-auto grid max-w-7xl items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-20">
         {/* Imagen editorial */}
         <a href={`/blog/${post.slug}`} className="group relative block">
           <img
             src={post.imageUrl || '/banner-catalog.png'}
             alt={post.title}
             loading="lazy"
-            className="h-[460px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] md:h-[640px]"
+            className="h-[300px] w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] sm:h-[420px] md:h-[640px]"
           />
           <span className="absolute bottom-0 left-0 bg-bg-alt pr-8 pt-5 font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">
             — Journal

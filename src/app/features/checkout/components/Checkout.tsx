@@ -7,7 +7,7 @@ function CheckoutContent() {
   const checkoutData = useCheckoutHook();
 
   return (
-    <div className="relative flex flex-col gap-10 border border-border bg-surface p-6 md:p-10 lg:flex-row lg:gap-14">
+    <div className="relative flex flex-col gap-7 border border-border bg-surface p-5 md:gap-10 md:p-10 lg:flex-row lg:gap-14">
       <div className="flex-1">
         <CheckoutForm {...checkoutData} />
       </div>

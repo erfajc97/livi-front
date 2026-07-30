@@ -45,14 +45,15 @@ function ProductGallery({
           </span>
         )}
       </div>
+      {/* Miniaturas cuadradas (el ancho se topa para que no crezcan de más) */}
       {list.length > 1 && (
-        <div className="grid shrink-0 grid-cols-3 gap-2.5">
+        <div className="grid w-full max-w-82.5 shrink-0 grid-cols-3 gap-2.5">
           {list.slice(0, 3).map((img, i) => (
             <button
               key={i}
               type="button"
               onClick={() => setActive(i)}
-              className={`relative h-14 overflow-hidden border bg-white transition-colors md:h-24 ${
+              className={`relative aspect-square overflow-hidden border bg-white transition-colors ${
                 idx === i ? 'border-text' : 'border-border opacity-90 hover:opacity-100'
               }`}
             >

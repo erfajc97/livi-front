@@ -14,7 +14,9 @@ export default function CartLine({ row, group, onSetTotal, onRemove }: CartLineP
   const isBajo = group === 'bajo';
   const isCombo = item.comboId != null;
 
-  // Decant topado por stock: no puede exceder maxQty (no genera bajo pedido).
+  // Decant topado por los ml del producto: nunca se piden más unidades que las
+  // que da el inventario (si los frascos del carrito ya ocuparon esos ml, la
+  // porción sobrante se muestra como bajo pedido, no se puede subir más).
   const decantCapped = item.stockAvailable == null && item.maxQty != null;
   const plusDisabled = decantCapped && total >= (item.maxQty ?? Infinity);
   // En la fila "en stock" de un item partido, el menos se gestiona desde la

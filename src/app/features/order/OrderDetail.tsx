@@ -12,7 +12,7 @@ function OrderDetailContent({ orderId }: OrderDetailProps) {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-32 flex items-center justify-center">
+      <div className="max-w-3xl mx-auto px-4 py-16 md:py-32 flex items-center justify-center">
         <Loader size={45} color="var(--color-accent)" />
       </div>
     );
@@ -20,7 +20,7 @@ function OrderDetailContent({ orderId }: OrderDetailProps) {
 
   if (isError || !order) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
+      <div className="max-w-3xl mx-auto px-4 py-12 md:py-20 text-center">
         <p className="text-[--color-text-muted]">No se encontró la orden.</p>
         <a href="/" className="mt-4 inline-block text-[--color-accent] text-sm hover:underline">
           Volver al inicio

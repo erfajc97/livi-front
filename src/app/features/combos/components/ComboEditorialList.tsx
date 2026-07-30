@@ -147,7 +147,7 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
   );
 
   return (
-    <div className="grid grid-cols-1 items-stretch gap-8 py-8 md:grid-cols-2 md:gap-16 md:py-12">
+    <div className="grid grid-cols-1 items-stretch gap-6 py-6 md:grid-cols-2 md:gap-16 md:py-12">
       {reversed ? (
         <>
           <div className="order-2 md:order-1">{detail}</div>
@@ -166,7 +166,7 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
 export default function ComboEditorialList({ combos, isLoading }: ComboEditorialListProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-32">
+      <div className="flex items-center justify-center py-16 md:py-32">
         <Loader size={45} />
       </div>
     );
@@ -174,7 +174,7 @@ export default function ComboEditorialList({ combos, isLoading }: ComboEditorial
 
   if (combos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-12 text-center md:py-20">
         <p className="font-body text-sm text-text-muted">No hay combos disponibles en este momento.</p>
       </div>
     );

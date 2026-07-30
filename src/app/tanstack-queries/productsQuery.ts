@@ -39,17 +39,20 @@ export const mapProduct = (raw: any): Product => {
     images: imageList.length > 0 ? imageList : [raw.imageUrl].filter(Boolean),
     variants: (raw.variations ?? raw.variants ?? []).map((v: any) => ({
       id: String(v.id),
-      ml: v.mlSize ?? extractMl(v),
+      ml: Number(v.mlSize ?? extractMl(v)),
       price: Number(v.price ?? 0),
-      mlSize: v.mlSize ?? extractMl(v),
+      mlSize: Number(v.mlSize ?? extractMl(v)),
       isFullBottle: v.isFullBottle ?? false,
-      availableQuantity: v.availableQuantity ?? 0,
+      availableQuantity: Number(v.availableQuantity ?? 0),
       images: extractImages(v.images),
     })),
     variationsCount: raw.variationsCount ?? (raw.variations ?? raw.variants ?? []).length,
-    totalMl: raw.totalMl ?? 100,
-    openBottleMlRemaining: raw.openBottleMlRemaining ?? 0,
-    availableMl: raw.availableMl ?? 0,
+    // El backend serializa los decimales como string ("100.00"): sin Number()
+    // las sumas de ml se concatenan ("96.00" + 200 → "96.00200") y la regla de
+    // stock frasco/decant deja de funcionar.
+    totalMl: Number(raw.totalMl ?? 100),
+    openBottleMlRemaining: Number(raw.openBottleMlRemaining ?? 0),
+    availableMl: Number(raw.availableMl ?? 0),
     isActive: raw.isActive ?? true,
     bajoPedido: raw.bajoPedido ?? false,
     gender: raw.gender ?? undefined,

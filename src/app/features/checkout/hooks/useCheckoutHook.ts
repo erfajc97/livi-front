@@ -3,6 +3,7 @@ import { useCartStore } from '@/app/store/cart/cartStore';
 import { useAuthStore } from '@/app/store/auth/authStore';
 import { useDeliveryMethodsHook } from './useDeliveryMethodsHook';
 import { calcPayphoneSurcharge } from '@/app/helpers/calcPayphoneSurcharge';
+import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
@@ -74,31 +75,6 @@ export interface BackorderLine {
   bajo: number;
 }
 
-/**
- * Divide la cantidad de un item entre stock inmediato y bajo pedido.
- * - Combo / item marcado bajoPedido → 100% bajo pedido.
- * - Frasco con stockAvailable definido y cantidad > stock → excedente bajo
- *   pedido (caso "tenemos X en stock, el resto bajo pedido").
- * - Resto (decants topados / sin límite) → todo en stock.
- */
-function splitCartQty(item: {
-  quantity: number;
-  bajoPedido?: boolean;
-  stockAvailable?: number;
-  comboId?: number;
-}): { inStock: number; bajo: number } {
-  const qty = item.quantity;
-  if (item.comboId != null) {
-    return item.bajoPedido ? { inStock: 0, bajo: qty } : { inStock: qty, bajo: 0 };
-  }
-  if (item.bajoPedido) return { inStock: 0, bajo: qty };
-  if (item.stockAvailable != null) {
-    const inStock = Math.min(qty, item.stockAvailable);
-    return { inStock, bajo: qty - inStock };
-  }
-  return { inStock: qty, bajo: 0 };
-}
-
 export function useCheckoutHook() {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [customer, setCustomer] = useState<CustomerFormData>(buildInitialCustomer);
@@ -163,12 +139,14 @@ export function useCheckoutHook() {
 
   const clearCart = useCartStore((s) => s.clearCart);
 
-  // Desglose bajo pedido: incluye tanto items 100% bajo pedido como frascos
-  // con stock PARCIAL (piden más de lo disponible → excedente bajo pedido,
-  // 13–17 días). Se usa para el modal de confirmación con detalle por producto.
+  // Desglose bajo pedido: incluye items 100% bajo pedido, frascos con stock
+  // PARCIAL y decants cuyo ml ya está comprometido por los frascos del mismo
+  // producto que van en el carrito (13–17 días). Se usa para el modal de
+  // confirmación con detalle por producto.
+  const splits = splitCartStock(items);
   const backorderItems: BackorderLine[] = items
     .map((i) => {
-      const s = splitCartQty(i);
+      const s = getSplit(splits, i);
       return { name: i.name, ml: i.ml, inStock: s.inStock, bajo: s.bajo };
     })
     .filter((b) => b.bajo > 0);

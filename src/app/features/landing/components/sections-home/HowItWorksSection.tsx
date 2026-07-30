@@ -7,19 +7,19 @@ const STEPS = [
 /** "Cómo funciona" — tres pasos editoriales (ref. DecantStory). */
 export default function HowItWorksSection() {
   return (
-    <section className="border-y border-border bg-surface-raised px-6 py-16 md:px-14 md:py-24">
+    <section className="border-y border-border bg-surface-raised px-6 py-10 md:px-14 md:py-24">
       <div className="mx-auto max-w-[720px] text-center">
         <span className="eyebrow">— Cómo funciona</span>
-        <h2 className="mt-6 font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-7xl">
+        <h2 className="mt-4 font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:mt-6 md:text-7xl">
           Tres pasos hacia <span className="italic">tu fragancia.</span>
         </h2>
       </div>
 
-      <div className="mx-auto mt-14 grid max-w-[1200px] gap-10 md:mt-24 md:grid-cols-3 md:gap-16">
+      <div className="mx-auto mt-8 grid max-w-[1200px] gap-8 md:mt-24 md:grid-cols-3 md:gap-16">
         {STEPS.map((s) => (
           <div key={s.n}>
             <div className="font-display text-sm italic tracking-[0.08em] text-accent">— {s.n}</div>
-            <div className="mb-6 mt-4 h-px bg-border" />
+            <div className="mb-4 mt-3 h-px bg-border md:mb-6 md:mt-4" />
             <div className="font-display text-3xl font-light tracking-[-0.01em] text-text">{s.h}</div>
             <p className="mt-3 font-body text-sm leading-[1.7] text-text-soft">{s.t}</p>
           </div>

@@ -89,7 +89,7 @@ function OrderConfirmationContent() {
 
   if (status === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-4">
+      <div className="flex flex-col items-center justify-center py-12 md:py-20 gap-4">
         <div className="h-10 w-10 animate-spin rounded-full border-2 border-border border-t-text" />
         <p className="font-body text-sm text-text-muted">Verificando tu pago...</p>
       </div>
@@ -98,7 +98,7 @@ function OrderConfirmationContent() {
 
   if (status === 'failed') {
     return (
-      <div className="flex flex-col items-center text-center py-16 gap-5">
+      <div className="flex flex-col items-center text-center py-10 md:py-16 gap-5">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-error-muted text-error">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />

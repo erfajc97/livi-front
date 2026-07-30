@@ -1,5 +1,6 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
+import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
 
 interface CheckoutOrderSummaryProps {
   items: CartItem[];
@@ -39,7 +40,10 @@ export default function CheckoutOrderSummary({
 
   const hasNonComboItems = items.some((item) => item.comboId == null);
 
-  const hasBajoPedido = items.some((item) => item.bajoPedido);
+  // Incluye lo que pasa a bajo pedido por reparto de inventario (frascos que
+  // consumen los ml de los decants del mismo producto), no solo el flag.
+  const splits = splitCartStock(items);
+  const hasBajoPedido = items.some((item) => getSplit(splits, item).bajo > 0);
 
   return (
     <div className="flex flex-col">

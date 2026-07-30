@@ -28,6 +28,9 @@ function HomeContent() {
 
       <EditorialBlogSplit />
 
+      {/* "Tres pasos hacia tu fragancia" va ANTES del ranking */}
+      <HowItWorksSection />
+
       {second && (
         <ProductRankingSection
           key={second.id}
@@ -49,7 +52,6 @@ function HomeContent() {
         />
       ))}
 
-      <HowItWorksSection />
       <CuratedHousesSection />
     </div>
   );

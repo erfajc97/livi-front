@@ -1,6 +1,12 @@
+import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import Loader from '@/app/components/Loader';
+import { CarouselProgressBar } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
+
+/** Productos por página en la lista lateral (desktop) y en la lista móvil. */
+const PER_PAGE = 4;
+const MOBILE_PER_PAGE = 5;
 
 interface ProductRankingSectionProps {
   title: string;
@@ -48,24 +54,44 @@ export default function ProductRankingSection({
   num = '02',
   viewAllHref = '/catalogo',
 }: ProductRankingSectionProps) {
+  // Página actual de la lista (hook antes de cualquier return condicional).
+  const [page, setPage] = useState(0);
+
   if (isLoading) {
     return (
-      <section className="bg-bg px-6 py-24 md:px-14">
-        <div className="flex items-center justify-center py-20"><Loader size={40} /></div>
+      <section className="bg-bg px-6 py-12 md:px-14 md:py-24">
+        <div className="flex items-center justify-center py-12 md:py-20"><Loader size={40} /></div>
       </section>
     );
   }
   if (!products || products.length === 0) return null;
 
   const top = products[0];
-  const list = products.slice(1, 5);
   const t = derive(top);
 
+  // La lista lateral pagina de 4 en 4 (02–05, 06–09, …) con la misma barrita
+  // de posición de los carruseles.
+  const rest = products.slice(1);
+  const totalPages = Math.max(1, Math.ceil(rest.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages - 1);
+  const list = rest.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE);
+  const rankAt = (i: number) => String(safePage * PER_PAGE + i + 2).padStart(2, '0');
+  const progress = totalPages > 1 ? safePage / (totalPages - 1) : 0;
+
+  // Móvil: misma paginación, incluyendo el #1 en la primera página.
+  const mobilePages = Math.max(1, Math.ceil(products.length / MOBILE_PER_PAGE));
+  const safeMobilePage = Math.min(page, mobilePages - 1);
+  const mobileList = products.slice(
+    safeMobilePage * MOBILE_PER_PAGE,
+    safeMobilePage * MOBILE_PER_PAGE + MOBILE_PER_PAGE,
+  );
+  const mobileProgress = mobilePages > 1 ? safeMobilePage / (mobilePages - 1) : 0;
+
   return (
-    <section className="bg-bg px-6 py-16 md:px-14 md:py-20">
+    <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
       <div className="mx-auto max-w-7xl">
         {/* Header editorial */}
-        <div className="mb-10 flex items-baseline justify-between md:mb-12">
+        <div className="mb-6 flex items-baseline justify-between md:mb-12">
           <div className="flex items-baseline gap-4">
             <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">— {num}</span>
             <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft md:text-[11px]">{title}</span>
@@ -100,13 +126,13 @@ export default function ProductRankingSection({
             </div>
           </a>
 
-          {/* Ranked list 02–05 */}
+          {/* Lista paginada (02–05, 06–09, …) */}
           <div className="flex flex-col">
             {list.map((p, i) => {
               const d = derive(p);
               return (
                 <a key={p.id} href={d.href} className="group grid grid-cols-[40px_120px_1fr_auto] items-center gap-6 border-b border-border py-6 first:border-t">
-                  <span className="font-display text-3xl italic leading-none text-accent">0{i + 2}</span>
+                  <span className="font-display text-3xl italic leading-none text-accent">{rankAt(i)}</span>
                   <div className="h-32 w-full overflow-hidden bg-surface-raised">
                     {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />}
                   </div>
@@ -121,16 +147,25 @@ export default function ProductRankingSection({
                 </a>
               );
             })}
+
+            {/* Barrita de posición — arrastra para ver los siguientes */}
+            <CarouselProgressBar
+              progress={progress}
+              snapCount={totalPages}
+              onSeek={(ratio) => setPage(Math.round(ratio * (totalPages - 1)))}
+              className="mt-7"
+            />
           </div>
         </div>
 
-        {/* ── Móvil: lista compacta top 5 ── */}
+        {/* ── Móvil: lista paginada ── */}
         <div className="flex flex-col md:hidden">
-          {products.slice(0, 5).map((p, i) => {
+          {mobileList.map((p, i) => {
             const d = derive(p);
+            const rank = String(safeMobilePage * MOBILE_PER_PAGE + i + 1).padStart(2, '0');
             return (
               <a key={p.id} href={d.href} className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-                <span className="font-display text-2xl italic leading-none text-accent">0{i + 1}</span>
+                <span className="font-display text-2xl italic leading-none text-accent">{rank}</span>
                 <div className="h-24 w-full overflow-hidden bg-surface-raised">
                   {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-cover" />}
                 </div>
@@ -142,6 +177,13 @@ export default function ProductRankingSection({
               </a>
             );
           })}
+
+          <CarouselProgressBar
+            progress={mobileProgress}
+            snapCount={mobilePages}
+            onSeek={(ratio) => setPage(Math.round(ratio * (mobilePages - 1)))}
+            className="mt-6"
+          />
         </div>
       </div>
     </section>

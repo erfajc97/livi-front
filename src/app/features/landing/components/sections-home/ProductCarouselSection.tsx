@@ -1,7 +1,13 @@
-import { useCallback } from 'react';
+import { useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ProductCard from '@/app/features/product/components/ProductCard';
 import Loader from '@/app/components/Loader';
+import {
+  useCarouselNav,
+  useMediaCenterTop,
+  CarouselArrow,
+  CarouselProgressBar,
+} from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
 interface ProductCarouselSectionProps {
@@ -24,15 +30,17 @@ export default function ProductCarouselSection({
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+  const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
+    useCarouselNav(emblaApi);
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const arrowTop = useMediaCenterTop(viewportRef, isLoading ? 0 : products.length);
 
   return (
-    <section className="bg-bg px-4 pb-14 pt-14 md:pt-20">
+    <section className="bg-bg px-4 pb-10 pt-10 md:pb-14 md:pt-20">
       <div className="mx-auto max-w-7xl">
         {/* Header editorial — — {num} · {label} · Ver todo */}
-        <div className="mb-8 flex items-baseline justify-between px-2 sm:px-12 md:mb-9">
+        <div className="mb-5 flex items-baseline justify-between px-2 sm:px-12 md:mb-9">
           <div className="flex items-baseline gap-4">
             <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">
               — {num}
@@ -58,18 +66,15 @@ export default function ProductCarouselSection({
             No hay productos disponibles.
           </p>
         ) : (
-          /* Carrusel con flechas editoriales (estilo Atelier) */
-          <div className="relative">
-            {/* Flecha izquierda */}
-            <button
+          <div className="relative" ref={viewportRef}>
+            {/* Flechas centradas con la IMAGEN de la card (no con la card entera) */}
+            <CarouselArrow
+              direction="prev"
               onClick={scrollPrev}
-              aria-label="Anterior"
-              className="absolute -left-2 top-[32%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-bg/80 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent sm:-left-3 sm:flex lg:-left-5"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M15 6l-6 6 6 6" />
-              </svg>
-            </button>
+              disabled={!canPrev}
+              top={arrowTop}
+              className="absolute left-0 top-[34%] -translate-y-1/2 sm:left-1 lg:-left-2"
+            />
 
             {/* Contenedor del carrusel */}
             <div className="w-full overflow-hidden px-3 sm:px-12" ref={emblaRef}>
@@ -82,16 +87,20 @@ export default function ProductCarouselSection({
               </div>
             </div>
 
-            {/* Flecha derecha */}
-            <button
+            <CarouselArrow
+              direction="next"
               onClick={scrollNext}
-              aria-label="Siguiente"
-              className="absolute -right-2 top-[32%] z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-bg/80 text-text backdrop-blur transition-colors hover:border-accent hover:text-accent sm:-right-3 sm:flex lg:-right-5"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 6l6 6-6 6" />
-              </svg>
-            </button>
+              disabled={!canNext}
+              top={arrowTop}
+              className="absolute right-0 top-[34%] -translate-y-1/2 sm:right-1 lg:-right-2"
+            />
+
+            <CarouselProgressBar
+              progress={progress}
+              snapCount={snapCount}
+              onSeek={seekRatio}
+              className="mt-5 px-3 sm:px-12 md:mt-7"
+            />
           </div>
         )}
 

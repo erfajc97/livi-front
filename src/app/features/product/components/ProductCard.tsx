@@ -1,4 +1,7 @@
+import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
+import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import type { Product } from '@/app/types/global.types';
 
 interface ProductCardProps {
@@ -6,6 +9,9 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const [hovered, setHovered] = useState(false);
+
   const productImages = (product.images ?? [])
     .map((img: any) => (typeof img === 'string' ? img : img.url))
     .filter(Boolean);
@@ -32,44 +38,103 @@ export default function ProductCard({ product }: ProductCardProps) {
     product.maxFormatPrice ?? (prices.length ? Math.max(...prices) : (product.price ?? 0));
   const hasRange = maxPrice > minPrice;
 
-  const sealedStock = product.stock ?? 0;
-  const openMl = product.openBottleMlRemaining ?? 0;
-  const totalMl = product.totalMl ?? 0;
+  // Number(): el backend manda los decimales como string y `openMl + stock*ml`
+  // concatenaría en vez de sumar.
+  const sealedStock = Number(product.stock ?? 0);
+  const openMl = Number(product.openBottleMlRemaining ?? 0);
+  const totalMl = Number(product.totalMl ?? 0);
   const availableMl = openMl + sealedStock * totalMl;
   const hasStock = sealedStock > 0 || availableMl > 0;
 
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
-  const discountedMin = hasDiscount ? minPrice * (1 - discount / 100) : minPrice;
-  const discountedMax = hasDiscount ? maxPrice * (1 - discount / 100) : maxPrice;
+  const applyDiscount = (n: number) => (hasDiscount ? n * (1 - discount / 100) : n);
+  const discountedMin = applyDiscount(minPrice);
+  const discountedMax = applyDiscount(maxPrice);
 
-  // Máximo 2 formatos como chips; el resto se ve en el detalle (botón +).
+  // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
   const chipFormats = formats.slice(0, 2);
+  const hasMoreFormats = formats.length > 2;
 
   const productUrl = `/producto/${product.id}`;
 
+  /**
+   * Añadido rápido: usa el formato más barato disponible (normalmente el decant
+   * más pequeño). Si ese formato no se puede vender, cae al frasco completo.
+   * Devuelve null cuando no hay nada que añadir → se manda al detalle.
+   */
+  const buildQuickAddItem = (): CartItem | null => {
+    const image = productImage || '';
+    const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
+
+    const buildFull = (price: number): CartItem => ({
+      productId: product.id,
+      variantId: `full-${product.id}`,
+      name: product.name,
+      image,
+      ml: totalMl,
+      price: applyDiscount(price),
+      quantity: 1,
+      bajoPedido: fullIsBackorder,
+      // El frasco no tiene tope: el excedente se desglosa como bajo pedido.
+      maxQty: undefined,
+      stockAvailable: fullIsBackorder ? undefined : sealedStock,
+      availableMl,
+    });
+
+    const sorted = [...formats].filter((f) => f.price > 0).sort((a, b) => a.price - b.price);
+
+    for (const f of sorted) {
+      if (f.isFullBottle) return buildFull(f.price);
+      // Decant: topado por los ml disponibles del producto.
+      const maxQty = f.ml > 0 ? Math.floor(availableMl / f.ml) : 0;
+      if (maxQty < 1) continue;
+      return {
+        productId: product.id,
+        variantId: f.id,
+        name: product.name,
+        image,
+        ml: f.ml,
+        price: applyDiscount(f.price),
+        quantity: 1,
+        bajoPedido: false,
+        maxQty,
+        availableMl,
+      };
+    }
+
+    // Sin decants preparables: queda el frasco (siempre comprable si hay precio).
+    const price = product.price ?? minPrice;
+    return price > 0 ? buildFull(price) : null;
+  };
+
+  const handleQuickAdd = () => {
+    const item = buildQuickAddItem();
+    if (!item) {
+      window.location.href = productUrl;
+      return;
+    }
+    addItem(item);
+    sonnerResponse(`${product.name} · ${item.ml} ml añadido al carrito.`, 'success');
+  };
+
   return (
-    <div className="group/card flex flex-col">
-      {/* Imagen — tile blanco (4:5); la botella llena casi todo con margen chico */}
-      <a href={productUrl} className="block">
-        <div className="relative aspect-4/5 overflow-hidden bg-white">
+    <div
+      className="group/card flex flex-col"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Imagen — tile blanco cuadrado; el cambio a la 2ª foto es inmediato.
+          `data-card-media` lo usa el carrusel para centrar sus flechas. */}
+      <div data-card-media className="relative aspect-square overflow-hidden bg-white">
+        <a href={productUrl} className="block h-full w-full">
           {productImage ? (
-            <>
-              <img
-                src={productImage}
-                alt={product.name}
-                loading="lazy"
-                className={`h-full w-full object-contain p-3 sm:p-4 transition-all duration-700 ${hoverImage ? 'group-hover/card:opacity-0' : 'group-hover/card:scale-[1.04]'}`}
-              />
-              {hoverImage && (
-                <img
-                  src={hoverImage}
-                  alt={product.name}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-contain p-3 opacity-0 transition-opacity duration-700 sm:p-4 group-hover/card:opacity-100"
-                />
-              )}
-            </>
+            <img
+              src={hovered && hoverImage ? hoverImage : productImage}
+              alt={product.name}
+              loading="lazy"
+              className="h-full w-full object-contain p-3 sm:p-4"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-text-muted">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
@@ -77,25 +142,35 @@ export default function ProductCard({ product }: ProductCardProps) {
               </svg>
             </div>
           )}
+        </a>
 
-          {hasDiscount && (
-            <span className="absolute left-3 top-3 bg-accent px-2.5 py-1 font-body text-[9px] font-medium uppercase tracking-[0.18em] text-bg">
-              -{discount}%
-            </span>
-          )}
-        </div>
-      </a>
+        {hasDiscount && (
+          <span className="absolute left-3 top-3 bg-accent px-2.5 py-1 font-body text-[9px] font-medium uppercase tracking-[0.18em] text-bg">
+            -{discount}%
+          </span>
+        )}
+
+        {/* Añadir al carrito — siempre visible en móvil, al hover en desktop.
+            Negro con texto beige; al pasar el cursor por encima se invierte. */}
+        <button
+          type="button"
+          onClick={handleQuickAdd}
+          className="absolute inset-x-0 bottom-0 z-10 border-t border-text bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-bg transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
+        >
+          Añadir al carrito
+        </button>
+      </div>
 
       {/* Info */}
-      <div className="flex flex-col gap-1.5 pt-3">
+      <div className="flex flex-col gap-1 pt-2.5">
         <a href={productUrl}>
           <h3 className="font-display text-[15px] font-normal leading-snug tracking-[-0.005em] text-text transition-colors group-hover/card:text-accent">
             {product.name}
           </h3>
         </a>
 
-        {/* Precio (rango) + estado */}
-        <div className="flex items-baseline justify-between gap-2">
+        {/* Precio (rango) + estado — en móvil el estado baja a su propia línea */}
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
           <span className="font-body text-[11px] tracking-[0.02em] text-text">
             {hasDiscount && (
               <span className="mr-1.5 text-text-muted line-through">{formatCurrency(minPrice)}</span>
@@ -112,9 +187,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {/* Chips de formato (máx 2) + botón + → detalle */}
+        {/* Chips de formato (máx 2); el "+" solo si hay más de 2 → detalle */}
         {chipFormats.length > 0 && (
-          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
             {chipFormats.map((f) => (
               <a
                 key={f.id}
@@ -124,15 +199,17 @@ export default function ProductCard({ product }: ProductCardProps) {
                 {f.ml} ml
               </a>
             ))}
-            <a
-              href={productUrl}
-              aria-label="Ver todos los formatos"
-              className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-text-soft transition-colors hover:border-text hover:text-text"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </a>
+            {hasMoreFormats && (
+              <a
+                href={productUrl}
+                aria-label="Ver todos los formatos"
+                className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-text-soft transition-colors hover:border-text hover:text-text"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </a>
+            )}
           </div>
         )}
       </div>

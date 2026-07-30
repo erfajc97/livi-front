@@ -6,7 +6,7 @@ function CombosContent() {
   const { data: combos = [], isLoading } = useActiveCombosQuery();
 
   return (
-    <div className="pb-20">
+    <div className="pb-12 md:pb-20">
       <ComboEditorialList combos={combos} isLoading={isLoading} />
     </div>
   );

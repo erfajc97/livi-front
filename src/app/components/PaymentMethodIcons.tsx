@@ -1,23 +1,39 @@
-export default function PaymentMethodIcons() {
+import visaSvg from '@/assets/svg/visa.svg';
+import mastercardSvg from '@/assets/svg/mastercard.svg';
+import dinnersSvg from '@/assets/svg/dinners.svg';
+import discoverSvg from '@/assets/svg/discover.svg';
+import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
+
+/**
+ * Medios de pago aceptados — logos oficiales, sin marcos ni fondos: los SVG de
+ * las tarjetas ya traen su propia tarjeta blanca, PayPhone su cuadro naranja y
+ * el wordmark de Pichincha se lee directo sobre el fondo del sitio.
+ */
+const LOGOS = [
+  { src: '/pagos/payphone-icon.png', alt: 'PayPhone', cls: 'h-10' },
+  { src: visaSvg.src, alt: 'Visa', cls: 'h-10' },
+  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-10' },
+  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-10' },
+  { src: discoverSvg.src, alt: 'Discover', cls: 'h-10' },
+  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-6' },
+];
+
+interface PaymentMethodIconsProps {
+  className?: string;
+}
+
+export default function PaymentMethodIcons({ className = '' }: PaymentMethodIconsProps) {
   return (
-    <div className="flex items-center gap-2.5 flex-wrap">
-      <div className="h-9 border border-gray-200 rounded-md px-2.5 flex items-center justify-center bg-orange-500 text-white font-bold text-[10px] italic">
-        ACEPTAMOS PayPhone
-      </div>
-      <div className="h-9 w-12 border border-gray-200 rounded-md flex items-center justify-center bg-white">
-        <span className="text-blue-800 font-bold text-[11px] italic">VISA</span>
-      </div>
-      <div className="h-9 w-12 border border-gray-200 rounded-md flex items-center justify-center bg-white">
-        <div className="w-5 h-5 rounded-full border-2 border-blue-500 overflow-hidden flex items-center justify-center">
-          <div className="w-2.5 h-6 bg-blue-500 skew-x-12" />
-        </div>
-      </div>
-      <div className="h-9 w-14 border border-gray-200 rounded-md flex items-center justify-center bg-white">
-        <span className="text-orange-500 font-bold text-[9px]">DISCOVER</span>
-      </div>
-      <div className="h-9 border border-gray-200 rounded-md px-2.5 flex items-center justify-center bg-white">
-        <span className="text-gray-600 font-bold text-[9px]">Transferencia Bancaria</span>
-      </div>
+    <div className={`flex flex-wrap items-center gap-x-4 gap-y-3 ${className}`}>
+      {LOGOS.map((logo) => (
+        <img
+          key={logo.alt}
+          src={logo.src}
+          alt={logo.alt}
+          title={logo.alt}
+          className={`${logo.cls} w-auto object-contain`}
+        />
+      ))}
     </div>
   );
 }

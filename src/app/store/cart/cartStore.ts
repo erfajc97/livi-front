@@ -25,6 +25,10 @@ export interface CartItem {
    *  este número, el excedente pasa a "bajo pedido" en el desglose del carrito.
    *  undefined = no aplica split (decant topado, o producto 100% bajo pedido). */
   stockAvailable?: number;
+  /** ml físicos disponibles del producto (frasco abierto + frascos sellados).
+   *  Frascos y decants del mismo producto comparten este pool: los frascos que
+   *  se venden lo consumen y los decants sobrantes pasan a bajo pedido. */
+  availableMl?: number;
 }
 
 const clampQty = (qty: number, max?: number) =>

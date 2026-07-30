@@ -28,7 +28,7 @@ const FALLBACK = '/banner-catalog.png';
   description={post.excerpt || `Lee sobre ${post.title} en el journal de NönDecants.`}
 >
   <article class="bg-bg">
-    <div class="mx-auto max-w-3xl px-6 pb-4 pt-12 md:pt-20">
+    <div class="mx-auto max-w-3xl px-6 pb-4 pt-8 md:pt-20">
       <a href="/blog" class="font-body text-[11px] uppercase tracking-[0.18em] text-text-muted transition-colors hover:text-text">
         ← Journal
       </a>
@@ -49,7 +49,7 @@ const FALLBACK = '/banner-catalog.png';
     )}
 
     {post.content && (
-      <div class="mx-auto max-w-2xl px-6 py-14 md:py-20">
+      <div class="mx-auto max-w-2xl px-6 py-10 md:py-20">
         <div class="whitespace-pre-line font-body text-[15px] leading-[1.85] text-text-soft">
           {post.content}
         </div>
@@ -58,8 +58,8 @@ const FALLBACK = '/banner-catalog.png';
   </article>
 
   {otherPosts.length > 0 && (
-    <section class="bg-bg px-6 pb-24 md:px-14">
-      <div class="mb-10 border-t border-border pt-8">
+    <section class="bg-bg px-6 pb-12 md:px-14 md:pb-24">
+      <div class="mb-6 border-t border-border pt-6 md:mb-10 md:pt-8">
         <span class="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft">— Más del journal</span>
       </div>
       <div class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">

@@ -28,7 +28,7 @@ export default function ProductReviewsCarousel({ name }: { name: string }) {
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   return (
-    <div className="mt-16">
+    <div className="mt-10 md:mt-16">
       <h2 className="font-heading text-2xl md:text-3xl font-bold uppercase mb-8 text-black">
         Lo que nuestros clientes opinan
       </h2>

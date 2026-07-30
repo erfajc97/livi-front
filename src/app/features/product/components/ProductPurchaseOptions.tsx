@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { deliveryWindow } from '@/app/helpers/deliveryWindow';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
+import axiosInstance from '@/app/config/axiosConfig';
+import { API_ENDPOINTS } from '@/app/api/endpoints';
+import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
 type SelectedOption = { type: 'full' } | { type: 'decant'; variant: ProductVariant };
@@ -19,10 +23,10 @@ export default function ProductPurchaseOptions({
 }: ProductPurchaseOptionsProps) {
   // Default selection: full bottle if available, else first available decant
   const [selected, setSelected] = useState<SelectedOption>(() => {
-    const stock = product.stock ?? 0;
+    const stock = Number(product.stock ?? 0);
     if (stock > 0) return { type: 'full' };
-    const openMl = product.openBottleMlRemaining ?? 0;
-    const totalAvailMl = openMl + stock * (product.totalMl ?? 0);
+    const openMl = Number(product.openBottleMlRemaining ?? 0);
+    const totalAvailMl = openMl + stock * Number(product.totalMl ?? 0);
     const firstAvailable = (product.variants ?? [])
       .filter(v => !v.isFullBottle && v.ml <= totalAvailMl)
       .sort((a, b) => a.ml - b.ml)[0];
@@ -59,9 +63,23 @@ export default function ProductPurchaseOptions({
     return unsub;
   }, []);
 
-  const fullBottlePrice = product.price ?? 0;
-  const fullBottleStock = product.stock ?? 0;
-  const fullBottleMl = product.totalMl ?? 0;
+  // Días extra de entrega configurados en el admin (setting opcional).
+  const [deliveryOffset, setDeliveryOffset] = useState(0);
+  useEffect(() => {
+    axiosInstance
+      .get(`${API_ENDPOINTS.SETTINGS}/delivery_days_offset`)
+      .then(({ data }) => {
+        const value = Number(data?.data?.value ?? data?.value);
+        if (Number.isFinite(value) && value > 0) setDeliveryOffset(value);
+      })
+      .catch(() => {});
+  }, []);
+
+  // Number(): los decimales llegan como string desde el backend; sin esto las
+  // sumas de ml concatenan y la disponibilidad sale mal.
+  const fullBottlePrice = Number(product.price ?? 0);
+  const fullBottleStock = Number(product.stock ?? 0);
+  const fullBottleMl = Number(product.totalMl ?? 0);
 
   const variants = product.variants ?? [];
   const decants = variants.filter(v => !v.isFullBottle);
@@ -76,7 +94,7 @@ export default function ProductPurchaseOptions({
   const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
 
   // Stock — use available ml to determine what's purchasable
-  const openMl = product.openBottleMlRemaining ?? 0;
+  const openMl = Number(product.openBottleMlRemaining ?? 0);
   const availableMl = openMl + fullBottleStock * fullBottleMl;
   // El flag `bajoPedido` define SOLO la sección (importación exclusiva). El
   // frasco completo SIEMPRE se puede comprar: si no queda stock sellado, se
@@ -118,6 +136,8 @@ export default function ProductPurchaseOptions({
         // Sin stock sellado → todo bajo pedido (stockAvailable undefined). Con
         // stock parcial → el carrito parte el excedente a bajo pedido.
         stockAvailable: fullIsBackorder ? undefined : fullBottleStock,
+        // Pool compartido con los decants: cada frasco vendido lo consume.
+        availableMl,
       };
     }
     if (selectedDecant) {
@@ -129,10 +149,13 @@ export default function ProductPurchaseOptions({
         ml: selectedDecant.ml,
         price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
         quantity: 1,
-        // Decant NUNCA va bajo pedido: se topa por las unidades disponibles
-        // (ml / mlSize), nunca se importa.
+        // El decant no se marca bajo pedido de origen: se topa por las unidades
+        // que dan los ml disponibles. Pero si en el carrito hay frascos del
+        // mismo producto que consumen esos ml, el excedente sí pasa a bajo
+        // pedido (el reparto lo hace `splitCartStock`).
         bajoPedido: false,
         maxQty: selectedDecant.availableQuantity,
+        availableMl,
       };
     }
     return null;
@@ -232,7 +255,8 @@ export default function ProductPurchaseOptions({
       {/* Selector de formato */}
       <div>
         <p className="eyebrow mb-2.5">Selecciona tu formato</p>
-        <div className="grid grid-cols-3 gap-2">
+        {/* Tarjetas cuadradas y compactas (tamaño fijo, no se estiran) */}
+        <div className="flex flex-wrap gap-2">
           {fullBottlePrice > 0 && (
             <SizeCard
               ml={fullBottleMl}
@@ -301,16 +325,21 @@ export default function ProductPurchaseOptions({
       {/* Entrega */}
       <div className="border-t border-border pt-4">
         <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
-          <span className="flex items-center gap-2"><Tick /> Garantía de autenticidad · 7 días</span>
-          <span className="flex items-center gap-2"><Tick /> Envío nacional asegurado · desde $3</span>
-          <span className="flex items-center gap-2"><Tick /> {selectedIsBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Preparación en 24 h'}</span>
+          <span className="flex items-center gap-2">
+            <Tick />
+            {selectedIsBajoPedido
+              ? 'Curado bajo pedido · 13–17 días'
+              : `Recibe entre ${deliveryWindow(deliveryOffset)}`}
+          </span>
+          <span className="flex items-center gap-2"><Tick /> Autenticidad garantizada</span>
+          <span className="flex items-center gap-2"><Tick /> Envíos nacionales a todo Ecuador</span>
         </div>
       </div>
 
-      {/* Pago */}
-      <div className="flex items-center gap-3 border-t border-border pt-4">
+      {/* Pago — medios aceptados */}
+      <div className="border-t border-border pt-4">
         <span className="eyebrow">Pago</span>
-        <span className="font-body text-[12px] text-text-soft">Tarjeta · Transferencia · PayPhone</span>
+        <PaymentMethodIcons className="mt-2.5" />
       </div>
 
       {pendingAction !== null && (
@@ -348,7 +377,8 @@ function SizeCard({ ml, type, price, active, disabled, onClick }: {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col items-start p-3 text-left transition-all ${
+      /* Bloque centrado y compacto: tipografía más grande, sin huecos muertos */
+      className={`flex aspect-square w-26 flex-col items-start justify-center gap-1.5 p-3 text-left transition-all ${
         disabled
           ? 'cursor-not-allowed border border-border opacity-40'
           : active
@@ -356,13 +386,13 @@ function SizeCard({ ml, type, price, active, disabled, onClick }: {
             : 'border border-border text-text hover:border-text'
       }`}
     >
-      <span className="font-display text-xl leading-none">
+      <span className="font-display text-2xl leading-none">
         {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
       </span>
-      <span className={`mt-1.5 font-body text-[9px] uppercase tracking-[0.18em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
+      <span className={`font-body text-[9px] uppercase leading-none tracking-[0.14em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
         {type}
       </span>
-      <span className="mt-1 font-body text-[11px]">{formatCurrency(price)}</span>
+      <span className="font-body text-[13px] leading-none">{formatCurrency(price)}</span>
     </button>
   );
 }

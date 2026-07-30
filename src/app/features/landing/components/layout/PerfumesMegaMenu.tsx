@@ -75,12 +75,14 @@ export default function PerfumesMegaMenu({
       onMouseLeave={onMouseLeave}
       className="absolute left-0 right-0 top-full z-50 hidden border-y border-border bg-bg text-text shadow-2xl md:block"
     >
-      <div className="mx-auto grid max-w-[1600px] grid-cols-[1fr_360px] gap-16 px-14 pb-16 pt-14">
+      <div className="mx-auto grid max-w-[1600px] grid-cols-[1fr_360px] gap-16 px-14 pb-10 pt-10">
         {/* Columnas de categorías → marcas (paginadas, máx 3) */}
         <div>
-          <div className="mb-9 flex items-center justify-between">
+          <div className="mb-9 flex items-center justify-between gap-8">
             <span className="eyebrow">Casas curadas</span>
-            {totalPages > 1 && (
+
+            <div className="flex items-center gap-8">
+              {totalPages > 1 && (
               <div className="flex items-center gap-4 text-text">
                 <span className="font-body text-[11px] tabular-nums tracking-wide text-text-muted">
                   {safePage + 1} / {totalPages}
@@ -104,7 +106,8 @@ export default function PerfumesMegaMenu({
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M9 6l6 6-6 6" /></svg>
                 </button>
               </div>
-            )}
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-x-12 gap-y-12">
@@ -115,18 +118,26 @@ export default function PerfumesMegaMenu({
           ) : (
             pageCats.map((cat) => (
               <div key={cat.id}>
-                <div className="flex items-baseline gap-3 pb-1">
-                  <span className="eyebrow">{cat.name}</span>
-                  <span className="mb-[3px] h-px w-6 bg-border" />
-                </div>
+                {/* La CATEGORÍA manda en la jerarquía: display grande.
+                    Las marcas quedan por debajo, en cuerpo pequeño. */}
+                <a
+                  href={`${basePath}?category=${cat.id}`}
+                  onClick={onClose}
+                  className="group block"
+                >
+                  <span className="block font-display text-[28px] font-normal leading-tight tracking-[-0.01em] text-text transition-colors group-hover:text-accent">
+                    {cat.name}
+                  </span>
+                </a>
+                <span className="mt-2 block h-px w-10 bg-accent/50" />
 
                 {cat.description && (
-                  <p className="mt-2.5 font-display text-sm italic leading-snug text-text-soft">
+                  <p className="mt-3 font-display text-[13px] italic leading-snug text-text-muted">
                     {cat.description}
                   </p>
                 )}
 
-                <div className="mt-7 flex flex-col gap-4">
+                <div className="mt-6 flex flex-col gap-2.5">
                   {cat.marcas.slice(0, 6).map((sub) => (
                     <a
                       key={sub.id}
@@ -134,7 +145,7 @@ export default function PerfumesMegaMenu({
                       onClick={onClose}
                       className="group block transition-transform duration-200 hover:translate-x-1"
                     >
-                      <span className="block font-display text-xl font-normal not-italic leading-tight text-text transition-colors group-hover:text-accent">
+                      <span className="block font-body text-[13px] leading-tight tracking-[0.01em] text-text-soft transition-colors group-hover:text-accent">
                         {sub.name}
                       </span>
                     </a>
@@ -145,7 +156,7 @@ export default function PerfumesMegaMenu({
                 <a
                   href={`${basePath}?category=${cat.id}`}
                   onClick={onClose}
-                  className="eyebrow mt-8 inline-block border-b border-border pb-1 text-text transition-colors hover:text-accent"
+                  className="eyebrow mt-6 inline-block border-b border-border pb-1 text-text-muted transition-colors hover:text-accent"
                 >
                   Todas las casas {cat.name.toLowerCase()} →
                 </a>
@@ -153,6 +164,18 @@ export default function PerfumesMegaMenu({
             ))
           )}
           </div>
+
+          {/* CTA principal — esquina inferior izquierda del panel */}
+          <a
+            href={basePath}
+            onClick={onClose}
+            className="group mt-16 inline-flex items-center gap-3 border-b-2 border-text pb-1.5 font-body text-sm uppercase tracking-[0.16em] text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Ver el catálogo completo
+            <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
         </div>
 
         {/* Panel editorial — publicidad de navbar (admin) o categoría destacada */}
@@ -186,22 +209,6 @@ export default function PerfumesMegaMenu({
         )}
       </div>
 
-      {/* Fila terciaria — descubrimiento */}
-      <div className="flex items-center justify-between border-t border-border bg-bg-alt px-14 py-5">
-        <div className="flex items-baseline gap-9">
-          <span className="eyebrow">Explorar de otra forma</span>
-          <a href="/catalogo/perfumes" onClick={onClose} className="text-xs tracking-wide text-text hover:text-accent">Novedades</a>
-          <a href="/catalogo/combos" onClick={onClose} className="text-xs tracking-wide text-text hover:text-accent">Combos</a>
-          <a href="/bajo-pedido" onClick={onClose} className="text-xs tracking-wide text-text hover:text-accent">Pedido especial</a>
-        </div>
-        <a
-          href={basePath}
-          onClick={onClose}
-          className="eyebrow border-b border-text pb-[3px] text-text transition-colors hover:text-accent hover:border-accent"
-        >
-          Ver el catálogo completo →
-        </a>
-      </div>
     </div>
   );
 }

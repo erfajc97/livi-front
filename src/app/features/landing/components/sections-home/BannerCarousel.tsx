@@ -1,32 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import LockIcon from '@/assets/svg/LockIcon';
-import TruckIcon from '@/assets/svg/TruckIcon';
-import BoxIcon from '@/assets/svg/BoxIcon';
-import HandsIcon from '@/assets/svg/HandsIcon';
+import CommitmentStrip from './CommitmentStrip';
+import { useCarouselNav, CarouselArrow, CarouselProgressBar } from '@/app/components/UI/CarouselNav';
 import type { Banner } from '@/app/types/global.types';
 
 interface BannerCarouselProps {
   banners: Banner[];
 }
 
-// Promesas — reutiliza los SVG existentes del proyecto
-const PROMISES = [
-  { Icon: LockIcon, title: 'Autenticidad garantizada', sub: 'Cada gota verificada' },
-  { Icon: TruckIcon, title: 'Envíos Servientrega 24–72h', sub: 'A todo el Ecuador' },
-  { Icon: BoxIcon, title: 'Devolución 7 días', sub: 'Sin preguntas' },
-  { Icon: HandsIcon, title: 'Bajo pedido global', sub: 'Cualquier fragancia del mundo' },
-];
-
 export default function BannerCarousel({ banners }: BannerCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 6000, stopOnInteraction: true }),
   ]);
   const [selected, setSelected] = useState(0);
-
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  const { progress, snapCount, scrollPrev, scrollNext, seekRatio } = useCarouselNav(emblaApi);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -44,7 +32,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     /* Desktop: hero + promesas llenan el primer viewport (menos navbar).
        Mobile: hero como banner-strip (altura fija, igual que los otros
        banners) en vez de casi-fullscreen — la sección crece natural. */
-    <section className="flex flex-col bg-bg md:h-[calc(100svh-7.7rem)]">
+    <section className="flex flex-col bg-bg md:h-[calc(100svh-8.5rem)]">
       {/* ── Hero (carousel de banners) ── */}
       <div className="group relative h-80 sm:h-96 md:h-auto md:min-h-0 md:flex-1">
         <div className="h-full overflow-hidden" ref={emblaRef}>
@@ -53,7 +41,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
               <div key={banner.id} className="relative h-full min-w-full">
                 <img
                   src={banner.imageUrl ?? banner.image ?? ''}
-                  alt={banner.title}
+                  alt={banner.title || 'Banner NönDecants'}
                   /* Mobile: encuadra hacia el centro-alto (no corta caras/frascos);
                      desktop vuelve a centro. */
                   className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
@@ -77,11 +65,14 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                     </span>
                   </div>
 
-                  {/* Titular — desde el back */}
+                  {/* Titular — desde el back (opcional: la imagen puede traer
+                      su propio texto) */}
                   <div className="flex items-end">
-                    <h1 className="max-w-[16ch] font-display text-[clamp(2.4rem,7vw,6.5rem)] font-light leading-[0.98] tracking-[-0.025em] text-white drop-shadow-sm md:text-text md:drop-shadow-none">
-                      {banner.title}
-                    </h1>
+                    {banner.title && (
+                      <h1 className="max-w-[16ch] font-display text-[clamp(2.4rem,7vw,6.5rem)] font-light leading-[0.98] tracking-[-0.025em] text-white drop-shadow-sm md:text-text md:drop-shadow-none">
+                        {banner.title}
+                      </h1>
+                    )}
                   </div>
 
                   {/* Texto (back) a la izquierda · botones a la derecha */}
@@ -93,17 +84,19 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
                     ) : (
                       <span />
                     )}
+                    {/* CTAs — tipografía fina (display serif) como el resto de
+                        los titulares editoriales */}
                     <div className="flex items-center gap-4">
                       <a
-                        href={banner.link ?? '/catalogo/perfumes'}
-                        className="inline-flex items-center gap-2 bg-text px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+                        href={banner.link || '/catalogo/perfumes'}
+                        className="inline-flex items-center gap-2 bg-text px-8 py-4 font-display text-sm uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
                       >
-                        {banner.buttonText ?? 'Explorar colección'}
+                        {banner.buttonText || 'Explorar colección'}
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
                       </a>
                       <a
                         href="/bajo-pedido"
-                        className="inline-flex items-center border border-text/20 bg-bg/85 px-7 py-4 font-body text-xs uppercase tracking-[0.2em] text-text backdrop-blur-sm transition-colors hover:border-accent hover:text-accent"
+                        className="inline-flex items-center border border-text/20 bg-bg/85 px-7 py-4 font-display text-sm uppercase tracking-[0.2em] text-text backdrop-blur-sm transition-colors hover:border-accent hover:text-accent"
                       >
                         Bajo Pedido
                       </a>
@@ -115,51 +108,32 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
           </div>
         </div>
 
-        {/* Flechas */}
+        {/* Flechas + barra de posición — siempre visibles: dejan claro que hay
+            más de un banner */}
         {banners.length > 1 && (
           <>
-            <button
+            <CarouselArrow
+              direction="prev"
               onClick={scrollPrev}
-              aria-label="Anterior"
-              className="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-text/30 text-text opacity-0 transition-all hover:border-accent hover:text-accent group-hover:opacity-100"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><polyline points="15 18 9 12 15 6" /></svg>
-            </button>
-            <button
+              className="absolute left-0 top-1/2 -translate-y-1/2"
+            />
+            <CarouselArrow
+              direction="next"
               onClick={scrollNext}
-              aria-label="Siguiente"
-              className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-text/30 text-text opacity-0 transition-all hover:border-accent hover:text-accent group-hover:opacity-100"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><polyline points="9 18 15 12 9 6" /></svg>
-            </button>
+              className="absolute right-0 top-1/2 -translate-y-1/2"
+            />
+            <CarouselProgressBar
+              progress={progress}
+              snapCount={snapCount}
+              onSeek={seekRatio}
+              className="absolute inset-x-0 bottom-4 z-20 px-6 md:px-12"
+            />
           </>
         )}
       </div>
 
-      {/* ── Promesas NönDecants ── */}
-      <div className="shrink-0 border-t border-border bg-bg-alt">
-        <div className="mx-auto max-w-[1600px] px-6 py-5 md:px-12 md:py-7">
-          <div className="mb-4 flex items-center justify-center gap-4">
-            <span className="h-px w-8 bg-border" />
-            <span className="eyebrow">La promesa NönDecants</span>
-            <span className="h-px w-8 bg-border" />
-          </div>
-          <div className="grid grid-cols-4">
-            {PROMISES.map((p, i) => (
-              <div
-                key={p.title}
-                className={`flex flex-col items-center gap-1.5 px-1 py-2 text-center md:gap-2 md:px-6 ${i > 0 ? 'border-l border-border' : ''}`}
-              >
-                <span className="[&>svg]:h-5 [&>svg]:w-5 md:[&>svg]:h-[26px] md:[&>svg]:w-[26px]">
-                  <p.Icon width={26} height={26} />
-                </span>
-                <span className="font-body text-[8px] leading-tight tracking-[0.12em] text-text uppercase md:text-[11px] md:tracking-[0.18em]">{p.title}</span>
-                <span className="hidden font-display text-xs italic text-text-muted md:block">{p.sub}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* ── Nuestro compromiso ── */}
+      <CommitmentStrip />
     </section>
   );
 }
