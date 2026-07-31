@@ -1,6 +1,7 @@
 import { useCartPageHook, type CartRow } from '../hooks/useCartPageHook';
 import CartLine from './CartLine';
 import CartPageSummary from './CartPageSummary';
+import CartRecommendations from './CartRecommendations';
 
 function GroupHeader({ num, title, meta, dot }: { num: string; title: string; meta: string; dot?: boolean }) {
   return (
@@ -54,6 +55,10 @@ export default function CartPage() {
           Explorar catálogo
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
         </a>
+
+        <div className="w-full text-left">
+          <CartRecommendations />
+        </div>
       </section>
     );
   }
@@ -124,6 +129,9 @@ export default function CartPage() {
           />
         </aside>
       </div>
+
+      {/* Publicidad de productos — se administra desde el admin */}
+      <CartRecommendations />
     </section>
   );
 }

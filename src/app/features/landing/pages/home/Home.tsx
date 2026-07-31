@@ -4,7 +4,6 @@ import ProductCarouselSection from '../../components/sections-home/ProductCarous
 import ProductRankingSection from '../../components/sections-home/ProductRankingSection';
 import EditorialBlogSplit from '../../components/sections-home/EditorialBlogSplit';
 import HowItWorksSection from '../../components/sections-home/HowItWorksSection';
-import CuratedHousesSection from '../../components/sections-home/CuratedHousesSection';
 
 function HomeContent() {
   const { sections, sectionsLoading } = useHomeHook();
@@ -52,7 +51,6 @@ function HomeContent() {
         />
       ))}
 
-      <CuratedHousesSection />
     </div>
   );
 }

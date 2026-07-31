@@ -41,20 +41,21 @@ export default function CommitmentStrip() {
           <span className="h-px w-8 bg-border" />
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+        {/* Una sola fila en todos los tamaños, placas de esquina viva */}
+        <div className="grid grid-cols-4 gap-1.5 md:gap-4">
           {COMMITMENTS.map(({ Icon, title, text }) => (
             <div
               key={title}
-              className="flex flex-col items-center gap-2 rounded-[14px] border border-accent/25 bg-surface-raised px-3 py-4 text-center shadow-[0_1px_2px_rgba(28,26,23,0.03)] md:gap-2.5 md:px-6 md:py-6"
+              className="flex flex-col items-center gap-1.5 border border-accent/25 bg-surface-raised px-1.5 py-3 text-center shadow-[0_1px_2px_rgba(28,26,23,0.03)] md:gap-2.5 md:px-6 md:py-6"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full border border-accent/20 bg-accent/5 text-accent md:h-12 md:w-12">
-                <Icon size={26} className="md:hidden" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-accent/20 bg-accent/5 text-accent md:h-12 md:w-12">
+                <Icon size={18} className="md:hidden" />
                 <Icon size={30} className="hidden md:block" />
               </span>
-              <span className="font-body text-[9px] uppercase leading-tight tracking-[0.14em] text-text md:text-[11px] md:tracking-[0.16em]">
+              <span className="font-body text-[7px] uppercase leading-tight tracking-[0.1em] text-text md:text-[11px] md:tracking-[0.16em]">
                 {title}
               </span>
-              <span className="font-display text-[13px] italic leading-snug text-text-muted md:text-[15px]">
+              <span className="font-display text-[10px] italic leading-snug text-text-muted md:text-[15px]">
                 {text}
               </span>
             </div>

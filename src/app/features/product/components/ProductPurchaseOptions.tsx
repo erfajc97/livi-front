@@ -3,8 +3,7 @@ import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { deliveryWindow } from '@/app/helpers/deliveryWindow';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
-import axiosInstance from '@/app/config/axiosConfig';
-import { API_ENDPOINTS } from '@/app/api/endpoints';
+import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
@@ -64,16 +63,7 @@ export default function ProductPurchaseOptions({
   }, []);
 
   // Días extra de entrega configurados en el admin (setting opcional).
-  const [deliveryOffset, setDeliveryOffset] = useState(0);
-  useEffect(() => {
-    axiosInstance
-      .get(`${API_ENDPOINTS.SETTINGS}/delivery_days_offset`)
-      .then(({ data }) => {
-        const value = Number(data?.data?.value ?? data?.value);
-        if (Number.isFinite(value) && value > 0) setDeliveryOffset(value);
-      })
-      .catch(() => {});
-  }, []);
+  const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
 
   // Number(): los decimales llegan como string desde el backend; sin esto las
   // sumas de ml concatenan y la disponibilidad sale mal.

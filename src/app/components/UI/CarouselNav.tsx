@@ -169,9 +169,11 @@ export function CarouselProgressBar({ progress, snapCount, onSeek, className = '
         }}
         className="relative h-3 w-full max-w-36 cursor-pointer touch-none"
       >
-        <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border" />
+        {/* Riel claro con el tramo recorrido en oscuro (invertido respecto a
+            la versión anterior, que era una hairline apenas visible). */}
+        <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-border" />
         <span
-          className="absolute top-1/2 h-px -translate-y-1/2 bg-text transition-[left] duration-150"
+          className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-text transition-[left] duration-300 ease-out"
           style={{ width: `${thumbWidth}%`, left: `${progress * (100 - thumbWidth)}%` }}
         />
       </div>

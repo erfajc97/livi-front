@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import AppProviders from '@/app/providers/AppProviders';
 import ProductPurchaseOptions from './ProductPurchaseOptions';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
@@ -66,7 +67,19 @@ function ProductGallery({
   );
 }
 
-export default function ProductDetailIsland({ product }: ProductDetailIslandProps) {
+/**
+ * Island raíz del detalle: necesita AppProviders porque dentro se usan queries
+ * de TanStack (p. ej. los días de entrega configurados en el admin).
+ */
+export default function ProductDetailIsland(props: ProductDetailIslandProps) {
+  return (
+    <AppProviders>
+      <ProductDetailContent {...props} />
+    </AppProviders>
+  );
+}
+
+function ProductDetailContent({ product }: ProductDetailIslandProps) {
   // Default: null = full bottle (product itself), not a variant
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 

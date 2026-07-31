@@ -79,30 +79,15 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
 }
 
-/* ── Marquee infinito (casas que curamos) ──────── */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.marquee-track {
-  animation: marquee var(--marquee-duration, 40s) linear infinite;
-}
-.marquee-wrap:hover .marquee-track {
-  animation-play-state: paused;
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { animation: none; }
-}
-
-/* ── Barra de promociones: los textos rotan (auto o con las flechas) y cada
-      cambio entra con un fundido corto. ─────────────────────────────────── */
-@keyframes announce-fade {
-  from { opacity: 0; transform: translateY(2px); }
+/* ── Barra de promociones: los textos rotan solos (o con las flechas) y cada
+      cambio entra deslizándose desde la derecha. ────────────────────────── */
+@keyframes announce-slide {
+  from { opacity: 0; transform: translateX(28px); }
   to   { opacity: 1; transform: none; }
 }
-.announce-fade {
-  animation: announce-fade 400ms ease-out;
+.announce-slide {
+  animation: announce-slide 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .announce-fade { animation: none; }
+  .announce-slide { animation: none; }
 }

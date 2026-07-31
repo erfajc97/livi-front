@@ -4,12 +4,17 @@ import { API_ENDPOINTS } from '@/app/api/endpoints';
 import type { LandingSection } from '@/app/types/global.types';
 import { mapProduct } from './productsQuery';
 
+/** Ubicación de la sección: landing o recomendados del carrito. */
+export type SectionPlacement = 'home' | 'cart';
+
 // ── Query para obtener secciones activas (público) ──
-export function useLandingSectionsActiveQuery() {
+export function useLandingSectionsActiveQuery(placement: SectionPlacement = 'home') {
   return useQuery({
-    queryKey: ['landing-sections', 'active'],
+    queryKey: ['landing-sections', 'active', placement],
     queryFn: async (): Promise<LandingSection[]> => {
-      const { data } = await axiosInstance.get(API_ENDPOINTS.LANDING_SECTIONS_ACTIVE);
+      const { data } = await axiosInstance.get(API_ENDPOINTS.LANDING_SECTIONS_ACTIVE, {
+        params: { placement },
+      });
       // Backend wrapper: { statusCode, message, data: [...] }
       const sections = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
       return sections.map((s: any) => ({

@@ -5,6 +5,7 @@ import AddressSection from './AddressSection';
 import DeliverySection from './DeliverySection';
 import PaymentSection from './PaymentSection';
 import TransferBankInfoStep from './TransferBankInfoStep';
+import { validateContact } from '../validators';
 import type { CustomerFormData, DeliveryMethod, PaymentMethod, DeliveryOption } from '../types';
 
 interface CheckoutFormProps {
@@ -43,6 +44,11 @@ export default function CheckoutForm({
   handleTransferSubmit,
 }: CheckoutFormProps) {
 
+  // El paso 1 solo avanza con los datos completos y un método de entrega
+  // elegido: hasta entonces el botón queda deshabilitado.
+  const contactError = validateContact(customer);
+  const canContinue = contactError === null && deliveryMethod !== null;
+
   const onFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1) handleNextStep();
@@ -69,12 +75,20 @@ export default function CheckoutForm({
             selected={deliveryMethod}
             onSelect={setDeliveryMethod}
           />
-          <button
-            type="submit"
-            className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
-          >
-            Continuar
-          </button>
+          <div className="mt-2">
+            <button
+              type="submit"
+              disabled={!canContinue}
+              className="w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40"
+            >
+              Continuar
+            </button>
+            {!canContinue && (
+              <p className="mt-2 font-body text-[11px] text-text-muted">
+                {contactError ?? 'Selecciona un método de entrega.'}
+              </p>
+            )}
+          </div>
         </>
       )}
 

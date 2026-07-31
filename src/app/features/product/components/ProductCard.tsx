@@ -8,6 +8,13 @@ interface ProductCardProps {
   product: Product;
 }
 
+interface Format {
+  id: string;
+  ml: number;
+  price: number;
+  isFullBottle: boolean;
+}
+
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
   const [hovered, setHovered] = useState(false);
@@ -20,8 +27,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const variants = product.variants ?? [];
   // Formatos: preferir la lista compacta del backend; si no, derivar de las
-  // variantes cargadas (mock / detalle).
-  const formats = (product.formats && product.formats.length
+  // variantes cargadas (mock / detalle). Se ordenan por precio para que el
+  // primero (el que arranca seleccionado) sea el más accesible.
+  const formats: Format[] = (product.formats && product.formats.length
     ? product.formats
     : variants.map((v) => ({
         id: v.id,
@@ -29,17 +37,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         price: v.price,
         isFullBottle: v.isFullBottle,
       }))
-  ).filter((f) => f.ml > 0 || f.price > 0);
+  )
+    .filter((f) => f.ml > 0 || f.price > 0)
+    .slice()
+    .sort((a, b) => a.price - b.price);
 
-  const prices = formats.map((f) => f.price).filter((n) => n > 0);
-  const minPrice =
-    product.minFormatPrice ?? (prices.length ? Math.min(...prices) : (product.price ?? 0));
-  const maxPrice =
-    product.maxFormatPrice ?? (prices.length ? Math.max(...prices) : (product.price ?? 0));
-  const hasRange = maxPrice > minPrice;
+  // Formato elegido desde la propia card: cambia el precio sin salir de aquí.
+  const [selectedId, setSelectedId] = useState<string | null>(formats[0]?.id ?? null);
+  const selected = formats.find((f) => f.id === selectedId) ?? formats[0] ?? null;
 
-  // Number(): el backend manda los decimales como string y `openMl + stock*ml`
-  // concatenaría en vez de sumar.
   const sealedStock = Number(product.stock ?? 0);
   const openMl = Number(product.openBottleMlRemaining ?? 0);
   const totalMl = Number(product.totalMl ?? 0);
@@ -49,8 +55,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
   const applyDiscount = (n: number) => (hasDiscount ? n * (1 - discount / 100) : n);
-  const discountedMin = applyDiscount(minPrice);
-  const discountedMax = applyDiscount(maxPrice);
+
+  // Precio del formato seleccionado (antes se mostraba el rango del producto).
+  const basePrice = selected?.price ?? product.minFormatPrice ?? product.price ?? 0;
+  const finalPrice = applyDiscount(basePrice);
 
   // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
   const chipFormats = formats.slice(0, 2);
@@ -58,12 +66,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const productUrl = `/producto/${product.id}`;
 
-  /**
-   * Añadido rápido: usa el formato más barato disponible (normalmente el decant
-   * más pequeño). Si ese formato no se puede vender, cae al frasco completo.
-   * Devuelve null cuando no hay nada que añadir → se manda al detalle.
-   */
-  const buildQuickAddItem = (): CartItem | null => {
+  /** Item de carrito del formato elegido en la card. */
+  const buildCartItem = (): CartItem | null => {
     const image = productImage || '';
     const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
 
@@ -82,9 +86,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       availableMl,
     });
 
-    const sorted = [...formats].filter((f) => f.price > 0).sort((a, b) => a.price - b.price);
+    // Se intenta el formato elegido y, si no se puede preparar, los siguientes.
+    const ordered = selected ? [selected, ...formats.filter((f) => f.id !== selected.id)] : formats;
 
-    for (const f of sorted) {
+    for (const f of ordered) {
+      if (f.price <= 0) continue;
       if (f.isFullBottle) return buildFull(f.price);
       // Decant: topado por los ml disponibles del producto.
       const maxQty = f.ml > 0 ? Math.floor(availableMl / f.ml) : 0;
@@ -104,12 +110,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
 
     // Sin decants preparables: queda el frasco (siempre comprable si hay precio).
-    const price = product.price ?? minPrice;
+    const price = product.price ?? basePrice;
     return price > 0 ? buildFull(price) : null;
   };
 
   const handleQuickAdd = () => {
-    const item = buildQuickAddItem();
+    const item = buildCartItem();
     if (!item) {
       window.location.href = productUrl;
       return;
@@ -120,7 +126,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <div
-      className="group/card flex flex-col"
+      className="group/card flex h-full flex-col bg-white"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -151,32 +157,32 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Añadir al carrito — siempre visible en móvil, al hover en desktop.
-            Negro con texto beige; al pasar el cursor por encima se invierte. */}
+            Negro con texto dorado; al pasar el cursor por encima se invierte
+            (beige con texto negro) sin dejar franja. */}
         <button
           type="button"
           onClick={handleQuickAdd}
-          className="absolute inset-x-0 bottom-0 z-10 border-t border-text bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-bg transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
+          className="absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-accent transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
         >
           Añadir al carrito
         </button>
       </div>
 
       {/* Info */}
-      <div className="flex flex-col gap-1 pt-2.5">
+      <div className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2.5">
         <a href={productUrl}>
           <h3 className="font-display text-[15px] font-normal leading-snug tracking-[-0.005em] text-text transition-colors group-hover/card:text-accent">
             {product.name}
           </h3>
         </a>
 
-        {/* Precio (rango) + estado — en móvil el estado baja a su propia línea */}
+        {/* Precio del formato elegido + estado */}
         <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
           <span className="font-body text-[11px] tracking-[0.02em] text-text">
             {hasDiscount && (
-              <span className="mr-1.5 text-text-muted line-through">{formatCurrency(minPrice)}</span>
+              <span className="mr-1.5 text-text-muted line-through">{formatCurrency(basePrice)}</span>
             )}
-            Desde {formatCurrency(discountedMin)}
-            {hasRange && <> – {formatCurrency(discountedMax)}</>}
+            {formatCurrency(finalPrice)}
           </span>
           <span
             className={`shrink-0 font-body text-[9px] uppercase tracking-[0.16em] ${
@@ -187,18 +193,28 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         </div>
 
-        {/* Chips de formato (máx 2); el "+" solo si hay más de 2 → detalle */}
+        {/* Chips de formato (máx 2): seleccionan y actualizan el precio aquí
+            mismo. El "+" (solo con más de 2 formatos) abre el detalle. */}
         {chipFormats.length > 0 && (
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-            {chipFormats.map((f) => (
-              <a
-                key={f.id}
-                href={productUrl}
-                className="border border-border px-2.5 py-1 font-body text-[10px] uppercase tracking-[0.08em] text-text-soft transition-colors hover:border-text hover:text-text"
-              >
-                {f.ml} ml
-              </a>
-            ))}
+            {chipFormats.map((f) => {
+              const isSelected = selected?.id === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setSelectedId(f.id)}
+                  aria-pressed={isSelected}
+                  className={`border px-2.5 py-1 font-body text-[10px] uppercase tracking-[0.08em] transition-colors ${
+                    isSelected
+                      ? 'border-text bg-text text-bg'
+                      : 'border-border text-text-soft hover:border-text hover:text-text'
+                  }`}
+                >
+                  {f.ml} ml
+                </button>
+              );
+            })}
             {hasMoreFormats && (
               <a
                 href={productUrl}

@@ -1,6 +1,8 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
+import { lineDeliveryLabel, orderDeliveryLabel } from '@/app/helpers/deliveryWindow';
+import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
 
 interface CheckoutOrderSummaryProps {
   items: CartItem[];
@@ -44,6 +46,8 @@ export default function CheckoutOrderSummary({
   // consumen los ml de los decants del mismo producto), no solo el flag.
   const splits = splitCartStock(items);
   const hasBajoPedido = items.some((item) => getSplit(splits, item).bajo > 0);
+
+  const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
 
   return (
     <div className="flex flex-col">
@@ -101,9 +105,26 @@ export default function CheckoutOrderSummary({
                   )}
                   <p className="font-body text-sm text-text">{formatCurrency(item.price * item.quantity)}</p>
                 </div>
+
+                {/* Cuándo llega esta línea */}
+                <p className="mt-2 flex items-center gap-1.5 font-body text-[11px] text-text-soft">
+                  <span
+                    className={`h-[5px] w-[5px] shrink-0 rounded-full ${
+                      getSplit(splits, item).bajo > 0 ? 'bg-accent' : 'bg-text-muted'
+                    }`}
+                  />
+                  {lineDeliveryLabel(getSplit(splits, item), deliveryOffset)}
+                </p>
               </div>
             </div>
           ))
+        )}
+
+        {/* Resumen global de tiempos de entrega */}
+        {items.length > 0 && (
+          <p className="border-t border-border pt-4 font-body text-[12px] leading-relaxed text-text-soft">
+            {orderDeliveryLabel(items.map((i) => getSplit(splits, i)), deliveryOffset)}
+          </p>
         )}
       </div>
 

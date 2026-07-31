@@ -17,3 +17,32 @@ export function deliveryWindow(offsetDays = 0): string {
     ? `${first.getDate()} y ${withMonth(second)}`
     : `${withMonth(first)} y ${withMonth(second)}`;
 }
+
+/** Días que tarda una importación bajo pedido. */
+export const BACKORDER_LABEL = '13–17 días';
+
+interface Split {
+  inStock: number;
+  bajo: number;
+}
+
+/** Etiqueta por línea del pedido: cuándo llega ese producto. */
+export function lineDeliveryLabel(split: Split, offsetDays = 0): string {
+  const window = deliveryWindow(offsetDays);
+  if (split.bajo === 0) return `Lo recibes entre el ${window}`;
+  if (split.inStock === 0) return `Bajo pedido · lo recibes en ${BACKORDER_LABEL}`;
+  return `${split.inStock} entre el ${window} · ${split.bajo} en ${BACKORDER_LABEL}`;
+}
+
+/** Resumen del pedido completo, debajo del desglose de productos. */
+export function orderDeliveryLabel(splits: Split[], offsetDays = 0): string {
+  const window = deliveryWindow(offsetDays);
+  const hasImmediate = splits.some((s) => s.inStock > 0);
+  const hasBackorder = splits.some((s) => s.bajo > 0);
+
+  if (hasImmediate && hasBackorder) {
+    return `Recibirás parte de tu pedido entre el ${window} y el resto en ${BACKORDER_LABEL}.`;
+  }
+  if (hasBackorder) return `Recibirás tu pedido en ${BACKORDER_LABEL}.`;
+  return `Recibirás tu pedido entre el ${window}.`;
+}

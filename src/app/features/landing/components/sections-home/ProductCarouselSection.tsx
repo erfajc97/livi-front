@@ -29,7 +29,9 @@ export default function ProductCarouselSection({
   num = '01',
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+  // `duration` alarga el desplazamiento: el paso entre productos se ve
+  // deslizar en vez de saltar.
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start', duration: 32 });
   const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
     useCarouselNav(emblaApi);
 

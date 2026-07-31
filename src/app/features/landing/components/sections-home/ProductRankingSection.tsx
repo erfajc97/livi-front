@@ -102,7 +102,7 @@ export default function ProductRankingSection({
         </div>
 
         {/* ── Desktop: #1 destacado + lista 02–05 ── */}
-        <div className="hidden items-start gap-12 md:grid md:grid-cols-[1.3fr_1fr]">
+        <div className="hidden items-start gap-12 md:grid md:grid-cols-[1.05fr_1fr]">
           {/* Featured #1 */}
           <a href={t.href} className="group block">
             <div className="relative aspect-square overflow-hidden bg-surface-raised">
@@ -113,11 +113,11 @@ export default function ProductRankingSection({
                 — Número uno
               </span>
             </div>
-            <div className="mt-7 grid grid-cols-[40px_1fr_auto] items-baseline gap-5">
-              <span className="font-display text-5xl font-light italic leading-none text-accent">01</span>
+            <div className="mt-6 grid grid-cols-[36px_1fr_auto] items-baseline gap-4">
+              <span className="font-display text-4xl font-light italic leading-none text-accent">01</span>
               <div>
                 {t.tags && <span className="eyebrow">{t.tags}</span>}
-                <div className="mt-2 font-display text-4xl font-light leading-none tracking-[-0.01em] text-text">{top.name}</div>
+                <div className="mt-2 font-display text-3xl font-light leading-none tracking-[-0.01em] text-text">{top.name}</div>
               </div>
               <div className="text-right">
                 <div className="font-body text-sm text-text">Desde {formatCurrency(t.minPrice)}</div>
