@@ -8,6 +8,7 @@ import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { normalizeCustomerField, validateContact } from '../validators';
+import { isPickupMethod, PICKUP_METHODS, type DeliveryMode } from '../components/DeliverySection';
 import type { CustomerFormData, PaymentMethod, DeliveryMethod } from '../types';
 
 const PREFS_KEY = 'nondecants-checkout-prefs';
@@ -82,6 +83,13 @@ export function useCheckoutHook() {
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(getInitialDeliveryMethod(savedPrefs));
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [isPending, setIsPending] = useState(false);
+  // Envío o retiro en tienda: filtra los métodos que se muestran.
+  const initialMethod = getInitialDeliveryMethod(savedPrefs);
+  const [deliveryMode, setDeliveryModeState] = useState<DeliveryMode>(
+    isPickupMethod(initialMethod) ? 'pickup' : 'shipping',
+  );
+  const [authOpen, setAuthOpen] = useState(false);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   // Fetch full profile from API to pre-fill all fields
   useEffect(() => {
@@ -126,6 +134,16 @@ export function useCheckoutHook() {
 
   const { methods: deliveryOptions, isLoading: deliveryLoading } = useDeliveryMethodsHook(customer.city);
 
+  // La ciudad se elige DESPUÉS del método: si la nueva ciudad no admite el
+  // método ya marcado, se limpia (antes se borraba con cualquier cambio de
+  // ciudad, lo que obligaba a volver arriba siempre).
+  useEffect(() => {
+    if (!deliveryMethod) return;
+    if (!deliveryOptions.some((m) => m.method === deliveryMethod)) {
+      setDeliveryMethod(null);
+    }
+  }, [deliveryOptions, deliveryMethod]);
+
   const deliveryCost = couponFreeShipping
     ? 0
     : deliveryMethod
@@ -158,7 +176,16 @@ export function useCheckoutHook() {
   const handleCustomerChange = (field: keyof CustomerFormData, value: string) => {
     const next = normalizeCustomerField(field, value);
     setCustomer((prev) => ({ ...prev, [field]: next }));
-    if (field === 'city') setDeliveryMethod(null);
+  };
+
+  // Al cambiar de modo se limpia el método si pertenece al otro grupo.
+  const setDeliveryMode = (mode: DeliveryMode) => {
+    setDeliveryModeState(mode);
+    setDeliveryMethod((current) => {
+      if (current == null) return null;
+      const currentIsPickup = PICKUP_METHODS.includes(current);
+      return currentIsPickup === (mode === 'pickup') ? current : null;
+    });
   };
 
   const handleApplyCoupon = async () => {
@@ -201,7 +228,9 @@ export function useCheckoutHook() {
   };
 
   const handleNextStep = () => {
-    const contactError = validateContact(customer);
+    const contactError = validateContact(customer, {
+      requiresAddress: deliveryMode !== 'pickup',
+    });
     if (contactError) {
       sonnerResponse(contactError, 'error');
       return;
@@ -472,6 +501,12 @@ export function useCheckoutHook() {
     setDeliveryMethod,
     setPaymentMethod,
     handleNextStep,
+    deliveryMode,
+    setDeliveryMode,
+    isAuthenticated,
+    authOpen,
+    openAuth: () => setAuthOpen(true),
+    closeAuth: () => setAuthOpen(false),
     handleSubmit: requestSubmit,
     handleTransferSubmit: requestTransferSubmit,
     // Confirmación bajo pedido

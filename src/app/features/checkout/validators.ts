@@ -30,15 +30,21 @@ export function normalizeCustomerField(
 /**
  * Valida los datos de contacto antes de avanzar de paso.
  * Devuelve el primer mensaje de error, o null si todo OK.
+ * En retiro en tienda no se pide dirección (no hay envío).
  */
-export function validateContact(c: CustomerFormData): string | null {
-  if (!c.name.trim()) return 'Ingresa tus nombres.';
-  if (!c.lastName.trim()) return 'Ingresa tus apellidos.';
+export function validateContact(
+  c: CustomerFormData,
+  options: { requiresAddress?: boolean } = {},
+): string | null {
+  const { requiresAddress = true } = options;
+
   if (!c.email.trim()) return 'Ingresa tu correo electrónico.';
   if (!isValidEmail(c.email)) return 'El correo electrónico no es válido.';
+  if (!c.name.trim()) return 'Ingresa tus nombres.';
+  if (!c.lastName.trim()) return 'Ingresa tus apellidos.';
   if (c.cedula && !isValidCedula(c.cedula))
     return 'La cédula debe tener 10 dígitos (o 13 si es RUC).';
-  if (!c.address.trim()) return 'Ingresa tu dirección.';
+  if (requiresAddress && !c.address.trim()) return 'Ingresa tu dirección.';
   if (!c.city) return 'Selecciona tu ciudad.';
   if (!c.phone.trim()) return 'Ingresa tu número telefónico.';
   if (!isValidPhone(c.phone)) return 'El teléfono debe tener 10 dígitos.';

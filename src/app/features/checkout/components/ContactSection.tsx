@@ -6,55 +6,51 @@ const INPUT_CLASS =
 interface ContactSectionProps {
   customer: CustomerFormData;
   onChange: (field: keyof CustomerFormData, value: string) => void;
+  /** Con sesión no se ofrece el bloque invitado / crear cuenta. */
+  isAuthenticated: boolean;
+  onLogin: () => void;
 }
 
-export default function ContactSection({ customer, onChange }: ContactSectionProps) {
+/**
+ * Contacto: aquí solo el correo (a esa dirección llega la confirmación).
+ * Nombre, cédula y demás van en el bloque de envío, más abajo.
+ */
+export default function ContactSection({
+  customer,
+  onChange,
+  isAuthenticated,
+  onLogin,
+}: ContactSectionProps) {
   return (
     <section>
-      <h2 className="eyebrow mb-5">Contacto</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 gap-y-5">
-        <input
-          type="text"
-          placeholder="Nombres"
-          value={customer.name}
-          onChange={(e) => onChange('name', e.target.value)}
-          className={INPUT_CLASS}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Apellidos"
-          value={customer.lastName}
-          onChange={(e) => onChange('lastName', e.target.value)}
-          className={INPUT_CLASS}
-          required
-        />
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={customer.email}
-          onChange={(e) => onChange('email', e.target.value)}
-          className={INPUT_CLASS}
-          required
-        />
-        <input
-          type="text"
-          inputMode="numeric"
-          autoComplete="off"
-          maxLength={13}
-          placeholder="Cédula / RUC"
-          value={customer.cedula}
-          onChange={(e) => onChange('cedula', e.target.value)}
-          className={INPUT_CLASS}
-        />
-        <input
-          type="text"
-          placeholder="Referencia (Opcional)"
-          value={customer.reference}
-          onChange={(e) => onChange('reference', e.target.value)}
-          className={`${INPUT_CLASS} md:col-span-2`}
-        />
-      </div>
+      <h2 className="mb-4 text-center font-display text-xl font-light text-text">
+        Información de contacto
+      </h2>
+
+      <input
+        type="email"
+        placeholder="Correo electrónico *"
+        value={customer.email}
+        onChange={(e) => onChange('email', e.target.value)}
+        className={INPUT_CLASS}
+        required
+      />
+
+      {!isAuthenticated && (
+        <div className="mt-4 flex flex-col items-start gap-2.5 border border-border bg-bg-alt px-4 py-3.5">
+          <p className="font-body text-[12px] leading-snug text-text-soft">
+            Sigues <span className="text-text">como invitado</span>: no necesitas cuenta para
+            terminar el pedido.
+          </p>
+          <button
+            type="button"
+            onClick={onLogin}
+            className="shrink-0 border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.16em] text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Crear cuenta o entrar
+          </button>
+        </div>
+      )}
     </section>
   );
 }

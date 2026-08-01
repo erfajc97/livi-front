@@ -2,7 +2,7 @@ import Loader from '@/app/components/Loader';
 import CheckoutStepTabs from './CheckoutStepTabs';
 import ContactSection from './ContactSection';
 import AddressSection from './AddressSection';
-import DeliverySection from './DeliverySection';
+import DeliverySection, { type DeliveryMode } from './DeliverySection';
 import PaymentSection from './PaymentSection';
 import TransferBankInfoStep from './TransferBankInfoStep';
 import { validateContact } from '../validators';
@@ -24,6 +24,10 @@ interface CheckoutFormProps {
   handleNextStep: () => void;
   handleSubmit: () => void;
   handleTransferSubmit: (receiptFile: File) => void;
+  deliveryMode: DeliveryMode;
+  setDeliveryMode: (mode: DeliveryMode) => void;
+  isAuthenticated: boolean;
+  onLogin: () => void;
 }
 
 export default function CheckoutForm({
@@ -42,11 +46,18 @@ export default function CheckoutForm({
   handleNextStep,
   handleSubmit,
   handleTransferSubmit,
+  deliveryMode,
+  setDeliveryMode,
+  isAuthenticated,
+  onLogin,
 }: CheckoutFormProps) {
 
   // El paso 1 solo avanza con los datos completos y un método de entrega
   // elegido: hasta entonces el botón queda deshabilitado.
-  const contactError = validateContact(customer);
+  // El modo manda sobre los campos: al marcar "retiro" la dirección sobra
+  // aunque todavía no se haya elegido el punto concreto.
+  const isPickup = deliveryMode === 'pickup';
+  const contactError = validateContact(customer, { requiresAddress: !isPickup });
   const canContinue = contactError === null && deliveryMethod !== null;
 
   const onFormSubmit = (e: React.FormEvent) => {
@@ -67,13 +78,24 @@ export default function CheckoutForm({
 
       {step === 1 && (
         <>
-          <ContactSection customer={customer} onChange={handleCustomerChange} />
-          <AddressSection customer={customer} onChange={handleCustomerChange} />
           <DeliverySection
             options={deliveryOptions}
             isLoading={deliveryLoading}
             selected={deliveryMethod}
             onSelect={setDeliveryMethod}
+            mode={deliveryMode}
+            onModeChange={setDeliveryMode}
+          />
+          <ContactSection
+            customer={customer}
+            onChange={handleCustomerChange}
+            isAuthenticated={isAuthenticated}
+            onLogin={onLogin}
+          />
+          <AddressSection
+            customer={customer}
+            onChange={handleCustomerChange}
+            isPickup={isPickup}
           />
           <div className="mt-2">
             <button

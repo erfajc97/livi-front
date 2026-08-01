@@ -1,4 +1,5 @@
 import AppProviders from '@/app/providers/AppProviders';
+import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
 import { useCheckoutHook, type BackorderLine } from '../hooks/useCheckoutHook';
 import CheckoutForm from './CheckoutForm';
 import CheckoutOrderSummary from './CheckoutOrderSummary';
@@ -9,7 +10,7 @@ function CheckoutContent() {
   return (
     <div className="relative flex flex-col gap-7 border border-border bg-surface p-5 md:gap-10 md:p-10 lg:flex-row lg:gap-14">
       <div className="flex-1">
-        <CheckoutForm {...checkoutData} />
+        <CheckoutForm {...checkoutData} onLogin={checkoutData.openAuth} />
       </div>
       <div className="hidden w-px shrink-0 bg-border lg:block" />
       <div className="lg:w-[400px] shrink-0">
@@ -30,6 +31,9 @@ function CheckoutContent() {
           onRemoveCoupon={checkoutData.handleRemoveCoupon}
         />
       </div>
+
+      {/* Registro/inicio de sesión sin salir del checkout (compra guest) */}
+      <AuthModalIsland open={checkoutData.authOpen} onClose={checkoutData.closeAuth} />
 
       {checkoutData.bajoConfirmOpen && (
         <BajoPedidoConfirmModal
