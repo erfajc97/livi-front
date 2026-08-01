@@ -21,7 +21,7 @@ const FEATURE_FALLBACK = '/banner-catalog.png';
 /**
  * Mega menú editorial (dirección Noir · estilo SSENSE / Mr Porter).
  * Despliega las categorías reales del backend, cada una con sus marcas.
- * "Todas las casas {categoría}" lleva a la página de catálogo filtrada por
+ * "Ver todo {categoría}" lleva a la página de catálogo filtrada por
  * esa categoría (banner con su imagen + todos los perfumes de sus marcas).
  * Sin tocar lógica de negocio: solo consume las queries existentes.
  */
@@ -79,7 +79,7 @@ export default function PerfumesMegaMenu({
         {/* Columnas de categorías → marcas (paginadas, máx 3) */}
         <div>
           <div className="mb-9 flex items-center justify-between gap-8">
-            <span className="eyebrow">Casas curadas</span>
+            <span className="eyebrow">Categorías</span>
 
             <div className="flex items-center gap-8">
               {totalPages > 1 && (
@@ -158,7 +158,7 @@ export default function PerfumesMegaMenu({
                   onClick={onClose}
                   className="eyebrow mt-6 inline-block border-b border-border pb-1 text-text-muted transition-colors hover:text-accent"
                 >
-                  Todas las casas {cat.name.toLowerCase()} →
+                  Ver todo {cat.name.toLowerCase()} →
                 </a>
               </div>
             ))

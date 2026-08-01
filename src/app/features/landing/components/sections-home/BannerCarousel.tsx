@@ -14,7 +14,7 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     Autoplay({ delay: 6000, stopOnInteraction: true }),
   ]);
   const [selected, setSelected] = useState(0);
-  const { progress, snapCount, scrollPrev, scrollNext, seekRatio } = useCarouselNav(emblaApi);
+  const { snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } = useCarouselNav(emblaApi);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -123,9 +123,9 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
               className="absolute right-0 top-1/2 -translate-y-1/2"
             />
             <CarouselProgressBar
-              progress={progress}
               snapCount={snapCount}
-              onSeek={seekRatio}
+              selectedIndex={selectedIndex}
+              onSelect={scrollToIndex}
               className="absolute inset-x-0 bottom-4 z-20 px-6 md:px-12"
             />
           </>

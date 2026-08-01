@@ -15,7 +15,7 @@ interface ExploreCategoriesCarouselProps {
 
 export default function ExploreCategoriesCarousel({ products }: ExploreCategoriesCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
-  const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
+  const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
     useCarouselNav(emblaApi);
   const viewportRef = useRef<HTMLDivElement>(null);
   const arrowTop = useMediaCenterTop(viewportRef, products.length);
@@ -63,9 +63,9 @@ export default function ExploreCategoriesCarousel({ products }: ExploreCategorie
         />
 
         <CarouselProgressBar
-          progress={progress}
           snapCount={snapCount}
-          onSeek={seekRatio}
+          selectedIndex={selectedIndex}
+          onSelect={scrollToIndex}
           className="mt-5 md:mt-7"
         />
       </div>

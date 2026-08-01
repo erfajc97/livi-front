@@ -10,12 +10,14 @@ export function useCarouselNav(emblaApi: EmblaCarouselType | undefined) {
   const [canNext, setCanNext] = useState(false);
   const [progress, setProgress] = useState(0);
   const [snapCount, setSnapCount] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const sync = useCallback(() => {
     if (!emblaApi) return;
     setCanPrev(emblaApi.canScrollPrev());
     setCanNext(emblaApi.canScrollNext());
     setProgress(Math.min(1, Math.max(0, emblaApi.scrollProgress())));
+    setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
@@ -49,7 +51,23 @@ export function useCarouselNav(emblaApi: EmblaCarouselType | undefined) {
     [emblaApi],
   );
 
-  return { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio };
+  /** Salta a una página concreta del carrusel. */
+  const scrollToIndex = useCallback(
+    (index: number) => emblaApi?.scrollTo(index),
+    [emblaApi],
+  );
+
+  return {
+    canPrev,
+    canNext,
+    progress,
+    snapCount,
+    selectedIndex,
+    scrollPrev,
+    scrollNext,
+    seekRatio,
+    scrollToIndex,
+  };
 }
 
 /**
@@ -115,68 +133,46 @@ export function CarouselArrow({ direction, onClick, disabled, className = '', to
 }
 
 interface ProgressProps {
-  progress: number;
   snapCount: number;
-  onSeek: (ratio: number) => void;
+  selectedIndex: number;
+  onSelect: (index: number) => void;
   className?: string;
 }
 
 /**
- * Barra inferior de posición: muestra en qué parte del carrusel estás y
- * permite arrastrar para desplazarse. Siempre visible — cuando todo cabe en
- * una vista el indicador ocupa el ancho completo (señal de "no hay más").
+ * Paginación del carrusel: un segmento por página, el actual en negro. Se
+ * eligió sobre la barra continua porque con pocas páginas el indicador ocupaba
+ * media barra y no se leía dónde estabas ni hacia dónde iba el clic.
  */
-export function CarouselProgressBar({ progress, snapCount, onSeek, className = '' }: ProgressProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
-
-  const hasPages = snapCount > 1;
-  const thumbWidth = hasPages ? Math.max(100 / snapCount, 12) : 100;
-
-  const seek = (clientX: number) => {
-    if (!hasPages) return;
-    const el = trackRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0) return;
-    onSeek((clientX - rect.left) / rect.width);
-  };
+export function CarouselProgressBar({
+  snapCount,
+  selectedIndex,
+  onSelect,
+  className = '',
+}: ProgressProps) {
+  if (snapCount <= 1) return null;
 
   return (
-    <div className={`flex justify-center ${className}`}>
-      <div
-        ref={trackRef}
-        role="slider"
-        aria-label="Posición del carrusel"
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(progress * 100)}
-        tabIndex={0}
-        onPointerDown={(e) => {
-          draggingRef.current = true;
-          e.currentTarget.setPointerCapture(e.pointerId);
-          seek(e.clientX);
-        }}
-        onPointerMove={(e) => {
-          if (draggingRef.current) seek(e.clientX);
-        }}
-        onPointerUp={(e) => {
-          draggingRef.current = false;
-          e.currentTarget.releasePointerCapture(e.pointerId);
-        }}
-        onPointerCancel={() => {
-          draggingRef.current = false;
-        }}
-        className="relative h-3 w-full max-w-36 cursor-pointer touch-none"
-      >
-        {/* Riel claro con el tramo recorrido en oscuro (invertido respecto a
-            la versión anterior, que era una hairline apenas visible). */}
-        <span className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-border" />
-        <span
-          className="absolute top-1/2 h-0.5 -translate-y-1/2 bg-text transition-[left] duration-300 ease-out"
-          style={{ width: `${thumbWidth}%`, left: `${progress * (100 - thumbWidth)}%` }}
-        />
-      </div>
+    <div className={`flex items-center justify-center gap-1.5 ${className}`}>
+      {Array.from({ length: snapCount }, (_, i) => {
+        const active = i === selectedIndex;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onSelect(i)}
+            aria-label={`Ir a la página ${i + 1} de ${snapCount}`}
+            aria-current={active}
+            className="group flex h-4 w-10 items-center justify-center"
+          >
+            <span
+              className={`block h-0.5 w-full transition-colors ${
+                active ? 'bg-text' : 'bg-border group-hover:bg-text-muted'
+              }`}
+            />
+          </button>
+        );
+      })}
     </div>
   );
 }

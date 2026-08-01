@@ -76,7 +76,6 @@ export default function ProductRankingSection({
   const safePage = Math.min(page, totalPages - 1);
   const list = rest.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE);
   const rankAt = (i: number) => String(safePage * PER_PAGE + i + 2).padStart(2, '0');
-  const progress = totalPages > 1 ? safePage / (totalPages - 1) : 0;
 
   // Móvil: misma paginación, incluyendo el #1 en la primera página.
   const mobilePages = Math.max(1, Math.ceil(products.length / MOBILE_PER_PAGE));
@@ -85,7 +84,6 @@ export default function ProductRankingSection({
     safeMobilePage * MOBILE_PER_PAGE,
     safeMobilePage * MOBILE_PER_PAGE + MOBILE_PER_PAGE,
   );
-  const mobileProgress = mobilePages > 1 ? safeMobilePage / (mobilePages - 1) : 0;
 
   return (
     <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
@@ -150,9 +148,9 @@ export default function ProductRankingSection({
 
             {/* Barrita de posición — arrastra para ver los siguientes */}
             <CarouselProgressBar
-              progress={progress}
               snapCount={totalPages}
-              onSeek={(ratio) => setPage(Math.round(ratio * (totalPages - 1)))}
+              selectedIndex={safePage}
+              onSelect={setPage}
               className="mt-7"
             />
           </div>
@@ -179,9 +177,9 @@ export default function ProductRankingSection({
           })}
 
           <CarouselProgressBar
-            progress={mobileProgress}
             snapCount={mobilePages}
-            onSeek={(ratio) => setPage(Math.round(ratio * (mobilePages - 1)))}
+            selectedIndex={safeMobilePage}
+            onSelect={setPage}
             className="mt-6"
           />
         </div>

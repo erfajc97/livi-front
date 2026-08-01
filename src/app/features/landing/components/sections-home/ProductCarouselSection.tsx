@@ -32,7 +32,7 @@ export default function ProductCarouselSection({
   // `duration` alarga el desplazamiento: el paso entre productos se ve
   // deslizar en vez de saltar.
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start', duration: 32 });
-  const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
+  const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
     useCarouselNav(emblaApi);
 
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -68,18 +68,22 @@ export default function ProductCarouselSection({
             No hay productos disponibles.
           </p>
         ) : (
-          <div className="relative" ref={viewportRef}>
-            {/* Flechas centradas con la IMAGEN de la card (no con la card entera) */}
+          /* El padding va FUERA del viewport: con overflow-hidden el recorte
+             ocurre en el borde del padding y se colaba un trozo de la card
+             siguiente. Así entran exactamente 4 (2 en móvil, 3 en tablet). */
+          <div className="relative px-3 sm:px-12" ref={viewportRef}>
+            {/* Flechas montadas sobre las esquinas de la primera/última card,
+                centradas con la imagen */}
             <CarouselArrow
               direction="prev"
               onClick={scrollPrev}
               disabled={!canPrev}
               top={arrowTop}
-              className="absolute left-0 top-[34%] -translate-y-1/2 sm:left-1 lg:-left-2"
+              className="absolute left-3 top-[34%] -translate-y-1/2 sm:left-12"
             />
 
             {/* Contenedor del carrusel */}
-            <div className="w-full overflow-hidden px-3 sm:px-12" ref={emblaRef}>
+            <div className="w-full overflow-hidden" ref={emblaRef}>
               <div className="flex">
                 {products.map((p) => (
                   <div key={p.id} className="shrink-0 basis-1/2 px-2.5 md:basis-1/3 md:px-3 lg:basis-1/4">
@@ -94,14 +98,14 @@ export default function ProductCarouselSection({
               onClick={scrollNext}
               disabled={!canNext}
               top={arrowTop}
-              className="absolute right-0 top-[34%] -translate-y-1/2 sm:right-1 lg:-right-2"
+              className="absolute right-3 top-[34%] -translate-y-1/2 sm:right-12"
             />
 
             <CarouselProgressBar
-              progress={progress}
               snapCount={snapCount}
-              onSeek={seekRatio}
-              className="mt-5 px-3 sm:px-12 md:mt-7"
+              selectedIndex={selectedIndex}
+              onSelect={scrollToIndex}
+              className="mt-5 md:mt-7"
             />
           </div>
         )}
