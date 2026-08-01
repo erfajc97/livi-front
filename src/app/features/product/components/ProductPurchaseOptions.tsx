@@ -62,6 +62,23 @@ export default function ProductPurchaseOptions({
     return unsub;
   }, []);
 
+  // ?variant=<id> — se llega desde el "+" de la card con un formato ya elegido.
+  // Se aplica tras montar (no en el estado inicial) para no romper la hidratación.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const variantId = new URLSearchParams(window.location.search).get('variant');
+    if (!variantId) return;
+
+    const variant = (product.variants ?? []).find((v) => String(v.id) === variantId);
+    if (variant && !variant.isFullBottle) {
+      setSelected({ type: 'decant', variant });
+      onVariantChange?.(variant);
+    } else {
+      setSelected({ type: 'full' });
+      onVariantChange?.(null);
+    }
+  }, [product.id]);
+
   // Días extra de entrega configurados en el admin (setting opcional).
   const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
 
@@ -232,16 +249,6 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      {/* Caja "curado bajo pedido" — frasco importado (flag) o sin stock sellado */}
-      {selectedIsBajoPedido && (
-        <div className="border-l-2 border-accent bg-bg-alt px-4 py-3.5">
-          <p className="font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
-            <span className="text-text-muted">Bajo pedido ·</span> Entrega
-            <span className="ml-2 font-display text-lg italic normal-case tracking-normal text-text">13–17 días</span>
-          </p>
-        </div>
-      )}
-
       {/* Selector de formato */}
       <div>
         <p className="eyebrow mb-2.5">Selecciona tu formato</p>
@@ -252,6 +259,7 @@ export default function ProductPurchaseOptions({
               ml={fullBottleMl}
               type={fullBottleStock > 0 ? 'Sellada' : 'Bajo pedido'}
               price={fullBottlePrice}
+              discount={discount}
               active={isFullSelected}
               disabled={!canBuyFullBottle}
               onClick={canBuyFullBottle ? handleSelectFull : undefined}
@@ -265,6 +273,7 @@ export default function ProductPurchaseOptions({
                 ml={v.ml}
                 type="Decant"
                 price={v.price}
+                discount={discount}
                 active={selectedDecant?.id === v.id}
                 disabled={!available}
                 onClick={available ? () => handleSelectDecant(v) : undefined}
@@ -274,15 +283,17 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      {/* Precio + CTA */}
-      <div className="flex items-baseline gap-3">
-        <p className="font-display text-2xl text-text">{formatCurrency(discountedPrice)}</p>
-        {hasDiscount && (
-          <>
-            <p className="font-body text-sm text-text-muted line-through">{formatCurrency(currentPrice)}</p>
-            <span className="bg-accent px-1.5 py-px font-body text-[10px] font-medium tracking-wide text-bg">-{discount}%</span>
-          </>
-        )}
+      {/* Entrega — ocupa el sitio donde antes se repetía el precio (ya está en
+          la tarjeta del formato y en el botón de añadir) */}
+      <div className="border-y border-border py-3.5">
+        <p className="eyebrow mb-1 text-text-muted">Entrega</p>
+        <p className="font-display text-2xl font-light leading-tight text-text">
+          {selectedIsBajoPedido ? (
+            <>Bajo pedido · <span className="italic">13–17 días</span></>
+          ) : (
+            <>Recibe entre el <span className="italic">{deliveryWindow(deliveryOffset)}</span></>
+          )}
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -314,13 +325,8 @@ export default function ProductPurchaseOptions({
 
       {/* Entrega */}
       <div className="border-t border-border pt-4">
+        {/* La entrega ya sale destacada arriba: aquí solo las garantías */}
         <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
-          <span className="flex items-center gap-2">
-            <Tick />
-            {selectedIsBajoPedido
-              ? 'Curado bajo pedido · 13–17 días'
-              : `Recibe entre ${deliveryWindow(deliveryOffset)}`}
-          </span>
           <span className="flex items-center gap-2"><Tick /> Autenticidad garantizada</span>
           <span className="flex items-center gap-2"><Tick /> Envíos nacionales a todo Ecuador</span>
         </div>
@@ -359,16 +365,26 @@ export default function ProductPurchaseOptions({
   );
 }
 
-/* Tarjeta de formato (ml + tipo + precio) — estilo editorial Noir */
-function SizeCard({ ml, type, price, active, disabled, onClick }: {
-  ml: number; type: string; price: number; active: boolean; disabled?: boolean; onClick?: () => void;
+/* Tarjeta de formato (ml + tipo + precio) — estilo editorial Noir.
+   Con descuento muestra el % en la esquina y el precio ya rebajado. */
+function SizeCard({ ml, type, price, discount = 0, active, disabled, onClick }: {
+  ml: number;
+  type: string;
+  price: number;
+  discount?: number;
+  active: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
 }) {
+  const hasDiscount = discount > 0;
+  const finalPrice = hasDiscount ? price * (1 - discount / 100) : price;
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       /* Bloque centrado y compacto: tipografía más grande, sin huecos muertos */
-      className={`flex aspect-square w-26 flex-col items-start justify-center gap-1.5 p-3 text-left transition-all ${
+      className={`relative flex aspect-square w-26 flex-col items-start justify-center gap-1.5 p-3 text-left transition-all ${
         disabled
           ? 'cursor-not-allowed border border-border opacity-40'
           : active
@@ -376,13 +392,26 @@ function SizeCard({ ml, type, price, active, disabled, onClick }: {
             : 'border border-border text-text hover:border-text'
       }`}
     >
+      {hasDiscount && (
+        <span className="absolute right-0 top-0 bg-accent px-1.5 py-px font-body text-[9px] font-medium tracking-wide text-bg">
+          -{discount}%
+        </span>
+      )}
+
       <span className="font-display text-2xl leading-none">
         {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
       </span>
       <span className={`font-body text-[9px] uppercase leading-none tracking-[0.14em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
         {type}
       </span>
-      <span className="font-body text-[13px] leading-none">{formatCurrency(price)}</span>
+      <span className="flex flex-col gap-0.5">
+        {hasDiscount && (
+          <span className={`font-body text-[10px] leading-none line-through ${active ? 'text-bg/60' : 'text-text-muted'}`}>
+            {formatCurrency(price)}
+          </span>
+        )}
+        <span className="font-body text-[13px] leading-none">{formatCurrency(finalPrice)}</span>
+      </span>
     </button>
   );
 }

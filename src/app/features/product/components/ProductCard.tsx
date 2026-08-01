@@ -65,6 +65,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const hasMoreFormats = formats.length > 2;
 
   const productUrl = `/producto/${product.id}`;
+  // El "+" abre el detalle ya posicionado en el formato elegido aquí.
+  const detailUrl = selected ? `${productUrl}?variant=${selected.id}` : productUrl;
 
   /** Item de carrito del formato elegido en la card. */
   const buildCartItem = (): CartItem | null => {
@@ -157,12 +159,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Añadir al carrito — siempre visible en móvil, al hover en desktop.
-            Negro con texto dorado; al pasar el cursor por encima se invierte
+            Negro con texto blanco; al pasar el cursor por encima se invierte
             (beige con texto negro) sin dejar franja. */}
         <button
           type="button"
           onClick={handleQuickAdd}
-          className="absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-accent transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
+          className="absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-white transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
         >
           Añadir al carrito
         </button>
@@ -217,7 +219,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             })}
             {hasMoreFormats && (
               <a
-                href={productUrl}
+                href={detailUrl}
                 aria-label="Ver todos los formatos"
                 className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-text-soft transition-colors hover:border-text hover:text-text"
               >
