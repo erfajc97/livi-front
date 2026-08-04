@@ -50,7 +50,7 @@ export default function TransferBankInfoStep({ total, isPending, onConfirm, onBa
         {ROWS.map(([label, value, mono]) => (
           <div key={label} className="flex justify-between px-4 py-2.5">
             <span className="font-body text-xs uppercase tracking-[0.14em] text-text-muted">{label}</span>
-            <span className={`text-sm text-text ${mono ? 'font-mono' : 'font-body'}`}>{value}</span>
+            <span className={`text-sm text-text ${mono ? 'font-body tabular-nums' : 'font-body'}`}>{value}</span>
           </div>
         ))}
       </div>

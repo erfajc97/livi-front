@@ -53,7 +53,7 @@ export interface Product {
   minFormatPrice?: number;
   maxFormatPrice?: number;
   /** Lista compacta de formatos (frasco + decants) para las cards. */
-  formats?: { id: string; ml: number; price: number; isFullBottle: boolean }[];
+  formats?: { id: string; ml: number; price: number; isFullBottle: boolean; imageUrl?: string }[];
   totalMl: number;
   openBottleMlRemaining: number;
   availableMl: number;

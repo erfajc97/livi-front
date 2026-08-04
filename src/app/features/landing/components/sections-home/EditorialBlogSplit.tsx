@@ -6,7 +6,25 @@ import { useBlogPostsQuery } from '@/app/tanstack-queries/blogQuery';
  * imagen grande a la izquierda + titular serif, extracto y enlaces a la derecha.
  */
 export default function EditorialBlogSplit() {
-  const { data: posts = [] } = useBlogPostsQuery();
+  const { data: posts = [], isLoading } = useBlogPostsQuery();
+
+  // Esqueleto del split editorial mientras llega el post.
+  if (isLoading) {
+    return (
+      <section className="bg-bg-alt px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
+        <div className="mx-auto grid max-w-7xl animate-pulse items-center gap-8 md:grid-cols-[1.1fr_1fr] md:gap-20">
+          <div className="h-[300px] w-full bg-border-soft sm:h-[420px] md:h-[640px]" />
+          <div className="md:pl-6">
+            <div className="h-3 w-20 rounded-sm bg-border-soft" />
+            <div className="mt-6 h-10 w-4/5 rounded-sm bg-border-soft md:mt-8 md:h-14" />
+            <div className="mt-5 h-4 w-full max-w-md rounded-sm bg-border-soft md:mt-7" />
+            <div className="mt-2 h-4 w-3/4 max-w-md rounded-sm bg-border-soft" />
+            <div className="mt-8 h-4 w-32 rounded-sm bg-border-soft md:mt-10" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const post = [...posts].sort((a, b) => a.position - b.position)[0];
   if (!post) return null;

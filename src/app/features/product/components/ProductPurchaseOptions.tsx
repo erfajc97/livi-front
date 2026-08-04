@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { deliveryWindow } from '@/app/helpers/deliveryWindow';
+import { productUrl } from '@/app/helpers/productUrl';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
@@ -213,7 +214,7 @@ export default function ProductPurchaseOptions({
     const url =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://www.nondecants.com/producto/${product.id}`;
+        : `https://www.nondecants.com${productUrl(product)}`;
     const msg = `Hola, estoy interesado/a en el perfume ${product.name}: ${url}`;
     window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -283,16 +284,21 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      {/* Entrega — ocupa el sitio donde antes se repetía el precio (ya está en
-          la tarjeta del formato y en el botón de añadir) */}
-      <div className="border-y border-border py-3.5">
-        <p className="eyebrow mb-1 text-text-muted">Entrega</p>
-        <p className="font-display text-2xl font-light leading-tight text-text">
-          {selectedIsBajoPedido ? (
-            <>Bajo pedido · <span className="italic">13–17 días</span></>
-          ) : (
-            <>Recibe entre el <span className="italic">{deliveryWindow(deliveryOffset)}</span></>
-          )}
+      {/* Entrega — destacada con brillo animado + punto pulsante para que
+          el usuario no pase por alto el tiempo de entrega */}
+      <div className="border-y border-border bg-bg-alt/60 px-4 py-3.5 -mx-4">
+        <p className="eyebrow mb-1 flex items-center gap-2 text-text-muted">
+          <span className="delivery-dot inline-block h-[6px] w-[6px] rounded-full bg-accent" />
+          Entrega
+        </p>
+        <p className="font-display text-2xl font-light leading-tight">
+          <span className="delivery-highlight">
+            {selectedIsBajoPedido ? (
+              <>Bajo pedido · <span className="italic">13–17 días</span></>
+            ) : (
+              <>Recibe entre el <span className="italic">{deliveryWindow(deliveryOffset)}</span></>
+            )}
+          </span>
         </p>
       </div>
 

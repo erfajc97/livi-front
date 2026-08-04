@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
-import Loader from '@/app/components/Loader';
+import { productUrl } from '@/app/helpers/productUrl';
 import { CarouselProgressBar } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
@@ -38,7 +38,7 @@ function derive(p: Product) {
     p.timeOfDay && (TIME_LABELS[p.timeOfDay] ?? p.timeOfDay),
     p.concentration && (CONCENTRATION_SHORT[p.concentration] ?? p.concentration),
   ].filter(Boolean);
-  return { image, minPrice, formatCount, tags: tags.join(' · '), href: `/producto/${p.id}` };
+  return { image, minPrice, formatCount, tags: tags.join(' · '), href: productUrl(p) };
 }
 
 const Arrow = () => (
@@ -58,9 +58,36 @@ export default function ProductRankingSection({
   const [page, setPage] = useState(0);
 
   if (isLoading) {
+    // Esqueleto del layout del ranking: destacado + lista de 4.
     return (
-      <section className="bg-bg px-6 py-12 md:px-14 md:py-24">
-        <div className="flex items-center justify-center py-12 md:py-20"><Loader size={40} /></div>
+      <section className="bg-bg px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
+        <div className="mx-auto max-w-7xl animate-pulse">
+          <div className="mb-6 h-3 w-40 rounded-sm bg-bg-alt md:mb-12" />
+          <div className="hidden items-start gap-12 md:grid md:grid-cols-[1.05fr_1fr]">
+            <div>
+              <div className="aspect-square w-full bg-bg-alt" />
+              <div className="mt-6 h-6 w-3/5 rounded-sm bg-bg-alt" />
+            </div>
+            <div className="flex flex-col">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="grid grid-cols-[40px_120px_1fr] items-center gap-6 border-b border-border py-6 first:border-t">
+                  <div className="h-7 w-8 rounded-sm bg-bg-alt" />
+                  <div className="h-32 w-full bg-bg-alt" />
+                  <div className="h-4 w-2/3 rounded-sm bg-bg-alt" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col md:hidden">
+            {Array.from({ length: 5 }, (_, i) => (
+              <div key={i} className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
+                <div className="h-6 w-6 rounded-sm bg-bg-alt" />
+                <div className="h-24 w-full bg-bg-alt" />
+                <div className="h-4 w-2/3 rounded-sm bg-bg-alt" />
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
     );
   }

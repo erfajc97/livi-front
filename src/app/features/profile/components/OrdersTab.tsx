@@ -135,7 +135,7 @@ export default function OrdersTab() {
         {isServientrega(selected.deliveryMethod) && selected.trackingCode && (
           <div className="border border-blue-200 bg-blue-50 p-4">
             <p className="text-sm font-bold text-blue-800 mb-1">Número de guía Servientrega</p>
-            <p className="text-lg font-mono font-bold text-blue-900 mb-2">{selected.trackingCode}</p>
+            <p className="text-lg font-body font-bold tabular-nums text-blue-900 mb-2">{selected.trackingCode}</p>
             <p className="text-xs text-blue-700 mb-2">
               Haz clic para rastrear tu envío con tu número de guía:
             </p>

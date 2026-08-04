@@ -3,6 +3,7 @@ import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { MOCK_ENABLED } from '@/app/lib/mock';
 import { MOCK_PRODUCTS } from '@/app/features/landing/data';
+import { parseProductId } from '@/app/helpers/productUrl';
 import type { Product, ProductQueryParams, PaginatedResponse } from '@/app/types/global.types';
 
 /** Extract ml value from variation — tries measureValue, ml, name, or optionValues */
@@ -76,6 +77,7 @@ export const mapProduct = (raw: any): Product => {
           ml: Number(f.ml),
           price: Number(f.price),
           isFullBottle: !!f.isFullBottle,
+          imageUrl: f.imageUrl ?? undefined,
         }))
       : undefined,
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
@@ -172,12 +174,14 @@ export const fetchProducts = async (params: ProductQueryParams): Promise<Paginat
 };
 
 export const fetchProductById = async (id: string): Promise<Product> => {
+  // La ruta pública es /producto/{id}-{slug}: resolver por el id numérico.
+  const numericId = parseProductId(id);
   if (MOCK_ENABLED) {
-    const found = MOCK_PRODUCTS.find(p => p.id === id);
+    const found = MOCK_PRODUCTS.find(p => p.id === numericId);
     if (found) return found;
   }
   try {
-    const { data } = await axiosInstance.get(`${API_ENDPOINTS.PRODUCT}/${id}`);
+    const { data } = await axiosInstance.get(`${API_ENDPOINTS.PRODUCT}/${numericId}`);
     // Backend returns: { statusCode, message, data: Product, ... }
     const productData = data?.data ?? data;
     if (productData && typeof productData === 'object') {
@@ -185,8 +189,8 @@ export const fetchProductById = async (id: string): Promise<Product> => {
     }
     return mapProduct(data);
   } catch (error) {
-    console.warn(`Error fetching product ${id}:`, error);
-    return MOCK_PRODUCTS.find(p => p.id === id) ?? MOCK_PRODUCTS[0];
+    console.warn(`Error fetching product ${numericId}:`, error);
+    return MOCK_PRODUCTS.find(p => p.id === numericId) ?? MOCK_PRODUCTS[0];
   }
 };
 

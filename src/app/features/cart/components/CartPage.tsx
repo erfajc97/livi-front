@@ -32,15 +32,42 @@ export default function CartPage() {
     hasHydrated,
   } = useCartPageHook();
 
-  // Evita parpadeo SSR/hidratación antes de leer localStorage
+  // Esqueleto mientras se hidrata el carrito desde localStorage: evita el
+  // parpadeo SSR/hidratación y el salto de layout al aparecer los items.
   if (!hasHydrated) {
-    return <div className="min-h-[60vh] bg-bg" />;
+    return (
+      <section className="mx-auto max-w-[1600px] animate-pulse px-6 py-8 md:px-12 md:py-20" aria-hidden="true">
+        <div className="mb-7 md:mb-16">
+          <div className="h-3 w-24 rounded-sm bg-bg-alt" />
+          <div className="mt-4 h-12 w-64 rounded-sm bg-bg-alt md:h-16 md:w-80" />
+          <div className="mt-4 h-4 w-full max-w-xl rounded-sm bg-bg-alt" />
+        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.55fr_1fr] lg:gap-16 xl:gap-24">
+          <div>
+            <div className="mb-4 h-6 w-48 rounded-sm bg-bg-alt" />
+            {Array.from({ length: 2 }, (_, i) => (
+              <div key={i} className="flex items-center gap-5 border-b border-border py-6">
+                <div className="h-28 w-24 shrink-0 bg-bg-alt" />
+                <div className="flex-1">
+                  <div className="h-4 w-3/5 rounded-sm bg-bg-alt" />
+                  <div className="mt-2 h-3 w-2/5 rounded-sm bg-bg-alt" />
+                </div>
+                <div className="h-8 w-24 rounded-sm bg-bg-alt" />
+              </div>
+            ))}
+          </div>
+          <div className="hidden lg:block">
+            <div className="h-72 w-full bg-bg-alt" />
+          </div>
+        </div>
+      </section>
+    );
   }
 
   // ── Carrito vacío ──
   if (itemCount === 0) {
     return (
-      <section className="mx-auto flex min-h-[60vh] max-w-[1600px] flex-col items-center justify-center gap-5 px-6 py-16 text-center md:py-24">
+      <section className="mx-auto flex min-h-[50vh] max-w-[1600px] flex-col items-center justify-center gap-5 px-6 py-12 text-center md:py-16">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-text-muted">
           <path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
         </svg>
@@ -77,9 +104,9 @@ export default function CartPage() {
   );
 
   return (
-    <section className="mx-auto max-w-[1600px] px-6 py-8 md:px-12 md:py-20">
+    <section className="mx-auto max-w-[1600px] px-6 py-6 md:px-12 md:py-12">
       {/* ── Encabezado ── */}
-      <header className="mb-7 md:mb-16">
+      <header className="mb-6 md:mb-10">
         <span className="eyebrow">— Tu selección</span>
         <h1 className="mt-3 font-display text-5xl font-light leading-none tracking-[-0.025em] text-text md:text-7xl">
           Carrito <span className="italic text-text-soft">({itemCount})</span>

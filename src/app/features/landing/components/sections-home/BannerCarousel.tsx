@@ -7,9 +7,10 @@ import type { Banner } from '@/app/types/global.types';
 
 interface BannerCarouselProps {
   banners: Banner[];
+  isLoading?: boolean;
 }
 
-export default function BannerCarousel({ banners }: BannerCarouselProps) {
+export default function BannerCarousel({ banners, isLoading = false }: BannerCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 6000, stopOnInteraction: true }),
   ]);
@@ -23,6 +24,16 @@ export default function BannerCarousel({ banners }: BannerCarouselProps) {
     emblaApi.on('select', onSelect);
     return () => { emblaApi.off('select', onSelect); };
   }, [emblaApi]);
+
+  // Esqueleto del hero mientras llegan los banners: misma altura final.
+  if (isLoading) {
+    return (
+      <section className="flex flex-col bg-bg md:h-[calc(100svh-8.5rem)]" aria-hidden="true">
+        <div className="h-80 animate-pulse bg-bg-alt sm:h-96 md:h-auto md:min-h-0 md:flex-1" />
+        <CommitmentStrip />
+      </section>
+    );
+  }
 
   if (banners.length === 0) return null;
 

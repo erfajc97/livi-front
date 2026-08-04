@@ -1,5 +1,6 @@
 import { useLandingSectionsActiveQuery } from '@/app/tanstack-queries/landingSectionsQuery';
 import ProductCard from '@/app/features/product/components/ProductCard';
+import ProductCardSkeleton from '@/app/components/UI/ProductCardSkeleton';
 import type { Product } from '@/app/types/global.types';
 
 /**
@@ -8,7 +9,21 @@ import type { Product } from '@/app/types/global.types';
  * ubicación "carrito" (mismo CRUD que las secciones de la landing).
  */
 export default function CartRecommendations() {
-  const { data: sections = [] } = useLandingSectionsActiveQuery('cart');
+  const { data: sections = [], isLoading } = useLandingSectionsActiveQuery('cart');
+
+  // Esqueleto mientras llegan las secciones: mismo grid de 4 cards.
+  if (isLoading) {
+    return (
+      <section className="mt-12 border-t border-border pt-10 md:mt-16 md:pt-14" aria-hidden="true">
+        <div className="mb-6 h-6 w-56 animate-pulse rounded-sm bg-surface-raised md:mb-8" />
+        <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-6">
+          {Array.from({ length: 4 }, (_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   // Una sola fila: se juntan las secciones de carrito y se quitan repetidos.
   const seen = new Set<string>();

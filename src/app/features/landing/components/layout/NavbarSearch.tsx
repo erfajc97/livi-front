@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useProductsQuery } from '@/app/tanstack-queries/productsQuery';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { productUrl } from '@/app/helpers/productUrl';
 import type { Product } from '@/app/types/global.types';
 
 const SearchIcon = ({ className = 'h-[18px] w-[18px]' }: { className?: string }) => (
@@ -86,7 +87,7 @@ export default function NavbarSearch() {
                     {results.map((p) => (
                       <a
                         key={p.id}
-                        href={`/producto/${p.id}`}
+                        href={productUrl(p)}
                         onClick={close}
                         className="flex items-center gap-4 border-b border-border/60 px-1 py-3 transition-colors hover:bg-bg-alt"
                       >

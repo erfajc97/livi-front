@@ -8,6 +8,20 @@ import HowItWorksSection from '../../components/sections-home/HowItWorksSection'
 function HomeContent() {
   const { sections, sectionsLoading } = useHomeHook();
 
+  // Mientras cargan las secciones se pintan los esqueletos con la forma final
+  // del home: 1 carrusel + split editorial + pasos + ranking. Sin esto la
+  // página quedaba en blanco y todo saltaba al llegar la data.
+  if (sectionsLoading) {
+    return (
+      <div className="bg-bg">
+        <ProductCarouselSection title="" products={[]} isLoading num="01" />
+        <EditorialBlogSplit />
+        <HowItWorksSection />
+        <ProductRankingSection title="" products={[]} isLoading num="02" />
+      </div>
+    );
+  }
+
   // Orden fijo de secciones por posición (no por order<=1):
   // 1ª sección → carrusel · split editorial (blog) · 2ª sección → ranking · resto → carrusel
   const sorted = [...sections].sort((a, b) => a.order - b.order);

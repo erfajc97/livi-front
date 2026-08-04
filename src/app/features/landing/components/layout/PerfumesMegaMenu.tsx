@@ -132,7 +132,7 @@ export default function PerfumesMegaMenu({
                 <span className="mt-2 block h-px w-10 bg-accent/50" />
 
                 {cat.description && (
-                  <p className="mt-3 font-display text-[13px] italic leading-snug text-text-muted">
+                  <p className="mt-3 font-body text-[13px] leading-snug text-text-muted">
                     {cat.description}
                   </p>
                 )}
@@ -193,7 +193,7 @@ export default function PerfumesMegaMenu({
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/65" />
             <span className="eyebrow absolute left-6 top-6 text-white/80">Destacado</span>
             <div className="absolute inset-x-6 bottom-6">
-              <div className="font-display text-3xl font-normal italic leading-tight text-white">
+              <div className="font-display text-3xl font-normal leading-tight text-white">
                 {panel.title}
               </div>
               {panel.description && (

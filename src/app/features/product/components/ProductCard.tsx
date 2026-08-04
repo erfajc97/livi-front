@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { productUrl as productUrlHelper } from '@/app/helpers/productUrl';
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import type { Product } from '@/app/types/global.types';
@@ -13,6 +14,7 @@ interface Format {
   ml: number;
   price: number;
   isFullBottle: boolean;
+  imageUrl?: string;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -27,8 +29,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const variants = product.variants ?? [];
   // Formatos: preferir la lista compacta del backend; si no, derivar de las
-  // variantes cargadas (mock / detalle). Se ordenan por precio para que el
-  // primero (el que arranca seleccionado) sea el más accesible.
+  // variantes cargadas (mock / detalle). Orden: botella completa primero y
+  // luego decants por ml ascendente — el frasco arranca seleccionado.
   const formats: Format[] = (product.formats && product.formats.length
     ? product.formats
     : variants.map((v) => ({
@@ -36,11 +38,15 @@ export default function ProductCard({ product }: ProductCardProps) {
         ml: v.ml,
         price: v.price,
         isFullBottle: v.isFullBottle,
+        imageUrl: v.images?.[0],
       }))
   )
     .filter((f) => f.ml > 0 || f.price > 0)
     .slice()
-    .sort((a, b) => a.price - b.price);
+    .sort((a, b) => {
+      if (a.isFullBottle !== b.isFullBottle) return a.isFullBottle ? -1 : 1;
+      return a.ml - b.ml;
+    });
 
   // Formato elegido desde la propia card: cambia el precio sin salir de aquí.
   const [selectedId, setSelectedId] = useState<string | null>(formats[0]?.id ?? null);
@@ -60,17 +66,22 @@ export default function ProductCard({ product }: ProductCardProps) {
   const basePrice = selected?.price ?? product.minFormatPrice ?? product.price ?? 0;
   const finalPrice = applyDiscount(basePrice);
 
+  // Imagen visible: la del formato elegido si tiene foto propia; si no, la
+  // imagen del producto (con el cambio a la 2ª foto al hover de siempre).
+  const selectedImage = selected?.imageUrl;
+  const displayImage = selectedImage || (hovered && hoverImage ? hoverImage : productImage);
+
   // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
   const chipFormats = formats.slice(0, 2);
   const hasMoreFormats = formats.length > 2;
 
-  const productUrl = `/producto/${product.id}`;
+  const productUrl = productUrlHelper(product);
   // El "+" abre el detalle ya posicionado en el formato elegido aquí.
   const detailUrl = selected ? `${productUrl}?variant=${selected.id}` : productUrl;
 
   /** Item de carrito del formato elegido en la card. */
   const buildCartItem = (): CartItem | null => {
-    const image = productImage || '';
+    const image = selected?.imageUrl || productImage || '';
     const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
 
     const buildFull = (price: number): CartItem => ({
@@ -136,9 +147,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           `data-card-media` lo usa el carrusel para centrar sus flechas. */}
       <div data-card-media className="relative aspect-square overflow-hidden bg-white">
         <a href={productUrl} className="block h-full w-full">
-          {productImage ? (
+          {displayImage ? (
             <img
-              src={hovered && hoverImage ? hoverImage : productImage}
+              src={displayImage}
               alt={product.name}
               loading="lazy"
               className="h-full w-full object-contain p-3 sm:p-4"

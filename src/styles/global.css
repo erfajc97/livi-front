@@ -74,7 +74,36 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-muted);
 }
 
-/* ── Loader animation ──────────────────────────── */
+/* ── Entrega destacada (detalle de producto): brillo que recorre el texto
+   + punto pulsante, para que el ojo caiga ahí sin ser estridente. ──────── */
+@keyframes delivery-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.delivery-highlight {
+  background: linear-gradient(
+    100deg,
+    var(--color-text) 42%,
+    var(--color-accent) 50%,
+    var(--color-text) 58%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: delivery-shimmer 3.4s linear infinite;
+}
+@keyframes delivery-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(138, 122, 102, 0.45); }
+  50% { opacity: 0.75; transform: scale(0.8); box-shadow: 0 0 0 6px rgba(138, 122, 102, 0); }
+}
+.delivery-dot {
+  animation: delivery-dot-pulse 1.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .delivery-highlight { animation: none; color: var(--color-text); background: none; }
+  .delivery-dot { animation: none; }
+}
 @keyframes loader-spin {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
 }

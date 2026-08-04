@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ProductCard from '@/app/features/product/components/ProductCard';
-import Loader from '@/app/components/Loader';
+import ProductCardSkeleton from '@/app/components/UI/ProductCardSkeleton';
 import {
   useCarouselNav,
   useMediaCenterTop,
@@ -30,8 +30,18 @@ export default function ProductCarouselSection({
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
   // `duration` alarga el desplazamiento: el paso entre productos se ve
-  // deslizar en vez de saltar.
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start', duration: 32 });
+  // deslizar en vez de saltar. `slidesToScroll`: las flechas avanzan por
+  // página completa (5 en desktop) en vez de producto en producto.
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'start',
+    duration: 32,
+    slidesToScroll: 2, // móvil: 2 columnas visibles
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 3 }, // tablet: 3 columnas
+      '(min-width: 1024px)': { slidesToScroll: 5 }, // desktop: páginas de 5
+    },
+  });
   const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
     useCarouselNav(emblaApi);
 
@@ -60,8 +70,15 @@ export default function ProductCarouselSection({
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader size={40} />
+          /* Mismo ancho por slide que el carrusel cargado: nada salta. */
+          <div className="px-3 sm:px-12">
+            <div className="flex">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="shrink-0 basis-1/2 px-2.5 md:basis-1/3 md:px-3 lg:basis-1/4">
+                  <ProductCardSkeleton />
+                </div>
+              ))}
+            </div>
           </div>
         ) : products.length === 0 ? (
           <p className="py-10 text-center text-sm text-text-muted">

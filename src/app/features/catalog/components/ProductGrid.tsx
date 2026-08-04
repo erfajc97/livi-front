@@ -1,5 +1,5 @@
 import ProductCard from '@/app/features/product/components/ProductCard';
-import Loader from '@/app/components/Loader';
+import ProductCardSkeleton from '@/app/components/UI/ProductCardSkeleton';
 import type { Product } from '@/app/types/global.types';
 
 interface ProductGridProps {
@@ -10,9 +10,12 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products, isLoading, isFetching }: ProductGridProps) {
   if (isLoading) {
+    // 9 = LIMIT del catálogo: el grid ya ocupa su altura final al cargar.
     return (
-      <div className="flex items-center justify-center py-16 md:py-32">
-        <Loader size={45} />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 9 }, (_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

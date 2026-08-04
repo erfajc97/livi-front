@@ -135,7 +135,7 @@ export default function CheckoutOrderSummary({
           {couponApplied ? (
             <div className="flex items-center justify-between border-l-2 border-success bg-bg-alt px-4 py-3">
               <div>
-                <span className="font-mono text-sm text-text">{couponCode}</span>
+                <span className="font-body text-sm tracking-[0.08em] text-text">{couponCode}</span>
                 <span className="ml-2 font-body text-xs text-success">
                   {couponFreeShipping ? 'Envío gratis' : `-${formatCurrency(couponDiscount)}`}
                 </span>
@@ -156,7 +156,7 @@ export default function CheckoutOrderSummary({
                 value={couponCode}
                 onChange={(e) => onCouponCodeChange?.(e.target.value.toUpperCase())}
                 placeholder="Ej: VERANO2026"
-                className="flex-1 border border-border bg-transparent px-4 py-3 font-mono text-sm uppercase text-text placeholder:text-text-muted focus:border-text focus:outline-none"
+                className="flex-1 border border-border bg-transparent px-4 py-3 font-body text-sm uppercase tracking-[0.08em] text-text placeholder:text-text-muted focus:border-text focus:outline-none"
               />
               <button
                 type="button"
