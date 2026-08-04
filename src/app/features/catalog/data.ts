@@ -10,12 +10,14 @@ export const CATALOG_TIME_OF_DAY = [
 ];
 
 export const CATALOG_CONCENTRATIONS = [
-  { value: 'EAU_DE_PARFUM',    label: 'Eau de Parfum' },
-  { value: 'EAU_DE_TOILETTE',  label: 'Eau de Toilette' },
-  { value: 'ELIXIR_DE_PARFUM', label: 'Elixir de Parfum' },
-  { value: 'EAU_DE_COLOGNE',   label: 'Eau de Cologne' },
-  { value: 'BODY_MIST',        label: 'Body Mist' },
-  { value: 'PARFUM_EXTRAIT',   label: 'Parfum / Extrait' },
+  { value: 'EAU_DE_PARFUM',          label: 'Eau de Parfum' },
+  { value: 'EAU_DE_TOILETTE',        label: 'Eau de Toilette' },
+  { value: 'EAU_DE_TOILETTE_INTENSE', label: 'Eau de Toilette Intense' },
+  { value: 'EAU_DE_COLOGNE',         label: 'Eau de Cologne' },
+  { value: 'BODY_MIST',              label: 'Body Mist' },
+  { value: 'ELIXIR',                 label: 'Elixir' },
+  { value: 'PARFUM',                 label: 'Parfum' },
+  { value: 'EXTRAIT_DE_PARFUM',      label: 'Extrait de Parfum' },
 ];
 
 export const CATALOG_PROJECTIONS = [

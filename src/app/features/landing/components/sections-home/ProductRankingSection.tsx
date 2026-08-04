@@ -19,10 +19,12 @@ interface ProductRankingSectionProps {
 const CONCENTRATION_SHORT: Record<string, string> = {
   EAU_DE_PARFUM: 'EDP',
   EAU_DE_TOILETTE: 'EDT',
-  ELIXIR_DE_PARFUM: 'Elixir',
+  EAU_DE_TOILETTE_INTENSE: 'EDT Intense',
   EAU_DE_COLOGNE: 'EDC',
   BODY_MIST: 'Body Mist',
-  PARFUM_EXTRAIT: 'Extrait',
+  ELIXIR: 'Elixir',
+  PARFUM: 'Parfum',
+  EXTRAIT_DE_PARFUM: 'Extrait',
 };
 const GENDER_LABELS: Record<string, string> = { HOMBRE: 'Hombre', MUJER: 'Mujer', UNISEX: 'Unisex' };
 const TIME_LABELS: Record<string, string> = { DIA: 'Día', NOCHE: 'Noche' };

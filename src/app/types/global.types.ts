@@ -25,7 +25,7 @@ export type DeliveryMethod = 'RETIRO' | 'ENTREGA_PERSONAL' | 'RETIRO_PIWU' | 'SE
 // ── Enums de producto ────────────────────────────────────
 export type Gender = 'HOMBRE' | 'MUJER' | 'UNISEX';
 export type TimeOfDay = 'DIA' | 'NOCHE';
-export type Concentration = 'EAU_DE_PARFUM' | 'EAU_DE_TOILETTE' | 'ELIXIR_DE_PARFUM' | 'EAU_DE_COLOGNE' | 'BODY_MIST' | 'PARFUM_EXTRAIT';
+export type Concentration = 'EAU_DE_PARFUM' | 'EAU_DE_TOILETTE' | 'EAU_DE_TOILETTE_INTENSE' | 'EAU_DE_COLOGNE' | 'BODY_MIST' | 'ELIXIR' | 'PARFUM' | 'EXTRAIT_DE_PARFUM';
 export type Projection = 'DISCRETA' | 'MODERADA' | 'ALTA';
 
 // ── Modelos de API ──────────────────────────────────────
