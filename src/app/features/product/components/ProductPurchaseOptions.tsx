@@ -302,7 +302,7 @@ export default function ProductPurchaseOptions({
         </p>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           onClick={handleAddToCart}
           className="flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"

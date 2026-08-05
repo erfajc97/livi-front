@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import ProductPurchaseOptions from './ProductPurchaseOptions';
 import type { Product, ProductVariant } from '@/app/types/global.types';
@@ -17,8 +17,23 @@ function ProductGallery({
   bajoPedido?: boolean;
 }) {
   const [active, setActive] = useState(0);
+  const touchStartX = useRef<number | null>(null);
   const list = images.filter(Boolean);
   const idx = Math.min(active, Math.max(0, list.length - 1));
+
+  const go = (dir: 1 | -1) =>
+    setActive((a) => (a + dir + list.length) % list.length);
+
+  /* Swipe en mobile: deslizar izquierda/derecha cambia la imagen */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current == null || list.length < 2) return;
+    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchStartX.current = null;
+  };
 
   if (list.length === 0) {
     return (
@@ -33,12 +48,16 @@ function ProductGallery({
   }
 
   return (
-    /* Galería compacta. En MÓVIL se limita a ~42svh para que el selector de
-       formatos quede visible casi sin scroll; en desktop usa el alto grande. */
+    /* Galería compacta. En MÓVIL se limita a ~42svh y se navega con swipe +
+       puntos (sin miniaturas); en desktop usa el alto grande con miniaturas. */
     <div className="flex h-[42svh] flex-col gap-2.5 sm:h-[50svh] md:h-[calc(100svh-15rem)] md:max-h-[620px]">
       {/* Imagen principal — botella completa sobre tile blanco (object-contain) */}
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-white">
-        <img src={list[idx]} alt={name} className="h-full w-full object-contain p-3 transition-opacity duration-300 md:p-4" />
+      <div
+        className="relative min-h-0 flex-1 overflow-hidden bg-white"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        <img src={list[idx]} alt={name} draggable={false} className="h-full w-full object-contain p-3 transition-opacity duration-300 md:p-4" />
         {bajoPedido && (
           <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text md:left-5 md:top-5">
             <span className="h-[5px] w-[5px] rounded-full bg-accent" />
@@ -46,9 +65,25 @@ function ProductGallery({
           </span>
         )}
       </div>
-      {/* Miniaturas cuadradas (el ancho se topa para que no crezcan de más) */}
+      {/* Puntos del carrusel — solo mobile, bajo la imagen sobre fondo claro */}
       {list.length > 1 && (
-        <div className="grid w-full max-w-82.5 shrink-0 grid-cols-3 gap-2.5">
+        <div className="flex shrink-0 items-center justify-center gap-1.5 py-1 md:hidden">
+          {list.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Imagen ${i + 1}`}
+              onClick={() => setActive(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === i ? 'w-4 bg-text' : 'w-1.5 bg-text/30'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+      {/* Miniaturas cuadradas — solo desktop */}
+      {list.length > 1 && (
+        <div className="hidden w-full max-w-82.5 shrink-0 grid-cols-3 gap-2.5 md:grid">
           {list.slice(0, 3).map((img, i) => (
             <button
               key={i}

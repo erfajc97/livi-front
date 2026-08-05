@@ -38,11 +38,12 @@ const TABS = [
 ] as const;
 
 /* Onda senoidal que se repite cada 200 unidades — al animar translateX(-50%)
-   el bucle es perfectamente continuo. */
+   el bucle es perfectamente continuo. La superficie queda baja (~bottom 20%)
+   para que el líquido no tape las etiquetas de los tabs. */
 const WAVE_A =
-  'M0 36 Q50 22 100 36 T200 36 T300 36 T400 36 T500 36 T600 36 T700 36 T800 36 V64 H0 Z';
+  'M0 50 Q50 40 100 50 T200 50 T300 50 T400 50 T500 50 T600 50 T700 50 T800 50 V64 H0 Z';
 const WAVE_B =
-  'M0 40 Q50 30 100 40 T200 40 T300 40 T400 40 T500 40 T600 40 T700 40 T800 40 V64 H0 Z';
+  'M0 53 Q50 46 100 53 T200 53 T300 53 T400 53 T500 53 T600 53 T700 53 T800 53 V64 H0 Z';
 
 export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps) {
   const [slosh, setSlosh] = useState(0);
@@ -77,8 +78,8 @@ export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps)
         .ltb-slosh { animation: ltb-sloshk 0.9s ease-out; }
         @keyframes ltb-sloshk {
           0% { transform: translateY(0) scaleY(1); }
-          30% { transform: translateY(-7px) scaleY(1.3); }
-          60% { transform: translateY(3px) scaleY(0.9); }
+          30% { transform: translateY(-9px) scaleY(1.8); }
+          60% { transform: translateY(3px) scaleY(0.85); }
           100% { transform: translateY(0) scaleY(1); }
         }
         .ltb-glow { animation: ltb-glowk 2.6s ease-in-out infinite; }

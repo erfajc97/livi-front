@@ -10,7 +10,7 @@ export const API_ENDPOINTS = {
   RESEND_VERIFICATION:        '/auth/resend-verification', // POST - public
   FORGOT_PASSWORD:            '/auth/forgot-password',     // POST - public
   RESET_PASSWORD:             '/auth/reset-password',      // POST - public
-  CHANGE_PASSWORD:            '/auth/change-password',     // Not implemented yet
+  CHANGE_PASSWORD:            '/auth/change-password',
   GOOGLE_AUTH:                '/auth/google',              // POST - public (Google ID token)
 
   // ── Users ───────────────────────────────────────

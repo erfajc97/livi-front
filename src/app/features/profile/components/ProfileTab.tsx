@@ -35,6 +35,8 @@ export default function ProfileTab() {
     reference: '',
     preferredDeliveryMethod: '',
   });
+  const [pwdForm, setPwdForm] = useState({ current: '', next: '', confirm: '' });
+  const [isChangingPwd, setIsChangingPwd] = useState(false);
   const loaded = useRef(false);
 
   useEffect(() => {
@@ -103,6 +105,38 @@ export default function ProfileTab() {
       sonnerResponse('Error al guardar', 'error');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!pwdForm.current || !pwdForm.next) {
+      sonnerResponse('Completa la contraseña actual y la nueva', 'error');
+      return;
+    }
+    if (pwdForm.next.length < 8) {
+      sonnerResponse('La nueva contraseña debe tener al menos 8 caracteres', 'error');
+      return;
+    }
+    if (pwdForm.next !== pwdForm.confirm) {
+      sonnerResponse('La confirmación no coincide', 'error');
+      return;
+    }
+    setIsChangingPwd(true);
+    try {
+      await axiosInstance.post(API_ENDPOINTS.CHANGE_PASSWORD, {
+        currentPassword: pwdForm.current,
+        newPassword: pwdForm.next,
+      });
+      sonnerResponse('Contraseña actualizada', 'success');
+      setPwdForm({ current: '', next: '', confirm: '' });
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      sonnerResponse(
+        typeof msg === 'string' ? msg : 'No se pudo cambiar la contraseña',
+        'error',
+      );
+    } finally {
+      setIsChangingPwd(false);
     }
   };
 
@@ -220,6 +254,55 @@ export default function ProfileTab() {
           </div>
         </div>
       </div>
+
+      {/* Seguridad — cambiar contraseña (solo cuentas con contraseña local) */}
+      {!isGoogleUser && (
+        <div className="border border-border bg-surface p-6">
+          <span className="eyebrow mb-5 block">Seguridad</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={LABEL}>Contraseña actual</label>
+              <input
+                type="password"
+                value={pwdForm.current}
+                onChange={(e) => setPwdForm((p) => ({ ...p, current: e.target.value }))}
+                autoComplete="current-password"
+                className={INPUT}
+              />
+            </div>
+            <div>
+              <label className={LABEL}>Nueva contraseña</label>
+              <input
+                type="password"
+                value={pwdForm.next}
+                onChange={(e) => setPwdForm((p) => ({ ...p, next: e.target.value }))}
+                autoComplete="new-password"
+                placeholder="Mín. 8 caracteres"
+                className={INPUT}
+              />
+            </div>
+            <div>
+              <label className={LABEL}>Confirmar nueva</label>
+              <input
+                type="password"
+                value={pwdForm.confirm}
+                onChange={(e) => setPwdForm((p) => ({ ...p, confirm: e.target.value }))}
+                autoComplete="new-password"
+                className={INPUT}
+              />
+            </div>
+          </div>
+          <div className="mt-5">
+            <button
+              onClick={handleChangePassword}
+              disabled={isChangingPwd}
+              className="border border-text px-8 py-3 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:bg-text hover:text-bg disabled:opacity-50"
+            >
+              {isChangingPwd ? <Loader size={16} /> : 'Cambiar contraseña'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Save + Logout */}
       <div className="flex flex-wrap items-center gap-3 pt-2">
