@@ -87,11 +87,22 @@ export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps)
         @keyframes ltb-glowk { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
       `}</style>
 
-      {/* Cápsula del vial */}
-      <div className="relative overflow-hidden rounded-full border border-[#3a2d1a] bg-[#14100C] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.6)]">
-        {/* Tapas metálicas del vial */}
-        <span className="pointer-events-none absolute inset-y-2 left-1.5 w-[3px] rounded-full bg-gradient-to-b from-[#E8C766] via-[#7a5f24] to-[#E8C766]" />
-        <span className="pointer-events-none absolute inset-y-2 right-1.5 w-[3px] rounded-full bg-gradient-to-b from-[#E8C766] via-[#7a5f24] to-[#E8C766]" />
+      {/* Vial decant horizontal — tapón atomizador dorado + cuerpo de vidrio */}
+      <div className="flex items-center">
+        {/* Tapón atomizador (izquierda) — cilindro dorado con boquilla y anillos */}
+        <div className="relative z-20 -mr-2.5 h-[62px] w-[46px] shrink-0 drop-shadow-[0_10px_14px_rgba(0,0,0,0.55)]" aria-hidden>
+          <div className="absolute inset-0 rounded-l-[16px] rounded-r-[7px] bg-[linear-gradient(180deg,#f7e3a1_0%,#ddb84e_20%,#9c7422_42%,#5f4512_58%,#a8802a_78%,#f0d588_100%)]" />
+          {/* brillo lateral del cilindro */}
+          <span className="absolute inset-y-1 left-[5px] w-[5px] rounded-full bg-white/35 blur-[2px]" />
+          {/* boquilla del spray */}
+          <span className="absolute left-[10px] top-1/2 h-[9px] w-[9px] -translate-y-1/2 rounded-full bg-[#0b0906] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35)]" />
+          {/* anillos de unión con el cuerpo */}
+          <span className="absolute inset-y-[7px] right-[4px] w-[3px] rounded-full bg-[#f0d588]/80" />
+          <span className="absolute inset-y-[10px] right-[10px] w-[2px] rounded-full bg-[#4a360e]" />
+        </div>
+
+        {/* Cuerpo del vial */}
+        <div className="relative flex-1 overflow-hidden rounded-full border border-[#C9A227]/55 bg-[#14100C] shadow-[0_18px_40px_-12px_rgba(0,0,0,0.6)]">
 
         {/* Video de líquido real (Higgsfield) — textura viva dentro del vial.
             Si falla la carga, se oculta y quedan las ondas SVG como fallback. */}
@@ -124,7 +135,7 @@ export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps)
         </div>
 
         {/* Tabs */}
-        <div className="relative z-10 grid grid-cols-5">
+        <div className="relative z-10 grid grid-cols-5 pl-4">
           {TABS.map(({ id, label, href, Icon }) => {
             const active = activeId === id;
             return (
@@ -153,6 +164,7 @@ export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps)
             );
           })}
         </div>
+      </div>
       </div>
     </nav>
   );
