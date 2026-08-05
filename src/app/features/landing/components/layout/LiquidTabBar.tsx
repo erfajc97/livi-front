@@ -47,6 +47,7 @@ const WAVE_B =
 
 export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps) {
   const [slosh, setSlosh] = useState(0);
+  const [videoOk, setVideoOk] = useState(true);
 
   // PDP y checkout ya tienen su propia barra fija de conversión
   if (pathname.startsWith('/producto') || pathname.startsWith('/checkout')) {
@@ -91,6 +92,26 @@ export default function LiquidTabBar({ pathname, itemCount }: LiquidTabBarProps)
         {/* Tapas metálicas del vial */}
         <span className="pointer-events-none absolute inset-y-2 left-1.5 w-[3px] rounded-full bg-gradient-to-b from-[#E8C766] via-[#7a5f24] to-[#E8C766]" />
         <span className="pointer-events-none absolute inset-y-2 right-1.5 w-[3px] rounded-full bg-gradient-to-b from-[#E8C766] via-[#7a5f24] to-[#E8C766]" />
+
+        {/* Video de líquido real (Higgsfield) — textura viva dentro del vial.
+            Si falla la carga, se oculta y quedan las ondas SVG como fallback. */}
+        {videoOk && (
+          <>
+            <video
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60"
+              src="/videos/liquid-tabbar.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
+              onError={() => setVideoOk(false)}
+            />
+            {/* Oscurece la zona de los iconos para mantener la legibilidad */}
+            <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#14100C]/75 via-[#14100C]/25 to-transparent" />
+          </>
+        )}
 
         {/* Líquido dorado — fluye siempre y salpica al tocar */}
         <div key={slosh} className={`ltb-waves ${slosh > 0 ? 'ltb-slosh' : ''}`} aria-hidden>
