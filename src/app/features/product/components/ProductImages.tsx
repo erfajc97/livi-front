@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface ProductImagesProps {
   images: string[];
@@ -8,7 +8,22 @@ interface ProductImagesProps {
 
 export default function ProductImages({ images, name, bajoPedido }: ProductImagesProps) {
   const [active, setActive] = useState(0);
+  const touchStartX = useRef<number | null>(null);
   const list = images.length > 0 ? images : [];
+
+  const go = (dir: 1 | -1) =>
+    setActive((a) => (a + dir + list.length) % list.length);
+
+  /* Swipe en mobile: deslizar izquierda/derecha cambia la imagen */
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current == null || list.length < 2) return;
+    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchStartX.current = null;
+  };
 
   if (list.length === 0) {
     return (
@@ -22,15 +37,21 @@ export default function ProductImages({ images, name, bajoPedido }: ProductImage
 
   return (
     /* Galería que cabe en el viewport: la imagen principal ocupa el espacio
-       disponible (flex-1) y las miniaturas quedan visibles sin hacer scroll. */
+       disponible. En mobile se navega con swipe + puntos; en desktop con
+       miniaturas. */
     <div className="flex flex-col gap-3 h-[66svh] md:h-[calc(100svh-13rem)] md:max-h-[760px]">
       {/* Imagen principal — con padding para que no quede pegada a los bordes */}
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-surface-raised">
+      <div
+        className="relative min-h-0 flex-1 overflow-hidden bg-surface-raised"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <div className="absolute inset-0 p-4 md:p-6">
           <img
             src={list[active]}
             alt={name}
             className="h-full w-full object-contain transition-opacity duration-300"
+            draggable={false}
           />
         </div>
         {bajoPedido && (
@@ -39,11 +60,28 @@ export default function ProductImages({ images, name, bajoPedido }: ProductImage
             Bajo Pedido
           </span>
         )}
+
+        {/* Puntos del carrusel — solo mobile */}
+        {list.length > 1 && (
+          <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5 md:hidden">
+            {list.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Imagen ${i + 1}`}
+                onClick={() => setActive(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  active === i ? 'w-4 bg-text' : 'w-1.5 bg-text/30'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Miniaturas */}
+      {/* Miniaturas — solo desktop */}
       {list.length > 1 && (
-        <div className="grid shrink-0 grid-cols-3 gap-3">
+        <div className="hidden shrink-0 grid-cols-3 gap-3 md:grid">
           {list.slice(0, 3).map((img, i) => (
             <button
               key={i}

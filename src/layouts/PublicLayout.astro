@@ -13,7 +13,7 @@ const { title, description } = Astro.props;
 
 <BaseLayout title={title} description={description}>
   <Navbar client:load />
-  <main>
+  <main class="pb-24 md:pb-0">
     <slot />
   </main>
   <Footer />

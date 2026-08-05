@@ -30,10 +30,12 @@ function getUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const catId = params.get('category');
   const subId = params.get('marca');
+  const desc = params.get('descuento');
   return {
     categoryId: catId ? Number(catId) : undefined,
     marcaId: subId ? Number(subId) : undefined,
     search: params.get('search') ?? undefined,
+    hasDiscount: desc === '1' || desc === 'true' ? true : undefined,
   };
 }
 
@@ -47,6 +49,7 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     search: urlParams.search ?? '',
     categoryId: catId,
     marcaId: subId,
+    hasDiscount: urlParams.hasDiscount ?? false,
   });
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
   const [debouncedMaxPrice, setDebouncedMaxPrice] = useState(filters.maxPrice);

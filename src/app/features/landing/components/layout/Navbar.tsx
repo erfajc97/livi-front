@@ -5,6 +5,7 @@ import AnnouncementBar from './AnnouncementBar';
 import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
 import NavbarSearch from './NavbarSearch';
+import LiquidTabBar from './LiquidTabBar';
 
 /* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
 const ico = 'h-[18px] w-[18px]';
@@ -171,6 +172,9 @@ export default function Navbar() {
           />
         )}
       </header>
+
+      {/* Bottom tab líquida — experimento mobile */}
+      <LiquidTabBar pathname={pathname} itemCount={itemCount} />
 
       <AuthModalIsland open={authOpen} onClose={() => setAuthOpen(false)} />
     </AppProviders>
