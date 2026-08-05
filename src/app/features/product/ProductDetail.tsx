@@ -42,7 +42,7 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   const isBajo = !!product.bajoPedido;
 
   return (
-    <div className="mx-auto max-w-[1500px] px-6 pb-24 md:px-14">
+    <div className="mx-auto max-w-[1500px] px-6 pb-40 md:px-14 md:pb-24">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 py-6 font-body text-[11px] tracking-[0.04em] text-text-muted">
         <a href="/" className="transition-colors hover:text-text">Inicio</a>

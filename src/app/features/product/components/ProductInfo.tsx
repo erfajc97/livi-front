@@ -113,8 +113,8 @@ export default function ProductInfo({
         })}
       </div>
 
-      {/* Cantidad + Añadir */}
-      <div className="mt-8 flex items-stretch gap-3">
+      {/* Cantidad + Añadir — fijo en la parte inferior en mobile */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-stretch gap-3 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:mt-8 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <div className="flex items-center border border-border">
           <button type="button" onClick={() => onQtyChange(Math.max(1, quantity - 1))} className="px-3.5 text-text-soft transition-colors hover:text-text">−</button>
           <span className="w-9 text-center font-body text-sm text-text">{quantity}</span>
