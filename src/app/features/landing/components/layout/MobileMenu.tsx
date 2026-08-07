@@ -4,8 +4,8 @@ import { useNormalCategoriesQuery, useBajoPedidoCategoriesQuery } from '@/app/ta
 
 interface MobileMenuProps {
   pathname: string;
-  isAuthenticated: boolean;
-  onAuthOpen: () => void;
+  isAuthenticated?: boolean;
+  onAuthOpen?: () => void;
   onClose: () => void;
 }
 
@@ -14,7 +14,7 @@ interface MobileMenuProps {
  * tipografía DM Sans en versalitas con tracking, nombres de marca en serif
  * display, líneas finas `border-border`, sin píldoras ni acentos rellenos.
  */
-export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onClose }: MobileMenuProps) {
+export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const { data: normalCategories = [] } = useNormalCategoriesQuery();
   const { data: bajoPedidoCategories = [] } = useBajoPedidoCategoriesQuery();
@@ -35,7 +35,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
               <div key={link.label} className="border-b border-border">
                 <button
                   onClick={() => setExpanded(isOpen ? null : link.dropdownId!)}
-                  className="flex w-full items-center justify-between py-4 font-body text-xs uppercase tracking-[0.18em]"
+                  className="flex w-full items-center justify-between py-4 font-display text-base uppercase tracking-[0.14em]"
                   aria-expanded={isOpen}
                 >
                   <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
@@ -94,7 +94,7 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-body text-xs uppercase tracking-[0.18em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
+              className={`border-b border-border py-4 font-display text-base uppercase tracking-[0.14em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
             >
               {link.label}
             </a>
@@ -102,25 +102,9 @@ export default function MobileMenu({ pathname, isAuthenticated, onAuthOpen, onCl
         })}
       </nav>
 
-      {/* Cuenta + fila de utilidades (espejo de la barra superior de escritorio) */}
+      {/* Fila de utilidades — solo el aviso de envíos, un poco más grande */}
       <div className="flex flex-col gap-4 bg-bg-alt px-6 py-7">
-        {isAuthenticated ? (
-          <a href="/mi-cuenta" onClick={onClose} className="eyebrow self-start text-text transition-colors hover:text-accent">
-            Mi cuenta
-          </a>
-        ) : (
-          <button
-            onClick={() => { onAuthOpen(); onClose(); }}
-            className="eyebrow self-start text-text transition-colors hover:text-accent"
-          >
-            Ingresar
-          </button>
-        )}
-        <div className="flex flex-col gap-2.5 font-body text-[11px] tracking-[0.04em] text-text-soft">
-          <a href="/rastrear" onClick={onClose} className="hover:text-text">Rastrear pedido</a>
-          <a href="/contacto" onClick={onClose} className="hover:text-text">Acerca de</a>
-        </div>
-        <span className="font-body text-[11px] tracking-[0.04em] text-text-muted">
+        <span className="font-body text-sm tracking-[0.04em] text-text-muted">
           Envíos a todo el Ecuador · Servientrega 24–72h · ES · USD
         </span>
       </div>

@@ -71,7 +71,7 @@ export default function LiquidTabBar({ pathname }: LiquidTabBarProps) {
     <nav
       aria-label="Navegación móvil"
       className="fixed inset-x-3 z-40 md:hidden"
-      style={{ bottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+      style={{ bottom: 'env(safe-area-inset-bottom)' }}
     >
       <style>{`
         .ltb-glow { animation: ltb-glowk 2.6s ease-in-out infinite; }

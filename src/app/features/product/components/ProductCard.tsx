@@ -184,7 +184,9 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Info */}
       <div className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2.5">
         <a href={productUrl}>
-          <h3 className="font-display text-[15px] font-normal leading-snug tracking-[-0.005em] text-text transition-colors group-hover/card:text-accent">
+          {/* Altura mínima de 2 líneas: los nombres largos ya no desalinean
+              los chips de formato entre cards vecinas */}
+          <h3 className="line-clamp-2 min-h-[2.75em] font-display text-[15px] font-normal leading-snug tracking-[-0.005em] text-text transition-colors group-hover/card:text-accent">
             {product.name}
           </h3>
         </a>
@@ -207,9 +209,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Chips de formato (máx 2): seleccionan y actualizan el precio aquí
-            mismo. El "+" (solo con más de 2 formatos) abre el detalle. */}
+            mismo. El "+" (solo con más de 2 formatos) abre el detalle.
+            `mt-auto` los fija al pie de la card para que queden alineados
+            entre cards de la misma fila. */}
         {chipFormats.length > 0 && (
-          <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+          <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-0.5">
             {chipFormats.map((f) => {
               const isSelected = selected?.id === f.id;
               return (
