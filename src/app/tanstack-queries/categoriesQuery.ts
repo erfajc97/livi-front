@@ -105,3 +105,22 @@ export const useBajoPedidoCategoriesQuery = () => useAllCategories(selectBajoPed
 /** Sin filtrar — todas las categorías y todas sus marcas (banner: resolver una
  *  marca por id aunque esté inactiva, p. ej. una marca solo de bajo pedido). */
 export const useRawCategoriesQuery = () => useAllCategories((cats) => cats)
+
+/**
+ * Jerarquía editorial de categorías en los menús: ÁRABES → DISEÑADOR →
+ * NICHOS → el resto (conservando su orden original). Compara por nombre
+ * normalizado (sin tildes, minúsculas), así no depende de IDs por entorno.
+ */
+export function sortCategoriesByHierarchy<T extends { name: string }>(cats: T[]): T[] {
+  const rank = (name: string): number => {
+    const n = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    if (/arab/.test(n)) return 0
+    if (/disenador|designer/.test(n)) return 1
+    if (/nicho|niche/.test(n)) return 2
+    return 3
+  }
+  return cats
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => rank(a.c.name) - rank(b.c.name) || a.i - b.i)
+    .map(({ c }) => c)
+}

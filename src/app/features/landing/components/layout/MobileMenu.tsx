@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NAV_LINKS, isLinkActive } from '../../hooks/useNavbarHook';
-import { useNormalCategoriesQuery, useBajoPedidoCategoriesQuery } from '@/app/tanstack-queries/categoriesQuery';
+import { useNormalCategoriesQuery, useBajoPedidoCategoriesQuery, sortCategoriesByHierarchy } from '@/app/tanstack-queries/categoriesQuery';
 
 interface MobileMenuProps {
   pathname: string;
@@ -20,15 +20,17 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
   const { data: bajoPedidoCategories = [] } = useBajoPedidoCategoriesQuery();
 
   return (
-    <div className="border-t border-border bg-bg md:hidden max-h-[80vh] overflow-y-auto">
+    <div className="border-t border-border bg-bg md:hidden max-h-[80vh] overflow-y-auto pb-24">
       <nav className="flex flex-col px-6" aria-label="Navegación móvil">
         {NAV_LINKS.map((link) => {
           const active = isLinkActive(link.href, pathname, link.exact);
 
           if (link.dropdown) {
             const isOpen = expanded === link.dropdownId;
-            const categories = (link.dropdownId === 'perfumes' ? normalCategories : bajoPedidoCategories)
-              .filter((c) => c.name.toLowerCase() !== 'all');
+            const categories = sortCategoriesByHierarchy(
+              (link.dropdownId === 'perfumes' ? normalCategories : bajoPedidoCategories)
+                .filter((c) => c.name.toLowerCase() !== 'all'),
+            );
             const basePath = link.dropdownId === 'perfumes' ? '/catalogo/perfumes' : '/bajo-pedido';
 
             return (
@@ -64,7 +66,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                         {categories.map((cat) => (
                           <div key={cat.id}>
                             <div className="flex items-baseline gap-3 pb-3">
-                              <span className="eyebrow">{cat.name}</span>
+                              <span className="eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70">{cat.name}</span>
                               <span className="h-px flex-1 bg-border" />
                             </div>
                             <div className="flex flex-col gap-3.5">
@@ -73,7 +75,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                                   key={sub.id}
                                   href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
                                   onClick={onClose}
-                                  className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent"
+                                  className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent hover:underline underline-offset-4 decoration-accent/70"
                                 >
                                   {sub.name}
                                 </a>

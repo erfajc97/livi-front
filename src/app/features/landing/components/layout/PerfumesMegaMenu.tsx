@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   useNormalCategoriesQuery,
   useBajoPedidoCategoriesQuery,
+  sortCategoriesByHierarchy,
 } from '@/app/tanstack-queries/categoriesQuery';
 import { useNavbarAdQuery } from '@/app/tanstack-queries/navbarAdQuery';
 
@@ -40,7 +41,7 @@ export default function PerfumesMegaMenu({
   const bajo = useBajoPedidoCategoriesQuery();
   const { data: categories = [], isLoading } = isBajoPedido ? bajo : normal;
 
-  const cats = categories.filter((c) => c.name.toLowerCase() !== 'all');
+  const cats = sortCategoriesByHierarchy(categories.filter((c) => c.name.toLowerCase() !== 'all'));
 
   // Paginación de categorías — máximo PER_PAGE por vista, flechas para el resto.
   const [page, setPage] = useState(0);
@@ -125,7 +126,7 @@ export default function PerfumesMegaMenu({
                   onClick={onClose}
                   className="group block"
                 >
-                  <span className="block font-display text-[28px] font-normal leading-tight tracking-[-0.01em] text-text transition-colors group-hover:text-accent">
+                  <span className="block font-display text-[28px] font-normal leading-tight tracking-[-0.01em] text-text transition-colors group-hover:text-accent group-hover:underline underline-offset-[6px] decoration-accent/70">
                     {cat.name}
                   </span>
                 </a>
@@ -145,7 +146,7 @@ export default function PerfumesMegaMenu({
                       onClick={onClose}
                       className="group block transition-transform duration-200 hover:translate-x-1"
                     >
-                      <span className="block font-body text-[13px] leading-tight tracking-[0.01em] text-text-soft transition-colors group-hover:text-accent">
+                      <span className="block font-body text-[13px] leading-tight tracking-[0.01em] text-text-soft transition-colors group-hover:text-accent group-hover:underline underline-offset-4 decoration-accent/70">
                         {sub.name}
                       </span>
                     </a>
