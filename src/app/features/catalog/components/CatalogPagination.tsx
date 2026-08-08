@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 interface PaginationInfo {
   page: number;
   totalPages: number;
@@ -10,12 +12,11 @@ interface CatalogPaginationProps {
   onPageChange: (page: number) => void;
 }
 
-function getVisiblePages(current: number, total: number): (number | '...')[] {
-  const maxVisible = 5;
+function getVisiblePages(current: number, total: number, maxVisible: number): (number | '...')[] {
   if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
 
   const pages: (number | '...')[] = [];
-  let start = Math.max(1, current - 2);
+  let start = Math.max(1, current - Math.floor(maxVisible / 2));
   let end = Math.min(total, start + maxVisible - 1);
 
   if (end - start < maxVisible - 1) {
@@ -39,13 +40,28 @@ function getVisiblePages(current: number, total: number): (number | '...')[] {
   return pages;
 }
 
+/** Móvil: 3 números (la fila completa con 5 + flechas desbordaba los 390px). */
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)');
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  return isDesktop;
+}
+
 export default function CatalogPagination({ pagination, onPageChange }: CatalogPaginationProps) {
   const { page, totalPages, total, limit } = pagination;
+  // El hook va ANTES del early return (regla de hooks de React)
+  const isDesktop = useIsDesktop();
   // Siempre visible (incluso con una sola página): el cliente debe saber
   // cuántos productos vienen por página y en qué página está.
   if (total <= 0) return null;
 
-  const visiblePages = getVisiblePages(page, totalPages);
+  const visiblePages = getVisiblePages(page, totalPages, isDesktop ? 5 : 3);
   const from = (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
 
@@ -56,11 +72,11 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
         Mostrando {from}–{to} de {total} productos · Página {page} de {totalPages}
       </p>
 
-      <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page <= 1}
-          className="px-4 sm:px-5 py-2.5 font-body text-[11px] uppercase tracking-[0.18em] border border-border text-text-muted hover:border-text hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="px-3 sm:px-5 py-2.5 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.18em] border border-border text-text-muted hover:border-text hover:text-text disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           Atrás
         </button>
@@ -68,14 +84,14 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
         <div className="flex items-center gap-1 sm:gap-1.5">
           {visiblePages.map((p, idx) =>
             p === '...' ? (
-              <span key={`dots-${idx}`} className="w-9 h-9 flex items-center justify-center text-xs text-text-muted">
+              <span key={`dots-${idx}`} className="w-6 sm:w-9 h-9 flex items-center justify-center text-xs text-text-muted">
                 ...
               </span>
             ) : (
               <button
                 key={p}
                 onClick={() => onPageChange(p)}
-                className={`w-9 h-9 text-sm font-body transition-colors ${
+                className={`w-8 sm:w-9 h-9 text-[13px] sm:text-sm font-body transition-colors ${
                   p === page
                     ? 'bg-text text-bg'
                     : 'border border-border text-text-muted hover:border-text hover:text-text'
@@ -90,7 +106,7 @@ export default function CatalogPagination({ pagination, onPageChange }: CatalogP
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages}
-          className="px-4 sm:px-5 py-2.5 font-body text-[11px] uppercase tracking-[0.18em] bg-text text-bg hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="px-3 sm:px-5 py-2.5 font-body text-[10px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.18em] bg-text text-bg hover:bg-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
           Siguiente
         </button>

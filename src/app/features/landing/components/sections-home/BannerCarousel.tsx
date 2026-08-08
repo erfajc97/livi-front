@@ -135,11 +135,12 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
               onClick={scrollNext}
               className="absolute right-0 top-1/2 -translate-y-1/2"
             />
+            {/* Móvil: más abajo para que no se pegue a los CTAs */}
             <CarouselProgressBar
               snapCount={snapCount}
               selectedIndex={selectedIndex}
               onSelect={scrollToIndex}
-              className="absolute inset-x-0 bottom-4 z-20 px-6 md:px-12"
+              className="absolute inset-x-0 bottom-1.5 z-20 px-6 md:bottom-4 md:px-12"
             />
           </>
         )}
