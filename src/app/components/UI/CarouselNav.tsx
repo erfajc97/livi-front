@@ -123,7 +123,7 @@ export function CarouselArrow({ direction, onClick, disabled, className = '', to
       disabled={disabled}
       aria-label={isPrev ? 'Anterior' : 'Siguiente'}
       style={top != null ? { top: `${top}px` } : undefined}
-      className={`z-20 hidden h-12 w-9 items-center justify-center bg-text text-bg shadow-[0_2px_10px_rgba(28,26,23,0.18)] transition-opacity hover:bg-accent disabled:pointer-events-none disabled:opacity-25 sm:flex ${className}`}
+      className={`z-20 flex h-9 w-7 items-center justify-center bg-text text-bg shadow-[0_2px_10px_rgba(28,26,23,0.18)] transition-opacity hover:bg-accent disabled:pointer-events-none disabled:opacity-25 sm:h-12 sm:w-9 ${className}`}
     >
       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <path d={isPrev ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />

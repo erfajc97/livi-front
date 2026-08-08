@@ -213,7 +213,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             `mt-auto` los fija al pie de la card para que queden alineados
             entre cards de la misma fila. */}
         {chipFormats.length > 0 && (
-          <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-0.5">
+          <div className="mt-auto flex flex-nowrap items-center gap-1.5 pt-0.5">
             {chipFormats.map((f) => {
               const isSelected = selected?.id === f.id;
               return (

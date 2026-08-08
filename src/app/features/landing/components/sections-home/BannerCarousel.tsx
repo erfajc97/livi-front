@@ -28,8 +28,8 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
   // Esqueleto del hero mientras llegan los banners: misma altura final.
   if (isLoading) {
     return (
-      <section className="flex flex-col bg-bg md:h-[calc(100svh-8.5rem)]" aria-hidden="true">
-        <div className="h-80 animate-pulse bg-bg-alt sm:h-96 md:h-auto md:min-h-0 md:flex-1" />
+      <section className="flex flex-col bg-bg" aria-hidden="true">
+        <div className="h-80 animate-pulse bg-bg-alt sm:h-96 md:h-[72svh]" />
         <CommitmentStrip />
       </section>
     );
@@ -40,12 +40,12 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
   const pad = (n: number) => String(n).padStart(2, '0');
 
   return (
-    /* Desktop: hero + promesas llenan el primer viewport (menos navbar).
-       Mobile: hero como banner-strip (altura fija, igual que los otros
-       banners) en vez de casi-fullscreen — la sección crece natural. */
-    <section className="flex flex-col bg-bg md:h-[calc(100svh-8.5rem)]">
+    /* El hero mide un viewport completo (menos navbar) en desktop y las
+       promesas fluyen debajo — antes ambas competían dentro del mismo
+       viewport y las cards altas de vidrio aplastaban el banner. */
+    <section className="flex flex-col bg-bg">
       {/* ── Hero (carousel de banners) ── */}
-      <div className="group relative h-80 sm:h-96 md:h-auto md:min-h-0 md:flex-1">
+      <div className="group relative h-80 sm:h-96 md:h-[72svh]">
         <div className="h-full overflow-hidden" ref={emblaRef}>
           <div className="flex h-full">
             {banners.map((banner) => (
@@ -97,17 +97,19 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
                     )}
                     {/* CTAs — tipografía fina (display serif) como el resto de
                         los titulares editoriales */}
-                    <div className="flex items-center gap-4">
+                    {/* CTAs — en móvil pegados a la derecha; en desktop al
+                        extremo derecho de la fila inferior */}
+                    <div className="flex items-center gap-3 self-end md:self-auto">
                       <a
                         href={banner.link || '/catalogo/perfumes'}
-                        className="inline-flex items-center gap-2 bg-text px-8 py-4 font-display text-sm uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+                        className="inline-flex items-center gap-2 bg-text px-5 py-2.5 font-display text-[11px] uppercase tracking-[0.18em] text-bg transition-colors hover:bg-accent md:px-6 md:py-3 md:text-xs"
                       >
                         {banner.buttonText || 'Explorar colección'}
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
                       </a>
                       <a
                         href="/bajo-pedido"
-                        className="inline-flex items-center border border-text/20 bg-bg/85 px-7 py-4 font-display text-sm uppercase tracking-[0.2em] text-text backdrop-blur-sm transition-colors hover:border-accent hover:text-accent"
+                        className="inline-flex items-center border border-text/20 bg-bg/85 px-4 py-2.5 font-display text-[11px] uppercase tracking-[0.18em] text-text backdrop-blur-sm transition-colors hover:border-accent hover:text-accent md:px-5 md:py-3 md:text-xs"
                       >
                         Bajo Pedido
                       </a>

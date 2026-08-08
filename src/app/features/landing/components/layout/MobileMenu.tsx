@@ -16,6 +16,8 @@ interface MobileMenuProps {
  */
 export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  // Segundo nivel: qué categoría tiene desplegadas sus marcas (una a la vez)
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
   const { data: normalCategories = [] } = useNormalCategoriesQuery();
   const { data: bajoPedidoCategories = [] } = useBajoPedidoCategoriesQuery();
 
@@ -36,7 +38,11 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
             return (
               <div key={link.label} className="border-b border-border">
                 <button
-                  onClick={() => setExpanded(isOpen ? null : link.dropdownId!)}
+                  onClick={() => {
+                    setExpanded(isOpen ? null : link.dropdownId!);
+                    // Al cambiar de sección se cierran las categorías abiertas
+                    setExpandedCat(null);
+                  }}
                   className="flex w-full items-center justify-between py-4 font-display text-base uppercase tracking-[0.14em]"
                   aria-expanded={isOpen}
                 >
@@ -62,27 +68,47 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     {categories.length === 0 ? (
                       <p className="font-body text-sm text-text-muted">No hay casas disponibles</p>
                     ) : (
-                      <div className="flex flex-col gap-7">
-                        {categories.map((cat) => (
-                          <div key={cat.id}>
-                            <div className="flex items-baseline gap-3 pb-3">
-                              <span className="eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70">{cat.name}</span>
-                              <span className="h-px flex-1 bg-border" />
-                            </div>
-                            <div className="flex flex-col gap-3.5">
-                              {cat.marcas.map((sub) => (
-                                <a
-                                  key={sub.id}
-                                  href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
-                                  onClick={onClose}
-                                  className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent hover:underline underline-offset-4 decoration-accent/70"
+                      <div className="flex flex-col gap-5">
+                        {categories.map((cat) => {
+                          const catOpen = expandedCat === String(cat.id);
+                          return (
+                            <div key={cat.id}>
+                              {/* Categoría colapsada por defecto: solo el nombre
+                                  con su flecha; al tocarla se despliegan sus
+                                  marcas para que el menú no sea infinito */}
+                              <button
+                                onClick={() => setExpandedCat(catOpen ? null : String(cat.id))}
+                                aria-expanded={catOpen}
+                                className="flex w-full items-baseline gap-3 pb-1.5 text-left"
+                              >
+                                <span className={`eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70 ${catOpen ? 'text-accent' : ''}`}>
+                                  {cat.name}
+                                </span>
+                                <span className="h-px flex-1 bg-border" />
+                                <svg
+                                  className={`h-2.5 w-2.5 shrink-0 self-center text-text-muted transition-transform ${catOpen ? 'rotate-180' : ''}`}
+                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
                                 >
-                                  {sub.name}
-                                </a>
-                              ))}
+                                  <path d="M6 9l6 6 6-6" />
+                                </svg>
+                              </button>
+                              {catOpen && (
+                                <div className="flex flex-col gap-3.5 pt-3">
+                                  {cat.marcas.map((sub) => (
+                                    <a
+                                      key={sub.id}
+                                      href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
+                                      onClick={onClose}
+                                      className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent hover:underline underline-offset-4 decoration-accent/70"
+                                    >
+                                      {sub.name}
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

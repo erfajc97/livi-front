@@ -218,18 +218,8 @@ export default function ProductRankingSection({
             );
           })}
 
-          {/* Placeholders invisibles: la última página incompleta reserva el
-              alto de las filas que faltan para que la sección no colapse */}
-          {Array.from({ length: MOBILE_PER_PAGE - mobileList.length }, (_, i) => (
-            <div key={`ph-${i}`} aria-hidden className="invisible grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-              <span className="font-display text-2xl italic leading-none">00</span>
-              <div className="h-24 w-full" />
-              <div>
-                <div className="mt-1 font-display text-lg font-light leading-tight">&nbsp;</div>
-                <div className="mt-1 font-body text-[11px]">&nbsp;</div>
-              </div>
-            </div>
-          ))}
+          {/* La última página incompleta NO reserva filas vacías en móvil:
+              así no queda espacio muerto entre la lista y el footer */}
 
           <CarouselProgressBar
             snapCount={mobilePages}

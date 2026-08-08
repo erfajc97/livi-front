@@ -30,16 +30,16 @@ export default function ProductCarouselSection({
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
   // `duration` alarga el desplazamiento: el paso entre productos se ve
-  // deslizar en vez de saltar. `slidesToScroll`: las flechas avanzan por
-  // página completa (5 en desktop) en vez de producto en producto.
+  // deslizar en vez de saltar. `slidesToScroll: 5`: las flechas avanzan
+  // por página completa (de 5 en 5) en todos los tamaños.
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     duration: 32,
-    slidesToScroll: 2, // móvil: 2 columnas visibles
+    slidesToScroll: 5,
     breakpoints: {
-      '(min-width: 768px)': { slidesToScroll: 3 }, // tablet: 3 columnas
-      '(min-width: 1024px)': { slidesToScroll: 5 }, // desktop: páginas de 5
+      '(min-width: 768px)': { slidesToScroll: 5 },
+      '(min-width: 1024px)': { slidesToScroll: 5 },
     },
   });
   const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =

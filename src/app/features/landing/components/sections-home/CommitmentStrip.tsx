@@ -27,9 +27,9 @@ const COMMITMENTS = [
 ];
 
 /**
- * "Nuestro Compromiso" — cuatro placas en forma de arco (silueta de decant)
- * con el icono suspendido dentro de una gota de agua dorada fotorrealista
- * (generada con IA, fondo transparente) y su gota satélite.
+ * "Nuestro Compromiso" — cada card es un pedazo real de vidrio vertical
+ * (placa de cristal generada con IA, centro transparente): arriba la gota
+ * de cristal con el icono dentro, abajo el texto — todo DENTRO del vidrio.
  */
 export default function CommitmentStrip() {
   return (
@@ -41,40 +41,50 @@ export default function CommitmentStrip() {
           <span className="h-px w-8 bg-border" />
         </div>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
+        {/* Fila horizontal de 4 en todos los tamaños */}
+        <div className="grid grid-cols-4 gap-2 md:gap-8">
           {COMMITMENTS.map(({ Icon, title, text }) => (
             <div
               key={title}
-              className="flex flex-col items-center rounded-b-md rounded-t-[999px] border border-accent/35 bg-surface-raised px-3 pb-6 pt-8 text-center shadow-[0_14px_34px_-16px_rgba(28,26,23,0.14)] md:px-5 md:pb-9 md:pt-12"
+              className="relative mx-auto aspect-[504/720] w-full max-w-[230px]"
             >
-              {/* Gota principal + icono suspendido + gota satélite */}
-              <span className="relative mb-3 block w-24 md:mb-5 md:w-36">
-                <img
-                  src="/images/commitment/droplet-main.webp"
-                  alt=""
-                  loading="lazy"
-                  className="block h-auto w-full select-none"
-                  draggable={false}
-                />
-                <span className="absolute left-[47%] top-[59%] -translate-x-1/2 -translate-y-1/2 text-accent">
-                  <Icon size={18} className="md:hidden" />
-                  <Icon size={28} className="hidden md:block" />
-                </span>
-                <img
-                  src="/images/commitment/droplet-small.webp"
-                  alt=""
-                  loading="lazy"
-                  className="absolute bottom-[6%] -right-2 w-5 select-none md:-right-3 md:w-7"
-                  draggable={false}
-                />
-              </span>
+              {/* Pedazo de vidrio — el contenedor ES la placa */}
+              <img
+                src="/images/commitment/glass-slab.webp"
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 h-full w-full select-none object-fill"
+                draggable={false}
+              />
 
-              <span className="font-body text-[9px] uppercase leading-snug tracking-[0.14em] text-text md:text-[12px] md:tracking-[0.18em]">
-                {title}
-              </span>
-              <span className="mt-1.5 font-display text-[11px] italic leading-snug text-text-muted md:mt-2.5 md:text-[15px]">
-                {text}
-              </span>
+              {/* Contenido dentro del vidrio */}
+              <div className="relative flex h-full flex-col items-center px-[9%] pt-[9%] text-center md:pt-[11%]">
+                {/* Gota de cristal + icono suspendido */}
+                <span className="relative block w-10 md:w-28">
+                  <img
+                    src="/images/commitment/droplet-crystal.webp"
+                    alt=""
+                    loading="lazy"
+                    className="block h-auto w-full select-none"
+                    draggable={false}
+                  />
+                  <span className="absolute left-[46%] top-[45%] -translate-x-1/2 -translate-y-1/2 text-accent">
+                    <Icon size={11} className="md:hidden" />
+                    <Icon size={26} className="hidden md:block" />
+                  </span>
+                </span>
+
+                {/* Título + texto centrados en el espacio restante:
+                    el centro de la placa ya no queda vacío */}
+                <span className="flex w-full flex-1 flex-col items-center justify-center gap-0.5 pb-[16%] md:gap-2 md:pb-[18%]">
+                  <span className="font-body text-[6.5px] uppercase leading-snug tracking-[0.08em] text-text md:text-[13px] md:tracking-[0.18em]">
+                    {title}
+                  </span>
+                  <span className="line-clamp-2 font-display text-[7.5px] italic leading-snug text-text-muted md:line-clamp-none md:text-[15px]">
+                    {text}
+                  </span>
+                </span>
+              </div>
             </div>
           ))}
         </div>
