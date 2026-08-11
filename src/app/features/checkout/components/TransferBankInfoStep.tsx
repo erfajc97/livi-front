@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import Loader from '@/app/components/Loader';
-import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
+import { BANK_LOGO_SRC } from '@/app/components/paymentLogos';
 import TermsAcceptance from './TermsAcceptance';
 
 interface TransferBankInfoStepProps {
@@ -25,7 +25,7 @@ const BANKS: BankInfo[] = [
   {
     id: 'pichincha',
     name: 'Banco Pichincha',
-    logo: <img src={pichinchaSvg.src} alt="Banco Pichincha" className="h-5 w-auto" />,
+    logo: <img src={BANK_LOGO_SRC.pichincha} alt="Banco Pichincha" className="h-4 w-auto object-contain md:h-5" />,
     rows: [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
       ['Número de cuenta', '2206573833', true],
@@ -37,7 +37,7 @@ const BANKS: BankInfo[] = [
   {
     id: 'produbanco',
     name: 'Produbanco',
-    logo: <img src="/images/pagos/produbanco.svg" alt="Produbanco" className="h-5 w-auto" />,
+    logo: <img src={BANK_LOGO_SRC.produbanco} alt="Produbanco" className="h-5 w-auto object-contain md:h-6" />,
     rows: [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
       ['Número de cuenta', '20009323889', true],
@@ -50,7 +50,7 @@ const BANKS: BankInfo[] = [
   {
     id: 'guayaquil',
     name: 'Banco Guayaquil',
-    logo: <img src="/images/pagos/banco-guayaquil.svg" alt="Banco Guayaquil" className="h-5 w-auto" />,
+    logo: <img src={BANK_LOGO_SRC.guayaquil} alt="Banco Guayaquil" className="h-5 w-auto object-contain md:h-6" />,
     rows: [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
       ['Número de cuenta', '0060453629', true],

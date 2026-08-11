@@ -1,90 +1,106 @@
+import { useEffect, useRef, useState } from 'react';
 import ShieldCheckLineIcon from '@/assets/svg/ShieldCheckLineIcon';
 import TruckLineIcon from '@/assets/svg/TruckLineIcon';
-import ReturnLineIcon from '@/assets/svg/ReturnLineIcon';
+import BottlesFrameLineIcon from '@/assets/svg/BottlesFrameLineIcon';
 import GlobeSearchLineIcon from '@/assets/svg/GlobeSearchLineIcon';
 
+/* Los cuatro pilares aprobados (REQ-057). "Devolución en 7 días" salió y entró
+   "Más de 300 referencias", que es un número real del catálogo. La clase de
+   animación es la que le da a cada ícono su gesto propio (REQ-061). */
 const COMMITMENTS = [
   {
     Icon: ShieldCheckLineIcon,
-    title: 'Autenticidad garantizada',
+    title: 'Autenticidad\ngarantizada',
     text: 'Cada decant es revisado por nosotros.',
+    motion: 'commit-icon--seal',
   },
   {
     Icon: TruckLineIcon,
-    title: 'Envíos a todo Ecuador',
+    title: 'Envíos a\ntodo Ecuador',
     text: 'Recíbelo entre 24 y 72 horas.',
+    motion: 'commit-icon--drive',
   },
   {
-    Icon: ReturnLineIcon,
-    title: 'Devolución en 7 días',
-    text: 'Compra con tranquilidad.',
+    Icon: BottlesFrameLineIcon,
+    title: 'Más de 300\nreferencias',
+    text: 'Un catálogo curado, disponible para ti.',
+    motion: 'commit-icon--rise',
   },
   {
     Icon: GlobeSearchLineIcon,
-    title: 'Fragancias por encargo',
+    title: 'Fragancias\npor encargo',
     text: 'Encontramos perfumes de todo el mundo.',
+    motion: 'commit-icon--search',
   },
 ];
 
 /**
- * "Nuestro Compromiso" — cada card es un pedazo real de vidrio vertical
- * (placa de cristal generada con IA, centro transparente): arriba la gota
- * de cristal con el icono dentro, abajo el texto — todo DENTRO del vidrio.
+ * "Nuestro compromiso" (REQ-057) — cuatro pilares sobre fondo crema plano,
+ * íconos de línea fina y separadores verticales sutiles. Sin placas de vidrio
+ * ni gotas doradas: la referencia aprobada es minimalista.
+ *
+ * Al entrar en pantalla, cada ícono hace su micro-animación (REQ-061): una sola
+ * vez, escalonadas y con un gesto que refuerza su significado. Se respeta
+ * `prefers-reduced-motion`.
  */
 export default function CommitmentStrip() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          observer.disconnect(); // sin loops: se dispara una sola vez
+        }
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="shrink-0 border-t border-border bg-bg-alt">
-      <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-12 md:py-12">
-        <div className="mb-6 flex items-center justify-center gap-4 md:mb-8">
+    <div ref={ref} className="shrink-0 border-t border-border bg-bg-alt">
+      <div className="mx-auto max-w-[1400px] px-4 py-8 md:px-12 md:py-12">
+        <div className="mb-7 flex items-center justify-center gap-4 md:mb-10">
           <span className="h-px w-8 bg-border" />
           <span className="eyebrow">Nuestro compromiso</span>
           <span className="h-px w-8 bg-border" />
         </div>
 
-        {/* Fila horizontal de 4 en todos los tamaños */}
-        <div className="grid grid-cols-4 gap-2 md:gap-8">
-          {COMMITMENTS.map(({ Icon, title, text }) => (
+        {/* Los cuatro pilares en UNA sola fila, también en móvil (ANX-A),
+            separados por líneas verticales sutiles */}
+        <div className="grid grid-cols-4">
+          {COMMITMENTS.map(({ Icon, title, text, motion }, i) => (
             <div
               key={title}
-              className="relative mx-auto aspect-[504/720] w-full max-w-[230px]"
+              className={`flex flex-col items-center px-1.5 text-center sm:px-4 md:px-8 ${
+                i > 0 ? 'border-l border-border' : ''
+              }`}
             >
-              {/* Pedazo de vidrio — el contenedor ES la placa */}
-              <img
-                src="/images/commitment/glass-slab.webp"
-                alt=""
-                loading="lazy"
-                className="absolute inset-0 h-full w-full select-none object-fill"
-                draggable={false}
-              />
+              <span
+                className={`text-text-soft ${visible ? `commit-icon ${motion}` : 'opacity-0'}`}
+                style={{ animationDelay: `${i * 110}ms` }}
+              >
+                <Icon size={22} className="sm:hidden" />
+                <Icon size={30} className="hidden sm:block md:hidden" />
+                <Icon size={38} className="hidden md:block" />
+              </span>
 
-              {/* Contenido dentro del vidrio */}
-              <div className="relative flex h-full flex-col items-center px-[9%] pt-[9%] text-center md:pt-[11%]">
-                {/* Gota de cristal + icono suspendido */}
-                <span className="relative block w-10 md:w-28">
-                  <img
-                    src="/images/commitment/droplet-crystal.webp"
-                    alt=""
-                    loading="lazy"
-                    className="block h-auto w-full select-none"
-                    draggable={false}
-                  />
-                  <span className="absolute left-[46%] top-[45%] -translate-x-1/2 -translate-y-1/2 text-accent">
-                    <Icon size={11} className="md:hidden" />
-                    <Icon size={26} className="hidden md:block" />
-                  </span>
-                </span>
-
-                {/* Título + texto centrados en el espacio restante:
-                    el centro de la placa ya no queda vacío */}
-                <span className="flex w-full flex-1 flex-col items-center justify-center gap-0.5 pb-[16%] md:gap-2 md:pb-[18%]">
-                  <span className="font-body text-[6.5px] uppercase leading-snug tracking-[0.08em] text-text md:text-[13px] md:tracking-[0.18em]">
-                    {title}
-                  </span>
-                  <span className="line-clamp-2 font-display text-[7.5px] italic leading-snug text-text-muted md:line-clamp-none md:text-[15px]">
-                    {text}
-                  </span>
-                </span>
-              </div>
+              <h3 className="mt-2.5 whitespace-pre-line font-display text-[10px] font-light uppercase leading-tight tracking-[0.08em] text-text sm:text-sm sm:tracking-[0.12em] md:mt-5 md:text-lg">
+                {title}
+              </h3>
+              <p className="mt-1.5 line-clamp-3 font-display text-[9px] italic leading-snug text-text-muted sm:line-clamp-none sm:text-xs md:mt-2 md:text-sm">
+                {text}
+              </p>
             </div>
           ))}
         </div>

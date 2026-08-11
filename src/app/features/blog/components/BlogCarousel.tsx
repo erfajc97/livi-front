@@ -53,13 +53,13 @@ function BlogCard({ post }: { post: BlogPost }) {
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col p-5 md:p-6">
+      <div className="flex flex-1 flex-col p-4 md:p-5">
         <h3 className="line-clamp-2 font-display text-2xl font-light leading-tight text-text">
           {post.title}
         </h3>
 
         {/* Fecha de publicación + tiempo de lectura */}
-        <div className="mt-3 flex items-center gap-2 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">
+        <div className="mt-2 flex items-center gap-2 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">
           {date && <span>{date}</span>}
           {date && <span aria-hidden="true">·</span>}
           <svg
@@ -79,14 +79,14 @@ function BlogCard({ post }: { post: BlogPost }) {
         </div>
 
         {excerpt && (
-          <p className="mt-3 line-clamp-3 font-body text-sm leading-relaxed text-text-soft">
+          <p className="mt-2.5 line-clamp-2 font-body text-sm leading-relaxed text-text-soft">
             {excerpt}
           </p>
         )}
 
         {/* Línea + enlace al artículo (anclado al pie de la tarjeta) */}
-        <div className="mt-auto pt-5">
-          <div className="border-t border-border pt-4">
+        <div className="mt-auto pt-3.5">
+          <div className="border-t border-border pt-3">
             <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors group-hover/card:text-accent">
               Ver artículo
             </span>
@@ -140,11 +140,11 @@ export default function BlogCarousel() {
 
   if (isLoading) {
     return (
-      <section className="bg-bg px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
+      <section className="bg-bg px-6 py-8 md:px-14 md:py-12" aria-hidden="true">
         <div className="mx-auto max-w-7xl animate-pulse">
-          <div className="mx-auto h-10 w-40 rounded-sm bg-border-soft md:h-14" />
-          <div className="mt-6 border-t border-border-soft md:mt-8" />
-          <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
+          <div className="mx-auto h-10 w-40 rounded-sm bg-border-soft md:h-12" />
+          <div className="mt-4 border-t border-border-soft md:mt-5" />
+          <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className={i > 0 ? 'hidden md:block' : ''}>
                 <div className="aspect-[4/3] w-full bg-border-soft" />
@@ -162,16 +162,17 @@ export default function BlogCarousel() {
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
+    /* Sección compacta (REQ-006): mismo diseño, menos aire vertical */
+    <section className="bg-bg px-6 py-8 md:px-14 md:py-12">
       <div className="mx-auto max-w-7xl">
         {/* Título centrado con línea fina debajo */}
-        <h2 className="text-center font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-6xl">
+        <h2 className="text-center font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-5xl">
           Blog
         </h2>
-        <div className="mt-6 border-t border-border md:mt-8" />
+        <div className="mt-4 border-t border-border md:mt-5" />
 
         {/* Carrusel de tarjetas */}
-        <div className="relative mt-8 md:mt-12">
+        <div className="relative mt-6 md:mt-8">
           <RoundArrow direction="prev" onClick={scrollPrev} disabled={!canPrev} />
 
           <div className="overflow-hidden" ref={emblaRef}>
@@ -192,7 +193,7 @@ export default function BlogCarousel() {
 
         {/* Puntitos de avance */}
         {snapCount > 1 && (
-          <div className="mt-8 flex items-center justify-center gap-2">
+          <div className="mt-5 flex items-center justify-center gap-2">
             {Array.from({ length: snapCount }, (_, i) => {
               const active = i === selectedIndex;
               return (
@@ -212,7 +213,7 @@ export default function BlogCarousel() {
         )}
 
         {/* Enlace inferior centrado */}
-        <div className="mt-8 text-center md:mt-10">
+        <div className="mt-6 text-center md:mt-7">
           <a
             href="/blog"
             className="inline-block border-b border-text pb-1 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent"

@@ -108,6 +108,51 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
 }
 
+/* ── "Nuestro compromiso": cada ícono entra con un gesto propio al aparecer en
+      pantalla (REQ-061). Una sola pasada, sin loops: el bloque es informativo,
+      no decorativo. ───────────────────────────────────────────────────────── */
+.commit-icon {
+  animation-duration: 900ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+/* Autenticidad — el escudo "sella": entra apretado y asienta. */
+@keyframes commit-seal {
+  0%   { opacity: 0; transform: scale(0.82); }
+  55%  { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.commit-icon--seal { animation-name: commit-seal; }
+
+/* Envíos — el camión llega desde la izquierda y frena. */
+@keyframes commit-drive {
+  0%   { opacity: 0; transform: translateX(-14px); }
+  70%  { opacity: 1; transform: translateX(2px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.commit-icon--drive { animation-name: commit-drive; }
+
+/* Catálogo — los frascos suben a su repisa. */
+@keyframes commit-rise {
+  0%   { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.commit-icon--rise { animation-name: commit-rise; }
+
+/* Encargos — la lupa barre el globo. */
+@keyframes commit-search {
+  0%   { opacity: 0; transform: rotate(-10deg) scale(0.92); }
+  60%  { opacity: 1; transform: rotate(4deg) scale(1.02); }
+  100% { opacity: 1; transform: rotate(0) scale(1); }
+}
+.commit-icon--search { animation-name: commit-search; }
+
+@media (prefers-reduced-motion: reduce) {
+  .commit-icon { animation: none; opacity: 1; transform: none; }
+}
+
 /* ── Barra de promociones: los textos rotan solos (o con las flechas) y cada
       cambio entra deslizándose desde la derecha. ────────────────────────── */
 @keyframes announce-slide {

@@ -1,10 +1,5 @@
 ---
-import visaSvg from '@/assets/svg/visa.svg';
-import mastercardSvg from '@/assets/svg/mastercard.svg';
-import discoverSvg from '@/assets/svg/discover.svg';
-import amexSvg from '@/assets/svg/amex.svg';
-import dinnersSvg from '@/assets/svg/dinners.svg';
-import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
+import { PAYMENT_LOGOS } from '@/app/components/paymentLogos';
 import { FOOTER_LINKS_COL1 } from '../../data';
 
 const SOCIAL = [
@@ -13,18 +8,8 @@ const SOCIAL = [
   { label: 'Facebook', href: '#' },
 ];
 
-// Logos oficiales sin marcos: las tarjetas ya traen su propio fondo blanco.
-const PAYMENT_ICONS = [
-  { src: '/images/pagos/payphone-horizontal.svg', alt: 'Payphone', cls: 'h-9' },
-  { src: visaSvg.src, alt: 'Visa', cls: 'h-8' },
-  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-8' },
-  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-8' },
-  { src: amexSvg.src, alt: 'American Express', cls: 'h-8' },
-  { src: discoverSvg.src, alt: 'Discover', cls: 'h-8' },
-  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-5' },
-  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-5' },
-  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-5' },
-];
+// Catálogo compartido: mismos logos y alturas que ficha de producto, carrito y combos.
+const PAYMENT_ICONS = PAYMENT_LOGOS;
 
 const CONTACT = ['+593 99 230 5463', 'contacto@nondecants.com'];
 
@@ -32,7 +17,8 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="border-t border-border bg-bg-alt text-text-soft">
-  <div class="mx-auto max-w-[1600px] px-6 pb-8 pt-10 md:pb-10 md:pt-14 md:px-14">
+  <!-- pb-28 en mobile: la tab bar es fixed (~65px + safe area) y tapaba la última fila. -->
+  <div class="mx-auto max-w-[1600px] px-6 pb-28 pt-10 md:pb-10 md:pt-14 md:px-14">
     <div class="mb-8 grid grid-cols-1 gap-8 md:mb-12 md:gap-14 md:grid-cols-[1.6fr_1fr_1.2fr]">
 
       <!-- Marca -->

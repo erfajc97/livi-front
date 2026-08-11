@@ -6,8 +6,8 @@ import {
   useCarouselNav,
   useMediaCenterTop,
   CarouselArrow,
-  CarouselProgressBar,
 } from '@/app/components/UI/CarouselNav';
+import CarouselProgressTrack from '@/app/components/UI/CarouselProgressTrack';
 import type { Product } from '@/app/types/global.types';
 
 interface ProductCarouselSectionProps {
@@ -26,17 +26,19 @@ export default function ProductCarouselSection({
   showCTA = false,
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
-  // `slidesToScroll: 'auto'` agrupa exactamente lo que se ve en pantalla
-  // (2 en móvil, 3 en tablet, 4 en desktop). Antes desktop avanzaba de 5 en 5
-  // mostrando 4: con 5 productos Embla creía que todo cabía en una página y
-  // las flechas morían y la barra de avance no aparecía (REQ-004 / REQ-005).
+  // Avance de a una tarjeta (REQ-004 / REQ-014): con `slidesToScroll: 'auto'`
+  // la última página avanzaba una distancia distinta —el "salto" al llegar al
+  // final— y con pocos productos Embla llegaba a crear una sola página, con lo
+  // que las flechas quedaban muertas. De a una, el paso es siempre el mismo y
+  // hay flecha activa mientras sobre aunque sea media tarjeta.
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     duration: 32,
-    slidesToScroll: 'auto',
+    containScroll: 'trimSnaps',
+    slidesToScroll: 1,
   });
-  const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
+  const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
     useCarouselNav(emblaApi);
 
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -111,10 +113,12 @@ export default function ProductCarouselSection({
               className="absolute right-3 top-[34%] -translate-y-1/2 sm:right-12"
             />
 
-            <CarouselProgressBar
+            {/* Barra continua (REQ-026): un solo riel gris con el tramo activo
+                en negro, igual que en la ficha de producto */}
+            <CarouselProgressTrack
+              progress={progress}
               snapCount={snapCount}
-              selectedIndex={selectedIndex}
-              onSelect={scrollToIndex}
+              onSeek={seekRatio}
               className="mt-5 md:mt-7"
             />
           </div>

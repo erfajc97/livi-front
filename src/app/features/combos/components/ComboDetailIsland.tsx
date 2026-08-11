@@ -2,29 +2,13 @@ import { useState } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
-import visaSvg from '@/assets/svg/visa.svg';
-import mastercardSvg from '@/assets/svg/mastercard.svg';
-import dinnersSvg from '@/assets/svg/dinners.svg';
-import discoverSvg from '@/assets/svg/discover.svg';
-import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
+/* Medios de pago aceptados — mismo componente que la ficha de producto (ANX-28). */
+import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboDetailIslandProps {
   combo: Combo;
 }
-
-/* Medios de pago aceptados — mismo set que la ficha de producto (ANX-28):
-   tarjetas con su SVG propio + PayPhone horizontal y bancos desde /images/pagos. */
-const PAYMENT_LOGOS = [
-  { src: '/images/pagos/payphone-horizontal.svg', alt: 'PayPhone', cls: 'h-6' },
-  { src: visaSvg.src, alt: 'Visa', cls: 'h-10' },
-  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-10' },
-  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-10' },
-  { src: discoverSvg.src, alt: 'Discover', cls: 'h-10' },
-  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-6' },
-  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-6' },
-  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-6' },
-];
 
 function Tick() {
   return (
@@ -280,17 +264,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
 
         <div className="mt-4 border-t border-border pt-4">
           <span className="eyebrow">Pago</span>
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-3">
-            {PAYMENT_LOGOS.map((logo) => (
-              <img
-                key={logo.alt}
-                src={logo.src}
-                alt={logo.alt}
-                title={logo.alt}
-                className={`${logo.cls} w-auto object-contain`}
-              />
-            ))}
-          </div>
+          <PaymentMethodIcons className="mt-2.5" />
         </div>
       </div>
     </div>

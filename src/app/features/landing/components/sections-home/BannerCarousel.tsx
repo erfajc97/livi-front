@@ -95,10 +95,9 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
                     ) : (
                       <span />
                     )}
-                    {/* CTAs — tipografía fina (display serif) como el resto de
-                        los titulares editoriales */}
-                    {/* CTAs — en móvil pegados a la derecha; en desktop al
-                        extremo derecho de la fila inferior */}
+                    {/* CTA único y funcional (REQ-015): el botón fijo "Bajo Pedido"
+                        no era parametrizable desde el admin y se eliminó. En móvil
+                        va pegado a la derecha; en desktop cierra la fila inferior. */}
                     <div className="flex items-center gap-3 self-end md:self-auto">
                       <a
                         href={banner.link || '/catalogo/perfumes'}
@@ -106,12 +105,6 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
                       >
                         {banner.buttonText || 'Explorar colección'}
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
-                      </a>
-                      <a
-                        href="/bajo-pedido"
-                        className="inline-flex items-center border border-text/20 bg-bg/85 px-4 py-2.5 font-display text-[11px] uppercase tracking-[0.18em] text-text backdrop-blur-sm transition-colors hover:border-accent hover:text-accent md:px-5 md:py-3 md:text-xs"
-                      >
-                        Bajo Pedido
                       </a>
                     </div>
                   </div>

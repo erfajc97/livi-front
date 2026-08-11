@@ -1,39 +1,24 @@
-import visaSvg from '@/assets/svg/visa.svg';
-import mastercardSvg from '@/assets/svg/mastercard.svg';
-import dinnersSvg from '@/assets/svg/dinners.svg';
-import discoverSvg from '@/assets/svg/discover.svg';
-import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
-
-/**
- * Medios de pago aceptados — logos oficiales, sin marcos ni fondos: los SVG de
- * las tarjetas ya traen su propia tarjeta blanca, Payphone va en su versión
- * horizontal con nombre y los bancos se leen como wordmark sobre el fondo del
- * sitio.
- */
-const LOGOS = [
-  { src: '/images/pagos/payphone-horizontal.svg', alt: 'Payphone', cls: 'h-11' },
-  { src: visaSvg.src, alt: 'Visa', cls: 'h-10' },
-  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-10' },
-  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-10' },
-  { src: discoverSvg.src, alt: 'Discover', cls: 'h-10' },
-  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-6' },
-  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-6' },
-  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-6' },
-];
+import { PAYMENT_LOGOS } from './paymentLogos';
 
 interface PaymentMethodIconsProps {
   className?: string;
 }
 
+/**
+ * Medios de pago aceptados — logos oficiales, sin marcos ni fondos. El catálogo
+ * y las alturas viven en `paymentLogos.ts` para que footer, ficha de producto,
+ * carrito y combos se vean igual.
+ */
 export default function PaymentMethodIcons({ className = '' }: PaymentMethodIconsProps) {
   return (
-    <div className={`flex flex-wrap items-center gap-x-4 gap-y-3 ${className}`}>
-      {LOGOS.map((logo) => (
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-2.5 md:gap-x-4 md:gap-y-3 ${className}`}>
+      {PAYMENT_LOGOS.map((logo) => (
         <img
           key={logo.alt}
           src={logo.src}
           alt={logo.alt}
           title={logo.alt}
+          loading="lazy"
           className={`${logo.cls} w-auto object-contain`}
         />
       ))}

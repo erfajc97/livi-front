@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ProductCard from './ProductCard';
-import CarouselProgressTrack from './CarouselProgressTrack';
+import CarouselProgressTrack from '@/app/components/UI/CarouselProgressTrack';
 import {
   useCarouselNav,
   useMediaCenterTop,
