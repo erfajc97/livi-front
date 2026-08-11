@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import Loader from '@/app/components/Loader';
+import SearchableSelect from '@/app/components/UI/SearchableSelect';
+import { PROVINCE_NAMES, cantonsOf, ALL_CANTONS } from '@/app/data/ecuadorLocations';
 import { validateAddressForm } from '../validators';
 import type { Address, AddressPayload } from '../types';
 
 const INPUT =
   'w-full border border-border bg-surface px-3.5 py-3 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:outline-none transition-colors';
-const SELECT =
-  'w-full cursor-pointer appearance-none border border-border bg-surface px-3.5 py-3 font-body text-sm text-text focus:border-text focus:outline-none transition-colors';
 const LABEL = 'mb-2 block font-body text-[10px] uppercase tracking-[0.18em] text-text-muted';
 
 const EMPTY_FORM: AddressPayload = {
@@ -94,43 +94,25 @@ export default function AddressForm({ initial, isPending, onSubmit, onCancel }: 
         </div>
         <div>
           <label className={LABEL}>Provincia *</label>
-          <select
+          <SearchableSelect
             value={form.provincia}
-            onChange={(e) => updateField('provincia', e.target.value)}
-            className={SELECT}
-          >
-            <option value="">Seleccionar</option>
-            <option value="Guayas">Guayas</option>
-            <option value="Pichincha">Pichincha</option>
-            <option value="Azuay">Azuay</option>
-            <option value="Manabi">Manabí</option>
-            <option value="El Oro">El Oro</option>
-            <option value="Los Rios">Los Ríos</option>
-            <option value="Tungurahua">Tungurahua</option>
-            <option value="Imbabura">Imbabura</option>
-            <option value="Santo Domingo">Santo Domingo</option>
-            <option value="Santa Elena">Santa Elena</option>
-          </select>
+            options={PROVINCE_NAMES}
+            placeholder="Buscar provincia"
+            onChange={(v) => {
+              updateField('provincia', v);
+              // Al cambiar de provincia la ciudad anterior deja de tener sentido.
+              if (v !== form.provincia) updateField('ciudad', '');
+            }}
+          />
         </div>
         <div>
           <label className={LABEL}>Ciudad *</label>
-          <select
+          <SearchableSelect
             value={form.ciudad}
-            onChange={(e) => updateField('ciudad', e.target.value)}
-            className={SELECT}
-          >
-            <option value="">Seleccionar</option>
-            <option value="Guayaquil">Guayaquil</option>
-            <option value="Duran">Durán</option>
-            <option value="Samborondon">Samborondón</option>
-            <option value="Quito">Quito</option>
-            <option value="Cuenca">Cuenca</option>
-            <option value="Machala">Machala</option>
-            <option value="Manta">Manta</option>
-            <option value="Ambato">Ambato</option>
-            <option value="Ibarra">Ibarra</option>
-            <option value="Santo Domingo">Santo Domingo</option>
-          </select>
+            options={form.provincia ? cantonsOf(form.provincia) : ALL_CANTONS}
+            placeholder="Buscar ciudad"
+            onChange={(v) => updateField('ciudad', v)}
+          />
         </div>
         <div className="sm:col-span-2">
           <label className={LABEL}>Dirección *</label>

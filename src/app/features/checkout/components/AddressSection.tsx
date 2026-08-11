@@ -1,11 +1,15 @@
+import SearchableSelect from '@/app/components/UI/SearchableSelect';
+import { PROVINCE_NAMES, cantonsOf, ALL_CANTONS } from '@/app/data/ecuadorLocations';
 import type { CustomerFormData } from '../types';
 import type { Address } from '@/app/features/profile/types';
 
 const INPUT_CLASS =
   'w-full border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:ring-0 transition-colors';
 
+/* Mismo subrayado que el resto del checkout, para que el buscador no rompa la
+   línea visual de los campos. */
 const SELECT_CLASS =
-  'w-full cursor-pointer border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text-muted focus:border-text focus:ring-0 transition-colors';
+  'w-full border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text outline-none transition-colors placeholder:text-text-muted focus:border-text focus:ring-0';
 
 interface AddressSectionProps {
   customer: CustomerFormData;
@@ -159,43 +163,26 @@ export default function AddressSection({
         )}
 
         {!isPickup && (
-          <select
+          <SearchableSelect
             value={customer.province}
-            onChange={(e) => onChange('province', e.target.value)}
-            className={SELECT_CLASS}
-          >
-            <option value="">Provincia</option>
-            <option value="Guayas">Guayas</option>
-            <option value="Pichincha">Pichincha</option>
-            <option value="Azuay">Azuay</option>
-            <option value="Manabi">Manabí</option>
-            <option value="El Oro">El Oro</option>
-            <option value="Los Rios">Los Ríos</option>
-            <option value="Tungurahua">Tungurahua</option>
-            <option value="Imbabura">Imbabura</option>
-            <option value="Santo Domingo">Santo Domingo</option>
-            <option value="Santa Elena">Santa Elena</option>
-          </select>
+            options={PROVINCE_NAMES}
+            placeholder="Provincia"
+            inputClassName={SELECT_CLASS}
+            onChange={(v) => {
+              onChange('province', v);
+              if (v !== customer.province) onChange('city', '');
+            }}
+          />
         )}
 
-        <select
+        <SearchableSelect
           value={customer.city}
-          onChange={(e) => onChange('city', e.target.value)}
-          className={`${SELECT_CLASS} ${isPickup ? 'md:col-span-2' : ''}`}
-          required
-        >
-          <option value="">Ciudad *</option>
-          <option value="Guayaquil">Guayaquil</option>
-          <option value="Duran">Durán</option>
-          <option value="Samborondon">Samborondón</option>
-          <option value="Quito">Quito</option>
-          <option value="Cuenca">Cuenca</option>
-          <option value="Machala">Machala</option>
-          <option value="Manta">Manta</option>
-          <option value="Ambato">Ambato</option>
-          <option value="Ibarra">Ibarra</option>
-          <option value="Santo Domingo">Santo Domingo</option>
-        </select>
+          options={customer.province ? cantonsOf(customer.province) : ALL_CANTONS}
+          placeholder="Ciudad *"
+          inputClassName={SELECT_CLASS}
+          onChange={(v) => onChange('city', v)}
+          className={isPickup ? 'md:col-span-2' : ''}
+        />
 
         <input
           type="text"
