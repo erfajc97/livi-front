@@ -2,20 +2,20 @@ import AppProviders from '@/app/providers/AppProviders';
 import { useHomeHook } from '../../hooks/useHomeHook';
 import ProductCarouselSection from '../../components/sections-home/ProductCarouselSection';
 import ProductRankingSection from '../../components/sections-home/ProductRankingSection';
-import EditorialBlogSplit from '../../components/sections-home/EditorialBlogSplit';
+import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
 import HowItWorksSection from '../../components/sections-home/HowItWorksSection';
 
 function HomeContent() {
   const { sections, sectionsLoading } = useHomeHook();
 
   // Mientras cargan las secciones se pintan los esqueletos con la forma final
-  // del home: 1 carrusel + split editorial + pasos + ranking. Sin esto la
+  // del home: 1 carrusel + carrusel del blog + pasos + ranking. Sin esto la
   // página quedaba en blanco y todo saltaba al llegar la data.
   if (sectionsLoading) {
     return (
       <div className="bg-bg">
         <ProductCarouselSection title="" products={[]} isLoading num="01" />
-        <EditorialBlogSplit />
+        <BlogCarousel />
         <HowItWorksSection />
         <ProductRankingSection title="" products={[]} isLoading num="02" />
       </div>
@@ -23,7 +23,7 @@ function HomeContent() {
   }
 
   // Orden fijo de secciones por posición (no por order<=1):
-  // 1ª sección → carrusel · split editorial (blog) · 2ª sección → ranking · resto → carrusel
+  // 1ª sección → carrusel · carrusel del blog · 2ª sección → ranking · resto → carrusel
   const sorted = [...sections].sort((a, b) => a.order - b.order);
   const [first, second, ...rest] = sorted;
 
@@ -39,7 +39,7 @@ function HomeContent() {
         />
       )}
 
-      <EditorialBlogSplit />
+      <BlogCarousel />
 
       {/* "Tres pasos hacia tu fragancia" va ANTES del ranking */}
       <HowItWorksSection />

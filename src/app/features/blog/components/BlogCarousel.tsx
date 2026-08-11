@@ -1,87 +1,224 @@
-import { useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
+import { useBlogPostsQuery, type BlogPost } from '@/app/tanstack-queries/blogQuery';
+import { useCarouselNav } from '@/app/components/UI/CarouselNav';
 
-interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt?: string | null;
-  content?: string | null;
-  imageUrl: string | null;
+/**
+ * Sección Blog del home (REQ-006): carrusel de tarjetas editoriales.
+ * Desktop: 3 tarjetas por vista, flechas redondas a los lados y puntitos de
+ * avance. Mobile: 1 tarjeta a la vez, sin flechas, con puntitos.
+ * Los datos llegan por TanStack Query (misma query pública del blog).
+ */
+
+const fmtDate = (d?: string | null) => {
+  if (!d) return '';
+  const parts = new Intl.DateTimeFormat('es-ES', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).formatToParts(new Date(d));
+  return parts
+    .map((p) => (p.type === 'month' ? p.value.charAt(0).toUpperCase() + p.value.slice(1) : p.value))
+    .join('');
+};
+
+/** Tiempo de lectura estimado (~200 palabras por minuto). */
+const readingTime = (post: BlogPost) => {
+  const text = (post.content || post.excerpt || '').replace(/<[^>]+>/g, ' ');
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+};
+
+const excerptOf = (post: BlogPost) =>
+  post.excerpt || (post.content ? post.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
+
+function BlogCard({ post }: { post: BlogPost }) {
+  const date = fmtDate(post.publishedAt || post.createdAt);
+  const excerpt = excerptOf(post);
+
+  return (
+    <a
+      href={`/blog/${post.slug}`}
+      className="group/card flex h-full flex-col border border-border bg-surface"
+    >
+      {/* Imagen con categoría encima, abajo a la izquierda */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface-raised">
+        <img
+          src={post.imageUrl || '/banner-catalog.png'}
+          alt={post.title}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover/card:scale-[1.03]"
+        />
+        <span className="absolute bottom-3 left-3 font-body text-[10px] uppercase tracking-[0.24em] text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.45)]">
+          Blog
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col p-5 md:p-6">
+        <h3 className="line-clamp-2 font-display text-2xl font-light leading-tight text-text">
+          {post.title}
+        </h3>
+
+        {/* Fecha de publicación + tiempo de lectura */}
+        <div className="mt-3 flex items-center gap-2 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">
+          {date && <span>{date}</span>}
+          {date && <span aria-hidden="true">·</span>}
+          <svg
+            className="h-3 w-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+          <span>{readingTime(post)} min</span>
+        </div>
+
+        {excerpt && (
+          <p className="mt-3 line-clamp-3 font-body text-sm leading-relaxed text-text-soft">
+            {excerpt}
+          </p>
+        )}
+
+        {/* Línea + enlace al artículo (anclado al pie de la tarjeta) */}
+        <div className="mt-auto pt-5">
+          <div className="border-t border-border pt-4">
+            <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors group-hover/card:text-accent">
+              Ver artículo
+            </span>
+          </div>
+        </div>
+      </div>
+    </a>
+  );
 }
 
-interface BlogCarouselProps {
-  posts: BlogPost[];
+function RoundArrow({
+  direction,
+  onClick,
+  disabled,
+}: {
+  direction: 'prev' | 'next';
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  const isPrev = direction === 'prev';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={isPrev ? 'Anterior' : 'Siguiente'}
+      className={`absolute top-1/2 z-10 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface text-text shadow-[0_2px_12px_rgba(28,26,23,0.12)] transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-30 md:flex ${
+        isPrev ? '-left-2 lg:-left-5' : '-right-2 lg:-right-5'
+      }`}
+    >
+      <svg
+        className="h-4 w-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d={isPrev ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />
+      </svg>
+    </button>
+  );
 }
 
-export default function BlogCarousel({ posts }: BlogCarouselProps) {
+export default function BlogCarousel() {
+  const { data: posts = [], isLoading } = useBlogPostsQuery();
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+  const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
+    useCarouselNav(emblaApi);
 
-  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
+  if (isLoading) {
+    return (
+      <section className="bg-bg px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
+        <div className="mx-auto max-w-7xl animate-pulse">
+          <div className="mx-auto h-10 w-40 rounded-sm bg-border-soft md:h-14" />
+          <div className="mt-6 border-t border-border-soft md:mt-8" />
+          <div className="mt-10 grid gap-6 md:mt-14 md:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className={i > 0 ? 'hidden md:block' : ''}>
+                <div className="aspect-[4/3] w-full bg-border-soft" />
+                <div className="mt-5 h-6 w-4/5 rounded-sm bg-border-soft" />
+                <div className="mt-3 h-3 w-1/2 rounded-sm bg-border-soft" />
+                <div className="mt-3 h-4 w-full rounded-sm bg-border-soft" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-white border-t border-border pt-8 pb-14 px-4">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="font-heading text-xl sm:text-2xl font-black md:text-3xl text-bg uppercase tracking-wide mb-8 px-4 sm:px-12">
-          Más del blog
+    <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
+      <div className="mx-auto max-w-7xl">
+        {/* Título centrado con línea fina debajo */}
+        <h2 className="text-center font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-6xl">
+          Blog
         </h2>
+        <div className="mt-6 border-t border-border md:mt-8" />
 
-        <div className="relative flex items-center group">
-          <button
-            onClick={scrollPrev}
-            aria-label="Anterior"
-            className="absolute left-0 sm:left-2 lg:-left-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-accent text-black shadow-lg hover:scale-105 transition-transform"
-          >
-            <div className="bg-bg w-9 h-9 flex items-center justify-center rounded-full text-white">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
-              </svg>
-            </div>
-          </button>
+        {/* Carrusel de tarjetas */}
+        <div className="relative mt-8 md:mt-12">
+          <RoundArrow direction="prev" onClick={scrollPrev} disabled={!canPrev} />
 
-          <div className="overflow-hidden w-full px-2 sm:px-12" ref={emblaRef}>
+          <div className="overflow-hidden" ref={emblaRef}>
             <div className="flex">
               {posts.map((post) => (
-                <div key={post.slug} className="px-2 shrink-0 basis-full sm:basis-1/2 lg:basis-1/3">
-                  <a href={`/blog/${post.slug}`} className="group/card flex flex-col border border-border rounded-2xl overflow-hidden h-full">
-                    <img
-                      src={post.imageUrl || '/home-3.png'}
-                      alt={post.title}
-                      className="w-full h-52 object-cover"
-                      loading="lazy"
-                    />
-                    <div className="flex flex-col items-center gap-4 p-6 flex-1">
-                      <h3 className="font-heading text-base font-bold text-black text-center group-hover/card:text-text-muted transition-colors line-clamp-2">
-                        {post.title}
-                      </h3>
-                      {(post.content || post.excerpt) && (
-                        <p className="font-body text-sm leading-relaxed text-text-muted text-center line-clamp-3">
-                          {post.content || post.excerpt}
-                        </p>
-                      )}
-                      <span className="mt-auto w-full py-2.5 bg-black text-white font-heading text-sm font-bold uppercase tracking-wider text-center rounded-full group-hover/card:bg-black/80 transition-colors">
-                        Leer el post
-                      </span>
-                    </div>
-                  </a>
+                <div
+                  key={post.slug}
+                  className="min-w-0 shrink-0 basis-full px-1 sm:basis-1/2 md:px-3 lg:basis-1/3"
+                >
+                  <BlogCard post={post} />
                 </div>
               ))}
             </div>
           </div>
 
-          <button
-            onClick={scrollNext}
-            aria-label="Siguiente"
-            className="absolute right-0 sm:right-2 lg:-right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-accent text-black shadow-lg hover:scale-105 transition-transform"
+          <RoundArrow direction="next" onClick={scrollNext} disabled={!canNext} />
+        </div>
+
+        {/* Puntitos de avance */}
+        {snapCount > 1 && (
+          <div className="mt-8 flex items-center justify-center gap-2">
+            {Array.from({ length: snapCount }, (_, i) => {
+              const active = i === selectedIndex;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => scrollToIndex(i)}
+                  aria-label={`Ir a la página ${i + 1} de ${snapCount}`}
+                  aria-current={active}
+                  className={`h-1.5 rounded-full transition-all ${
+                    active ? 'w-4 bg-text' : 'w-1.5 bg-border hover:bg-text-muted'
+                  }`}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {/* Enlace inferior centrado */}
+        <div className="mt-8 text-center md:mt-10">
+          <a
+            href="/blog"
+            className="inline-block border-b border-text pb-1 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent"
           >
-            <div className="bg-bg w-9 h-9 flex items-center justify-center rounded-full text-white">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"/>
-              </svg>
-            </div>
-          </button>
+            Descubre el blog
+          </a>
         </div>
       </div>
     </section>

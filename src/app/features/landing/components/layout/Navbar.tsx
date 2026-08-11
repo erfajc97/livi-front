@@ -103,15 +103,15 @@ export default function Navbar() {
                 <MegaTrigger id="perfumes" label="Perfumes" href="/catalogo/perfumes" />
                 <NavLink label="Combos" href="/catalogo/combos" />
                 <MegaTrigger id="bajoPedido" label="Bajo Pedido" href="/bajo-pedido" />
-                <NavLink label="Journal" href="/blog" muted />
+                <NavLink label="Blog" href="/blog" muted />
               </nav>
             </div>
 
             {/* Centro: logo */}
-            <a href="/" className="justify-self-center text-text" aria-label="NönDecants — Inicio">
+            <a href="/" className="justify-self-center text-text" aria-label="NonDecants — Inicio">
               <img
                 src="/logonondecants.png"
-                alt="NönDecants"
+                alt="NonDecants"
                 width={543}
                 height={127}
                 className="h-6 w-auto sm:h-7 md:h-9"
@@ -174,7 +174,12 @@ export default function Navbar() {
       </header>
 
       {/* Bottom tab líquida — experimento mobile */}
-      <LiquidTabBar pathname={pathname} itemCount={itemCount} />
+      <LiquidTabBar
+        pathname={pathname}
+        itemCount={itemCount}
+        isAuthenticated={isAuthenticated}
+        onAuthOpen={() => setAuthOpen(true)}
+      />
 
       <AuthModalIsland open={authOpen} onClose={() => setAuthOpen(false)} />
     </AppProviders>

@@ -86,24 +86,15 @@ function CatalogContent({
     if (marca) activeChips.push({ key: 'marca', label: marca.name, onRemove: () => setMarcaId(initialMarcaId) });
   }
 
-  // Chips rápidos (género + momento) — valores reales del back
-  const quickChips = [
-    ...CATALOG_GENDERS.map((g) => ({
-      key: `g-${g.value}`,
-      label: g.label,
-      active: filters.gender === g.value,
-      onToggle: () => setGender(filters.gender === g.value ? '' : (g.value as never)),
-    })),
-    ...CATALOG_TIME_OF_DAY.map((t0) => ({
-      key: `t-${t0.value}`,
-      label: t0.label,
-      active: filters.timeOfDay === t0.value,
-      onToggle: () => setTimeOfDay(filters.timeOfDay === t0.value ? '' : (t0.value as never)),
-    })),
-  ];
+  // Género/ocasión se eligieron en el panel de filtros (secciones 2 y 3);
+  // aquí solo quedan los chips de filtros activos, removibles.
 
   const filtersNode = (
     <CatalogFilters
+      gender={filters.gender}
+      onGenderChange={setGender}
+      timeOfDay={filters.timeOfDay}
+      onTimeOfDayChange={setTimeOfDay}
       concentration={filters.concentration}
       onConcentrationChange={setConcentration}
       projection={filters.projection}
@@ -132,8 +123,8 @@ function CatalogContent({
         marcaId={filters.marcaId}
       />
 
-      {/* Búsqueda + chips rápidos */}
-      <div className="flex flex-col gap-5 border-b border-border px-6 py-7 md:px-14 md:py-9">
+      {/* Búsqueda */}
+      <div className="border-b border-border px-6 py-7 md:px-14 md:py-9">
         <input
           type="search"
           value={filters.search}
@@ -141,31 +132,22 @@ function CatalogContent({
           placeholder="Buscar fragancia o casa…"
           className="w-full max-w-md border-b border-border bg-transparent pb-2 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:outline-none"
         />
-        <div className="flex flex-wrap gap-2.5">
-          {quickChips.map((q) => (
-            <button
-              key={q.key}
-              type="button"
-              onClick={q.onToggle}
-              className={`border px-4 py-2 font-body text-[11px] uppercase tracking-[0.1em] transition-colors ${
-                q.active ? 'border-text bg-text text-bg' : 'border-border text-text hover:border-text'
-              }`}
-            >
-              {q.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Barra de filtros sticky: activos · conteo · orden */}
       <div className="sticky top-0 z-20 border-b border-border bg-bg/95 backdrop-blur-sm">
         <div className="flex flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between md:px-14">
           <div className="flex flex-wrap items-center gap-3">
+            {/* Acceso a filtros — solo mobile: botón oscuro claro y visible
+                (la barra lateral ya está siempre visible en desktop). */}
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="border-b border-text pb-1 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:text-accent lg:cursor-default"
+              className="inline-flex items-center gap-2 bg-text px-4 py-2.5 font-body text-[11px] uppercase tracking-[0.14em] text-bg transition-colors hover:bg-accent md:hidden"
             >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
               Filtros{activeChips.length ? ` (${activeChips.length})` : ''}
             </button>
             {activeChips.map((chip) => (

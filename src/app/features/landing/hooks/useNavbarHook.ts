@@ -6,9 +6,9 @@ export const NAV_LINKS = [
   { href: '/',                   label: 'Inicio',             exact: true,  dropdown: false,      dropdownId: '' },
   { href: '/catalogo/perfumes',  label: 'Perfumes',           exact: true,  dropdown: true,       dropdownId: 'perfumes' },
   { href: '/catalogo/combos',    label: 'Combos',             exact: true,  dropdown: false,      dropdownId: '' },
-  { href: '/bajo-pedido',        label: 'Bajo Pedido',        exact: true,  dropdown: true,       dropdownId: 'bajoPedido' },
+  { href: '/bajo-pedido',        label: 'Bajo pedido',        exact: true,  dropdown: true,       dropdownId: 'bajoPedido' },
   { href: '/blog',               label: 'Blog',               exact: true,  dropdown: false,      dropdownId: '' },
-  { href: '/rastrear',           label: 'Rastrear tú pedido', exact: true,  dropdown: false,      dropdownId: '' },
+  { href: '/rastrear',           label: 'Rastrear tu pedido', exact: true,  dropdown: false,      dropdownId: '' },
 ];
 
 export function isLinkActive(href: string, currentUrl: string, exact: boolean) {
@@ -65,6 +65,33 @@ export function useNavbarHook() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  // REQ-038 — scroll-lock: con el menú móvil abierto, el fondo no se mueve.
+  // Se compensa el ancho del scrollbar para evitar el salto de layout y se
+  // restaura todo al cerrar el menú (o al desmontar).
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const { body } = document;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
+
+    // Si el viewport pasa a desktop con el menú abierto, se cierra solo:
+    // el botón hamburguesa es md:hidden y sin esto el scroll quedaría
+    // bloqueado sin forma visible de cerrarlo.
+    const handleResize = () => {
+      if (window.innerWidth >= 768) setMobileOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+    };
+  }, [mobileOpen]);
 
   // Close dropdown on click outside or Escape
   useEffect(() => {

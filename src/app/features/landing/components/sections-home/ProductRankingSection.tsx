@@ -12,7 +12,6 @@ interface ProductRankingSectionProps {
   title: string;
   products: Product[];
   isLoading?: boolean;
-  num?: string;
   viewAllHref?: string;
 }
 
@@ -32,15 +31,27 @@ const TIME_LABELS: Record<string, string> = { DIA: 'Día', NOCHE: 'Noche' };
 function derive(p: Product) {
   const imgs = (p.images ?? []).map((i: any) => (typeof i === 'string' ? i : i.url)).filter(Boolean);
   const image = imgs[0] || p.image || p.imageUrl;
-  const prices = (p.variants ?? []).map((v) => v.price);
-  const minPrice = prices.length ? Math.min(...prices) : p.price ?? 0;
-  const formatCount = (p.variants?.length ?? 0) || 1;
+
+  // Precio del ranking: SIEMPRE el decant de entrada (el de menor ml, sin
+  // frasco), mostrado como "Desde $X" (REQ-013). Se prefiere la lista compacta
+  // `formats` del backend; si no está, se deriva de las variantes cargadas.
+  const formats = (p.formats && p.formats.length
+    ? p.formats
+    : (p.variants ?? []).map((v) => ({ ml: v.ml, price: v.price, isFullBottle: v.isFullBottle }))
+  ).filter((f) => f.price > 0);
+  const entryDecant = formats
+    .filter((f) => !f.isFullBottle)
+    .slice()
+    .sort((a, b) => a.ml - b.ml)[0];
+  const cheapest = formats.slice().sort((a, b) => a.price - b.price)[0];
+  const entryPrice = entryDecant?.price ?? cheapest?.price ?? p.minFormatPrice ?? p.price ?? 0;
+
   const tags = [
     p.gender && (GENDER_LABELS[p.gender] ?? p.gender),
     p.timeOfDay && (TIME_LABELS[p.timeOfDay] ?? p.timeOfDay),
     p.concentration && (CONCENTRATION_SHORT[p.concentration] ?? p.concentration),
   ].filter(Boolean);
-  return { image, minPrice, formatCount, tags: tags.join(' · '), href: productUrl(p) };
+  return { image, entryPrice, tags: tags.join(' · '), href: productUrl(p) };
 }
 
 const Arrow = () => (
@@ -53,7 +64,6 @@ export default function ProductRankingSection({
   title,
   products,
   isLoading = false,
-  num = '02',
   viewAllHref = '/catalogo',
 }: ProductRankingSectionProps) {
   // Página actual de la lista (hook antes de cualquier return condicional).
@@ -64,10 +74,11 @@ export default function ProductRankingSection({
     return (
       <section className="bg-bg px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
         <div className="mx-auto max-w-7xl animate-pulse">
-          <div className="mb-6 h-3 w-40 rounded-sm bg-bg-alt md:mb-12" />
-          <div className="hidden items-start gap-12 md:grid md:grid-cols-[1.05fr_1fr]">
-            <div>
-              <div className="aspect-square w-full bg-bg-alt" />
+          <div className="mb-6 h-8 w-52 rounded-sm bg-bg-alt md:mb-12 md:h-10 md:w-72" />
+          <div className="hidden items-start gap-12 md:grid md:grid-cols-[0.75fr_1.25fr]">
+            <div className="border border-border p-6 md:p-8">
+              <div className="h-8 w-10 rounded-sm bg-bg-alt" />
+              <div className="mx-auto mt-4 aspect-square w-full max-w-[280px] bg-bg-alt" />
               <div className="mt-6 h-6 w-3/5 rounded-sm bg-bg-alt" />
             </div>
             <div className="flex flex-col">
@@ -117,39 +128,28 @@ export default function ProductRankingSection({
   return (
     <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
       <div className="mx-auto max-w-7xl">
-        {/* Header editorial */}
+        {/* Header de sección — título en Cormorant Garamond (REQ-028) */}
         <div className="mb-6 flex items-baseline justify-between md:mb-12">
-          <div className="flex items-baseline gap-4">
-            <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">— {num}</span>
-            <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft md:text-[11px]">{title}</span>
-          </div>
-          <a href={viewAllHref} className="hidden border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block">
+          <h2 className="font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-5xl">{title}</h2>
+          <a href={viewAllHref} className="hidden shrink-0 border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block">
             Ver el ranking completo
           </a>
         </div>
 
-        {/* ── Desktop: #1 destacado + lista 02–05 ── */}
-        <div className="hidden items-start gap-12 md:grid md:grid-cols-[1.05fr_1fr]">
+        {/* ── Desktop: #1 destacado (card compacta con marco, ref. ANX-10) + lista 02–05 ── */}
+        <div className="hidden items-start gap-12 md:grid md:grid-cols-[0.75fr_1.25fr]">
           {/* Featured #1 */}
-          <a href={t.href} className="group block">
-            <div className="relative aspect-square overflow-hidden bg-surface-raised">
+          <a href={t.href} className="group block border border-border bg-surface-raised p-6 transition-colors duration-300 hover:border-text-muted md:p-8">
+            <span className="font-display text-3xl leading-none text-text md:text-4xl">01</span>
+            <div className="mx-auto mt-4 aspect-square w-full max-w-[240px] overflow-hidden md:max-w-[280px]">
               {t.image && (
-                <img src={t.image} alt={top.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" />
+                <img src={t.image} alt={top.name} className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]" />
               )}
-              <span className="absolute left-6 top-6 bg-black/55 px-3 py-1.5 font-display text-sm italic tracking-wide text-white">
-                — Número uno
-              </span>
             </div>
-            <div className="mt-6 grid grid-cols-[36px_1fr_auto] items-baseline gap-4">
-              <span className="font-display text-4xl font-light italic leading-none text-accent">01</span>
-              <div>
-                {t.tags && <span className="eyebrow">{t.tags}</span>}
-                <div className="mt-2 font-display text-3xl font-light leading-none tracking-[-0.01em] text-text">{top.name}</div>
-              </div>
-              <div className="text-right">
-                <div className="font-body text-sm text-text">Desde {formatCurrency(t.minPrice)}</div>
-                <div className="mt-1 font-body text-[10px] uppercase tracking-[0.18em] text-text-muted">{t.formatCount} formatos</div>
-              </div>
+            <div className="mt-6">
+              <div className="font-display text-2xl font-light leading-tight tracking-[-0.01em] text-text">{top.name}</div>
+              {t.tags && <span className="eyebrow mt-2 block">{t.tags}</span>}
+              <div className="mt-3 font-body text-sm text-text">Desde {formatCurrency(t.entryPrice)}</div>
             </div>
           </a>
 
@@ -159,17 +159,17 @@ export default function ProductRankingSection({
               const d = derive(p);
               return (
                 <a key={p.id} href={d.href} className="group grid grid-cols-[40px_120px_1fr_auto] items-center gap-6 border-b border-border py-6 first:border-t">
-                  <span className="font-display text-3xl italic leading-none text-accent">{rankAt(i)}</span>
-                  <div className="h-32 w-full overflow-hidden bg-surface-raised">
-                    {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />}
+                  <span className="font-display text-3xl leading-none text-text">{rankAt(i)}</span>
+                  <div className="h-32 w-full overflow-hidden border border-border bg-surface-raised p-2">
+                    {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.03]" />}
                   </div>
                   <div>
-                    {d.tags && <span className="eyebrow">{d.tags}</span>}
-                    <div className="mt-1.5 font-display text-[22px] font-light leading-tight text-text">{p.name}</div>
+                    <div className="font-display text-[22px] font-light leading-tight text-text">{p.name}</div>
+                    {d.tags && <span className="eyebrow mt-1.5 block">{d.tags}</span>}
                   </div>
-                  <div className="text-right">
-                    <div className="font-body text-[13px] text-text">{formatCurrency(d.minPrice)}</div>
-                    <span className="mt-2 ml-auto block w-fit text-text-soft transition-colors group-hover:text-accent"><Arrow /></span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-body text-[13px] text-text">Desde {formatCurrency(d.entryPrice)}</span>
+                    <span className="text-text-soft transition-colors group-hover:text-accent"><Arrow /></span>
                   </div>
                 </a>
               );
@@ -179,10 +179,10 @@ export default function ProductRankingSection({
                 faltan en la última página para evitar el salto de altura */}
             {Array.from({ length: PER_PAGE - list.length }, (_, i) => (
               <div key={`ph-d-${i}`} aria-hidden className="invisible grid grid-cols-[40px_120px_1fr_auto] items-center gap-6 border-b border-border py-6 first:border-t">
-                <span className="font-display text-3xl italic leading-none">00</span>
+                <span className="font-display text-3xl leading-none">00</span>
                 <div className="h-32 w-full" />
                 <div>
-                  <div className="mt-1.5 font-display text-[22px] font-light leading-tight">&nbsp;</div>
+                  <div className="font-display text-[22px] font-light leading-tight">&nbsp;</div>
                 </div>
                 <div className="font-body text-[13px]">&nbsp;</div>
               </div>
@@ -212,7 +212,7 @@ export default function ProductRankingSection({
                 <div>
                   {d.tags && <span className="eyebrow">{d.tags}</span>}
                   <div className="mt-1 font-display text-lg font-light leading-tight text-text">{p.name}</div>
-                  <div className="mt-1 font-body text-[11px] text-text-soft">Desde {formatCurrency(d.minPrice)}</div>
+                  <div className="mt-1 font-body text-[11px] text-text-soft">Desde {formatCurrency(d.entryPrice)}</div>
                 </div>
               </a>
             );

@@ -15,8 +15,6 @@ interface ProductCarouselSectionProps {
   products: Product[];
   isLoading?: boolean;
   showCTA?: boolean;
-  /** Número editorial mostrado a la izquierda del título (— 01) */
-  num?: string;
   /** Ruta del enlace "Ver todo" (oculto en móvil) */
   viewAllHref?: string;
 }
@@ -26,20 +24,17 @@ export default function ProductCarouselSection({
   products,
   isLoading = false,
   showCTA = false,
-  num = '01',
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
-  // `slidesToScroll`: las flechas avanzan lo que se ve en pantalla —
-  // 2 columnas en móvil, 3 en tablet y páginas de 5 en desktop.
+  // `slidesToScroll: 'auto'` agrupa exactamente lo que se ve en pantalla
+  // (2 en móvil, 3 en tablet, 4 en desktop). Antes desktop avanzaba de 5 en 5
+  // mostrando 4: con 5 productos Embla creía que todo cabía en una página y
+  // las flechas morían y la barra de avance no aparecía (REQ-004 / REQ-005).
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     duration: 32,
-    slidesToScroll: 2, // móvil: 2 visibles
-    breakpoints: {
-      '(min-width: 768px)': { slidesToScroll: 3 }, // tablet: 3 visibles
-      '(min-width: 1024px)': { slidesToScroll: 5 }, // desktop: 5 en 5
-    },
+    slidesToScroll: 'auto',
   });
   const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
     useCarouselNav(emblaApi);
@@ -50,19 +45,18 @@ export default function ProductCarouselSection({
   return (
     <section className="bg-bg px-4 pb-10 pt-10 md:pb-14 md:pt-20">
       <div className="mx-auto max-w-7xl">
-        {/* Header editorial — — {num} · {label} · Ver todo */}
+        {/* Header de sección — título en Cormorant Garamond (REQ-028) · Ver todo */}
         <div className="mb-5 flex items-baseline justify-between px-2 sm:px-12 md:mb-9">
-          <div className="flex items-baseline gap-4">
-            <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">
-              — {num}
-            </span>
-            <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft md:text-[11px]">
+          {isLoading ? (
+            <div className="h-8 w-52 animate-pulse rounded-sm bg-bg-alt md:h-10 md:w-72" />
+          ) : (
+            <h2 className="font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-5xl">
               {title}
-            </span>
-          </div>
+            </h2>
+          )}
           <a
             href={viewAllHref}
-            className="hidden border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block"
+            className="hidden shrink-0 border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block"
           >
             Ver todo
           </a>

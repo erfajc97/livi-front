@@ -2,18 +2,35 @@ import { useState } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
+import visaSvg from '@/assets/svg/visa.svg';
+import mastercardSvg from '@/assets/svg/mastercard.svg';
+import dinnersSvg from '@/assets/svg/dinners.svg';
+import discoverSvg from '@/assets/svg/discover.svg';
+import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboDetailIslandProps {
   combo: Combo;
 }
 
-function TrustRow({ label, value }: { label: string; value: string }) {
+/* Medios de pago aceptados — mismo set que la ficha de producto (ANX-28):
+   tarjetas con su SVG propio + PayPhone horizontal y bancos desde /images/pagos. */
+const PAYMENT_LOGOS = [
+  { src: '/images/pagos/payphone-horizontal.svg', alt: 'PayPhone', cls: 'h-6' },
+  { src: visaSvg.src, alt: 'Visa', cls: 'h-10' },
+  { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-10' },
+  { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-10' },
+  { src: discoverSvg.src, alt: 'Discover', cls: 'h-10' },
+  { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-6' },
+  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-6' },
+  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-6' },
+];
+
+function Tick() {
   return (
-    <div className="grid grid-cols-[96px_1fr] items-baseline gap-4">
-      <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— {label}</span>
-      <span className="font-display text-sm italic leading-snug text-text-soft">{value}</span>
-    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="shrink-0 text-accent">
+      <path d="M5 12.5L10 17.5L20 7" />
+    </svg>
   );
 }
 
@@ -95,7 +112,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   return (
     <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[0.8fr_1fr] md:gap-12">
       {/* Imagen — compacta, cabe en el viewport */}
-      <div className="relative h-[46svh] overflow-hidden bg-surface-raised sm:h-[54svh] md:h-[calc(100svh-13rem)] md:max-h-[560px]">
+      <div className="relative h-[46svh] overflow-hidden bg-surface-raised sm:h-[54svh] md:h-[calc(100svh-16rem)] md:max-h-[440px]">
         {(active.imageUrl || combo.imageUrl) ? (
           <img src={active.imageUrl || combo.imageUrl} alt={combo.name} className="h-full w-full object-cover" />
         ) : (
@@ -127,7 +144,15 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           {combo.name}
         </h1>
         {active.description && (
-          <p className="mt-3 max-w-md font-body text-sm leading-relaxed text-text-soft">{active.description}</p>
+          <div className="mt-3 max-w-md">
+            <p className="line-clamp-4 font-body text-sm leading-relaxed text-text-soft">{active.description}</p>
+            <a
+              href={`/combo/${active.id}`}
+              className="mt-2 inline-block border-b border-border pb-0.5 font-body text-[10px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent"
+            >
+              Leer más
+            </a>
+          </div>
         )}
 
         {/* Selector de versión — mismo combo, otra composición/precio */}
@@ -244,11 +269,28 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           </div>
         </div>
 
-        {/* Confianza */}
-        <div className="mt-5 space-y-2.5 border-t border-border pt-4">
-          <TrustRow label="Autenticidad" value="Verificado por NönDecants" />
-          <TrustRow label="Entrega" value={comboHasBajoPedido ? 'Curado bajo pedido · 13–17 días' : 'Servientrega 24–72h · todo el Ecuador'} />
-          <TrustRow label="Pago" value="Tarjeta · Transferencia · PayPhone" />
+        {/* Garantías + pago — mismo formato que la ficha de producto (ANX-28).
+            La entrega ya sale destacada arriba; aquí solo las garantías. */}
+        <div className="mt-5 border-t border-border pt-4">
+          <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
+            <span className="flex items-center gap-2"><Tick /> Autenticidad garantizada</span>
+            <span className="flex items-center gap-2"><Tick /> Envíos nacionales a todo Ecuador</span>
+          </div>
+        </div>
+
+        <div className="mt-4 border-t border-border pt-4">
+          <span className="eyebrow">Pago</span>
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-3">
+            {PAYMENT_LOGOS.map((logo) => (
+              <img
+                key={logo.alt}
+                src={logo.src}
+                alt={logo.alt}
+                title={logo.alt}
+                className={`${logo.cls} w-auto object-contain`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

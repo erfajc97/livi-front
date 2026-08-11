@@ -1,4 +1,4 @@
-// Fuente única de verdad para todos los endpoints de la API NönDecants
+// Fuente única de verdad para todos los endpoints de la API NonDecants
 // Backend: http://localhost:3030/api
 export const API_ENDPOINTS = {
   // ── Auth ────────────────────────────────────────
@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
 
   // ── Users ───────────────────────────────────────
   USER_ME:                    '/users/me',             // GET (auth) / PATCH (auth)
+  USER_ADDRESSES:             '/users/me/addresses',   // GET list / POST create (auth) · + /:id PATCH/DELETE · + /:id/default PATCH
   USERS:                      '/users',                // GET all (admin), POST create (public)
   USER:                       '/users',                // + /:id GET/PATCH/DELETE
 

@@ -11,8 +11,8 @@ interface MobileMenuProps {
 
 /**
  * Menú móvil — misma dirección editorial (Atelier) que la navbar de escritorio:
- * tipografía DM Sans en versalitas con tracking, nombres de marca en serif
- * display, líneas finas `border-border`, sin píldoras ni acentos rellenos.
+ * opciones en serif display capitalizada (REQ-036), líneas finas
+ * `border-border`, sin píldoras ni acentos rellenos.
  */
 export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -43,7 +43,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     // Al cambiar de sección se cierran las categorías abiertas
                     setExpandedCat(null);
                   }}
-                  className="flex w-full items-center justify-between py-4 font-display text-base uppercase tracking-[0.14em]"
+                  className="flex w-full items-center justify-between py-4 font-display text-base tracking-[0.04em]"
                   aria-expanded={isOpen}
                 >
                   <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
@@ -122,7 +122,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-display text-base uppercase tracking-[0.14em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
+              className={`border-b border-border py-4 font-display text-base tracking-[0.04em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
             >
               {link.label}
             </a>
@@ -130,11 +130,16 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
         })}
       </nav>
 
-      {/* Fila de utilidades — solo el aviso de envíos, un poco más grande */}
-      <div className="flex flex-col gap-4 bg-bg-alt px-6 py-7">
+      {/* Fila de utilidades — aviso de envíos + logo de Servientrega (REQ-037) */}
+      <div className="flex items-center gap-4 bg-bg-alt px-6 py-7">
         <span className="font-body text-sm tracking-[0.04em] text-text-muted">
-          Envíos a todo el Ecuador · Servientrega 24–72h · ES · USD
+          Envíos a todo el Ecuador
         </span>
+        <img
+          src="/servientrega.png"
+          alt="Servientrega"
+          className="h-12 w-auto object-contain"
+        />
       </div>
     </div>
   );

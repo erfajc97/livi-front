@@ -74,7 +74,7 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
   const media = (
     <a
       href={`/combo/${combo.id}`}
-      className="group relative block aspect-[4/5] overflow-hidden bg-surface-raised md:aspect-[5/6]"
+      className="group relative block aspect-[4/3] overflow-hidden bg-surface-raised md:aspect-[5/6]"
     >
       {combo.imageUrl ? (
         <img
@@ -100,22 +100,34 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
 
   const detail = (
     <div className="flex flex-col justify-center">
-      <div className="flex items-baseline gap-3">
-        <span className="font-display text-lg italic text-text-muted">— {ROMAN[index] ?? index + 1}</span>
-        <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
-          {products.length} {products.length === 1 ? 'fragancia' : 'fragancias'}
-        </span>
+      {/* Orden mobile (REQ-054): nombre → precio → descripción recortada → botón.
+          Desktop mantiene: nombre → descripción → precio → botones. */}
+      <div className="order-1">
+        <div className="flex items-baseline gap-3">
+          <span className="font-display text-lg italic text-text-muted">— {ROMAN[index] ?? index + 1}</span>
+          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
+            {products.length} {products.length === 1 ? 'fragancia' : 'fragancias'}
+          </span>
+        </div>
+
+        <h3 className="mt-3 font-display text-4xl font-light leading-[1.02] tracking-[-0.02em] text-text md:text-5xl">
+          <a href={`/combo/${combo.id}`} className="transition-colors hover:text-accent">{combo.name}</a>
+        </h3>
       </div>
 
-      <h3 className="mt-3 font-display text-4xl font-light leading-[1.02] tracking-[-0.02em] text-text md:text-5xl">
-        <a href={`/combo/${combo.id}`} className="transition-colors hover:text-accent">{combo.name}</a>
-      </h3>
-
       {description && (
-        <p className="mt-4 max-w-md font-body text-sm leading-relaxed text-text-soft">{description}</p>
+        <div className="order-3 mt-4 max-w-md md:order-2">
+          <p className="line-clamp-3 font-body text-sm leading-relaxed text-text-soft">{description}</p>
+          <a
+            href={`/combo/${combo.id}`}
+            className="mt-2 inline-block border-b border-border pb-0.5 font-body text-[10px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Leer más
+          </a>
+        </div>
       )}
 
-      <div className="mt-6 flex items-baseline gap-3">
+      <div className="order-2 mt-5 flex items-baseline gap-3 md:order-3 md:mt-6">
         <span className="font-display text-3xl text-text">{formatCurrency(actualPrice)}</span>
         {originalSum > actualPrice && (
           <span className="font-body text-sm text-text-muted line-through">{formatCurrency(originalSum)}</span>
@@ -125,7 +137,7 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
         )}
       </div>
 
-      <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
+      <div className="order-4 mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
         <button
           onClick={inStock ? handleAdd : undefined}
           disabled={!inStock}
@@ -184,9 +196,9 @@ export default function ComboEditorialList({ combos, isLoading }: ComboEditorial
     <div className="mx-auto max-w-[1500px]">
       {/* Encabezado editorial — compacto */}
       <header className="mx-auto max-w-3xl px-6 py-7 text-center md:py-10">
-        <span className="eyebrow">— Cápsulas curadas por la casa</span>
-        <h1 className="mt-2.5 font-display text-2xl font-light leading-[1.1] tracking-[-0.02em] text-text md:text-4xl">
-          Curadurías que cuestan <span className="italic text-text-soft">menos</span> que la suma de sus partes.
+        <span className="eyebrow">— Selecciones de la casa</span>
+        <h1 className="mt-2.5 font-display text-3xl font-light leading-[1.1] tracking-[-0.02em] text-text md:text-5xl">
+          Cada combo, pensado para un momento.
         </h1>
       </header>
 

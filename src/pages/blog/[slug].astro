@@ -24,17 +24,17 @@ const FALLBACK = '/banner-catalog.png';
 ---
 
 <PublicLayout
-  title={`${post.title} — Journal NönDecants`}
-  description={post.excerpt || `Lee sobre ${post.title} en el journal de NönDecants.`}
+  title={`${post.title} — Blog NonDecants`}
+  description={post.excerpt || `Lee sobre ${post.title} en el blog de NonDecants.`}
 >
   <article class="bg-bg">
     <div class="mx-auto max-w-3xl px-6 pb-4 pt-8 md:pt-20">
       <a href="/blog" class="font-body text-[11px] uppercase tracking-[0.18em] text-text-muted transition-colors hover:text-text">
-        ← Journal
+        ← Blog
       </a>
       <div class="mt-10 text-center">
         <span class="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
-          Journal{date ? ` · ${date}` : ''}
+          Blog{date ? ` · ${date}` : ''}
         </span>
         <h1 class="mt-4 font-display text-4xl font-light leading-tight tracking-[-0.02em] text-text md:text-6xl">
           {post.title}
@@ -60,7 +60,7 @@ const FALLBACK = '/banner-catalog.png';
   {otherPosts.length > 0 && (
     <section class="bg-bg px-6 pb-12 md:px-14 md:pb-24">
       <div class="mb-6 border-t border-border pt-6 md:mb-10 md:pt-8">
-        <span class="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft">— Más del journal</span>
+        <span class="font-body text-[10px] uppercase tracking-[0.24em] text-text-soft">— Más del blog</span>
       </div>
       <div class="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
         {otherPosts.slice(0, 3).map((p) => (

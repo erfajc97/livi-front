@@ -5,10 +5,7 @@ import discoverSvg from '@/assets/svg/discover.svg';
 import amexSvg from '@/assets/svg/amex.svg';
 import dinnersSvg from '@/assets/svg/dinners.svg';
 import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
-import {
-  FOOTER_LINKS_COL1,
-  FOOTER_LINKS_COL2,
-} from '../../data';
+import { FOOTER_LINKS_COL1 } from '../../data';
 
 const SOCIAL = [
   { label: 'Instagram', href: '#', primary: true },
@@ -18,32 +15,35 @@ const SOCIAL = [
 
 // Logos oficiales sin marcos: las tarjetas ya traen su propio fondo blanco.
 const PAYMENT_ICONS = [
-  { src: '/pagos/payphone-icon.png', alt: 'PayPhone', cls: 'h-8' },
+  { src: '/images/pagos/payphone-horizontal.svg', alt: 'Payphone', cls: 'h-9' },
   { src: visaSvg.src, alt: 'Visa', cls: 'h-8' },
   { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-8' },
   { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-8' },
   { src: amexSvg.src, alt: 'American Express', cls: 'h-8' },
   { src: discoverSvg.src, alt: 'Discover', cls: 'h-8' },
   { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-5' },
+  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-5' },
+  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-5' },
 ];
 
-const CONTACT = ['+593 99 230 5463', 'contacto@nondecants.com', 'Daule, Ecuador', 'Lun–Sáb · 9–18h'];
+const CONTACT = ['+593 99 230 5463', 'contacto@nondecants.com'];
 
 const year = new Date().getFullYear();
 ---
 
 <footer class="border-t border-border bg-bg-alt text-text-soft">
   <div class="mx-auto max-w-[1600px] px-6 pb-8 pt-10 md:pb-10 md:pt-14 md:px-14">
-    <div class="mb-8 grid grid-cols-1 gap-8 md:mb-12 md:gap-14 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+    <div class="mb-8 grid grid-cols-1 gap-8 md:mb-12 md:gap-14 md:grid-cols-[1.6fr_1fr_1.2fr]">
 
       <!-- Marca -->
       <div>
-        <a href="/" aria-label="NönDecants — Inicio" class="inline-block">
-          <img src="/logonondecants.png" alt="NönDecants" width={543} height={127} class="h-9 w-auto" />
+        <a href="/" aria-label="NonDecants — Inicio" class="inline-block">
+          <img src="/logonondecants.png" alt="NonDecants" width={543} height={127} class="h-9 w-auto" />
         </a>
         <p class="mt-6 max-w-[320px] font-body text-[13px] leading-relaxed text-text-soft">
-          Casa de fragancias en Ecuador. Sellados, decants y nondecants curados.
-          Cada perfume, en el tamaño que necesitas.
+          Perfumes auténticos al mejor precio. Prueba en decant antes de
+          comprometerte con el frasco entero, y si no está en nuestro catálogo,
+          lo conseguimos por ti en tiempo récord.
         </p>
         <div class="mt-8 flex gap-5">
           {SOCIAL.map((s) => (
@@ -57,21 +57,11 @@ const year = new Date().getFullYear();
         </div>
       </div>
 
-      <!-- Catálogo -->
+      <!-- Explora -->
       <div>
-        <span class="eyebrow">Catálogo</span>
+        <span class="eyebrow">Explora</span>
         <div class="mt-5 flex flex-col gap-3">
           {FOOTER_LINKS_COL1.map((l) => (
-            <a href={l.href} class="font-body text-[13px] text-text-soft transition-colors hover:text-text">{l.label}</a>
-          ))}
-        </div>
-      </div>
-
-      <!-- Casa -->
-      <div>
-        <span class="eyebrow">Casa</span>
-        <div class="mt-5 flex flex-col gap-3">
-          {FOOTER_LINKS_COL2.map((l) => (
             <a href={l.href} class="font-body text-[13px] text-text-soft transition-colors hover:text-text">{l.label}</a>
           ))}
         </div>
@@ -91,11 +81,12 @@ const year = new Date().getFullYear();
     <div class="h-px bg-border"></div>
 
     <div class="mt-6 flex flex-col items-start justify-between gap-4 font-body text-[11px] tracking-[0.04em] text-text-muted sm:flex-row sm:items-center">
-      <span>© {year} NönDecants · Daule, Ecuador</span>
+      <span>© {year} NonDecants · Daule, Ecuador</span>
       <div class="flex flex-wrap items-center gap-5">
         <a href="/terminos" class="transition-colors hover:text-text">Términos</a>
         <a href="/privacidad" class="transition-colors hover:text-text">Privacidad</a>
         <a href="/privacidad" class="transition-colors hover:text-text">Cookies</a>
+        <a href="/faq" class="transition-colors hover:text-text">FAQ</a>
         <div class="flex flex-wrap items-center gap-2">
           {PAYMENT_ICONS.map((icon) => (
             <img

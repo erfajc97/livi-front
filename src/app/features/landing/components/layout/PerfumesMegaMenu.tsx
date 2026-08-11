@@ -79,37 +79,33 @@ export default function PerfumesMegaMenu({
       <div className="mx-auto grid max-w-[1600px] grid-cols-[1fr_360px] gap-16 px-14 pb-10 pt-10">
         {/* Columnas de categorías → marcas (paginadas, máx 3) */}
         <div>
-          <div className="mb-9 flex items-center justify-between gap-8">
-            <span className="eyebrow">Categorías</span>
-
-            <div className="flex items-center gap-8">
-              {totalPages > 1 && (
-              <div className="flex items-center gap-4 text-text">
-                <span className="font-body text-[11px] tabular-nums tracking-wide text-text-muted">
-                  {safePage + 1} / {totalPages}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Categorías anteriores"
-                  disabled={safePage === 0}
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M15 6l-6 6 6 6" /></svg>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Siguientes categorías"
-                  disabled={safePage >= totalPages - 1}
-                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                  className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M9 6l6 6-6 6" /></svg>
-                </button>
-              </div>
-              )}
+          {/* Sin el rótulo "Categorías" (REQ-001): las columnas suben y
+              cierran el hueco superior; la paginación queda a la derecha. */}
+          {totalPages > 1 && (
+            <div className="mb-8 flex items-center justify-end gap-4 text-text">
+              <span className="font-body text-[11px] tabular-nums tracking-wide text-text-muted">
+                {safePage + 1} / {totalPages}
+              </span>
+              <button
+                type="button"
+                aria-label="Categorías anteriores"
+                disabled={safePage === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M15 6l-6 6 6 6" /></svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Siguientes categorías"
+                disabled={safePage >= totalPages - 1}
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
             </div>
-          </div>
+          )}
 
           <div className="grid grid-cols-3 gap-x-12 gap-y-12">
           {isLoading ? (
@@ -130,14 +126,8 @@ export default function PerfumesMegaMenu({
                     {cat.name}
                   </span>
                 </a>
-                <span className="mt-2 block h-px w-10 bg-accent/50" />
 
-                {cat.description && (
-                  <p className="mt-3 font-body text-[13px] leading-snug text-text-muted">
-                    {cat.description}
-                  </p>
-                )}
-
+                {/* Sin línea fina ni palabra descriptiva (REQ-002) — limpio, como en mobile */}
                 <div className="mt-6 flex flex-col gap-2.5">
                   {cat.marcas.slice(0, 6).map((sub) => (
                     <a

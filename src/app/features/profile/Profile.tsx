@@ -3,9 +3,11 @@ import { useProfileHook } from './hooks/useProfileHook';
 import ProfileSidebar from './components/ProfileSidebar';
 import OrdersTab from './components/OrdersTab';
 import ProfileTab from './components/ProfileTab';
+import AddressesTab from './components/AddressesTab';
 
 const TAB_CONTENT = {
   perfil: ProfileTab,
+  direcciones: AddressesTab,
   pedidos: OrdersTab,
 } as const;
 

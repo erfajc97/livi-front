@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { useAuthStore } from '@/app/store/auth/authStore';
 import { useDeliveryMethodsHook } from './useDeliveryMethodsHook';
+import { useAddressesQuery } from '@/app/tanstack-queries/addressesQuery';
 import { calcPayphoneSurcharge } from '@/app/helpers/calcPayphoneSurcharge';
 import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
@@ -82,6 +83,7 @@ export function useCheckoutHook() {
   const savedPrefs = loadPrefs();
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod | null>(getInitialDeliveryMethod(savedPrefs));
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [isPending, setIsPending] = useState(false);
   // Envío o retiro en tienda: filtra los métodos que se muestran.
   const initialMethod = getInitialDeliveryMethod(savedPrefs);
@@ -90,6 +92,37 @@ export function useCheckoutHook() {
   );
   const [authOpen, setAuthOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  // Direcciones guardadas (REQ-062): solo con sesión; el guest checkout no cambia.
+  const { data: savedAddresses = [] } = useAddressesQuery();
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const addressAutoApplied = useRef(false);
+
+  // Autocompleta los datos de envío con la dirección elegida.
+  // `null` = "nueva dirección": el usuario escribe los campos a mano.
+  const handleSelectAddress = (id: string | null) => {
+    setSelectedAddressId(id);
+    if (id == null) return;
+    const addr = savedAddresses.find((a) => a.id === id);
+    if (!addr) return;
+    setCustomer((prev) => ({
+      ...prev,
+      phone:     normalizeCustomerField('phone', addr.telefono),
+      province:  addr.provincia,
+      city:      addr.ciudad,
+      address:   addr.direccion,
+      reference: addr.referencia,
+    }));
+  };
+
+  // Preselección: al cargar las direcciones se aplica la predeterminada
+  // (o la primera) una sola vez, antes de que el usuario empiece a editar.
+  useEffect(() => {
+    if (addressAutoApplied.current || savedAddresses.length === 0) return;
+    addressAutoApplied.current = true;
+    const def = savedAddresses.find((a) => a.isDefault) ?? savedAddresses[0];
+    handleSelectAddress(def.id);
+  }, [savedAddresses]);
 
   // Fetch full profile from API to pre-fill all fields
   useEffect(() => {
@@ -448,6 +481,10 @@ export function useCheckoutHook() {
       sonnerResponse('Selecciona un método de pago.', 'error');
       return;
     }
+    if (!termsAccepted) {
+      sonnerResponse('Debes aceptar los términos y condiciones.', 'error');
+      return;
+    }
     if (hasBajoPedido) {
       setBajoConfirm({ kind: 'submit' });
       return;
@@ -456,6 +493,10 @@ export function useCheckoutHook() {
   };
 
   const requestTransferSubmit = (file: File) => {
+    if (!termsAccepted) {
+      sonnerResponse('Debes aceptar los términos y condiciones.', 'error');
+      return;
+    }
     if (hasBajoPedido) {
       setBajoConfirm({ kind: 'transfer', file });
       return;
@@ -500,6 +541,8 @@ export function useCheckoutHook() {
     handleCustomerChange,
     setDeliveryMethod,
     setPaymentMethod,
+    termsAccepted,
+    setTermsAccepted,
     handleNextStep,
     deliveryMode,
     setDeliveryMode,
@@ -507,6 +550,10 @@ export function useCheckoutHook() {
     authOpen,
     openAuth: () => setAuthOpen(true),
     closeAuth: () => setAuthOpen(false),
+    // Direcciones guardadas (REQ-062)
+    savedAddresses,
+    selectedAddressId,
+    handleSelectAddress,
     handleSubmit: requestSubmit,
     handleTransferSubmit: requestTransferSubmit,
     // Confirmación bajo pedido

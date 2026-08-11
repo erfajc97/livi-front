@@ -1,34 +1,70 @@
 import { useRef, useState } from 'react';
 import Loader from '@/app/components/Loader';
+import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
+import TermsAcceptance from './TermsAcceptance';
 
 interface TransferBankInfoStepProps {
   total: number;
   isPending: boolean;
+  termsAccepted: boolean;
+  onTermsChange: (accepted: boolean) => void;
   onConfirm: (receiptFile: File) => void;
   onBack: () => void;
 }
 
-const BANK_INFO = {
-  bank: 'Banco Pichincha',
-  accountType: 'Cuenta de Ahorros',
-  accountNumber: '2206573833',
-  name: 'NönDecants',
-  cedula: '0924538271',
-  email: 'nondecants@gmail.com',
-};
+type BankRow = [string, string, boolean?];
 
-const ROWS: [string, string, boolean?][] = [
-  ['Banco', BANK_INFO.bank],
-  ['Tipo de cuenta', BANK_INFO.accountType],
-  ['Número de cuenta', BANK_INFO.accountNumber, true],
-  ['Nombre', BANK_INFO.name],
-  ['Cédula / RUC', BANK_INFO.cedula],
-  ['Email', BANK_INFO.email],
+interface BankInfo {
+  id: string;
+  name: string;
+  logo: React.ReactNode;
+  rows: BankRow[];
+}
+
+const BANKS: BankInfo[] = [
+  {
+    id: 'pichincha',
+    name: 'Banco Pichincha',
+    logo: <img src={pichinchaSvg.src} alt="Banco Pichincha" className="h-5 w-auto" />,
+    rows: [
+      ['Tipo de cuenta', 'Cuenta de Ahorros'],
+      ['Número de cuenta', '2206573833', true],
+      ['Titular', 'NonDecants'],
+      ['Cédula / RUC', '0924538271', true],
+      ['Correo', 'nondecants@gmail.com'],
+    ],
+  },
+  {
+    id: 'produbanco',
+    name: 'Produbanco',
+    logo: <img src="/images/pagos/produbanco.svg" alt="Produbanco" className="h-5 w-auto" />,
+    rows: [
+      ['Tipo de cuenta', 'Cuenta de Ahorros'],
+      ['Número de cuenta', '20009323889', true],
+      ['Titular', 'Wong Diaz Jean Philippe'],
+      ['RUC / Identificación', '0951454917', true],
+      ['Correo', 'nondecants@gmail.com'],
+      ['Celular', '0992305463', true],
+    ],
+  },
+  {
+    id: 'guayaquil',
+    name: 'Banco Guayaquil',
+    logo: <img src="/images/pagos/banco-guayaquil.svg" alt="Banco Guayaquil" className="h-5 w-auto" />,
+    rows: [
+      ['Tipo de cuenta', 'Cuenta de Ahorros'],
+      ['Número de cuenta', '0060453629', true],
+      ['CI', '0951454917', true],
+      ['Correo', 'nondecants@gmail.com'],
+      ['Celular', '0992305463', true],
+    ],
+  },
 ];
 
-export default function TransferBankInfoStep({ total, isPending, onConfirm, onBack }: TransferBankInfoStepProps) {
+export default function TransferBankInfoStep({ total, isPending, termsAccepted, onTermsChange, onConfirm, onBack }: TransferBankInfoStepProps) {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [openBank, setOpenBank] = useState<string | null>('pichincha');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (file: File | null) => {
@@ -42,17 +78,50 @@ export default function TransferBankInfoStep({ total, isPending, onConfirm, onBa
       <h2 className="font-display text-2xl font-light text-text">Datos para transferencia</h2>
 
       <p className="font-body text-sm text-text-soft">
-        Realiza la transferencia por <span className="text-text">${total.toFixed(2)}</span> a la siguiente cuenta y sube tu comprobante.
+        Realiza la transferencia por <span className="text-text">${total.toFixed(2)}</span> a una de las siguientes cuentas y sube tu comprobante.
       </p>
 
-      {/* Datos bancarios */}
+      {/* Selector de banco: cada uno despliega sus datos */}
       <div className="divide-y divide-border border border-border">
-        {ROWS.map(([label, value, mono]) => (
-          <div key={label} className="flex justify-between px-4 py-2.5">
-            <span className="font-body text-xs uppercase tracking-[0.14em] text-text-muted">{label}</span>
-            <span className={`text-sm text-text ${mono ? 'font-body tabular-nums' : 'font-body'}`}>{value}</span>
-          </div>
-        ))}
+        {BANKS.map((bank) => {
+          const isOpen = openBank === bank.id;
+          return (
+            <div key={bank.id}>
+              <button
+                type="button"
+                onClick={() => setOpenBank(isOpen ? null : bank.id)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-bg-alt"
+              >
+                <span className="flex items-center gap-3">
+                  {bank.logo}
+                  <span className="font-body text-sm text-text">{bank.name}</span>
+                </span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  className={`shrink-0 text-text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {isOpen && (
+                <div className="divide-y divide-border border-t border-border bg-bg-alt">
+                  {bank.rows.map(([label, value, mono]) => (
+                    <div key={label} className="flex justify-between gap-4 px-4 py-2.5">
+                      <span className="font-body text-xs uppercase tracking-[0.14em] text-text-muted">{label}</span>
+                      <span className={`text-right text-sm text-text ${mono ? 'font-body tabular-nums' : 'font-body'}`}>{value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       {/* Comprobante */}
@@ -104,11 +173,13 @@ export default function TransferBankInfoStep({ total, isPending, onConfirm, onBa
         </p>
       </div>
 
+      <TermsAcceptance checked={termsAccepted} onChange={onTermsChange} />
+
       {/* Acciones */}
       <button
         type="button"
-        onClick={() => receiptFile && onConfirm(receiptFile)}
-        disabled={!receiptFile || isPending}
+        onClick={() => receiptFile && termsAccepted && onConfirm(receiptFile)}
+        disabled={!receiptFile || !termsAccepted || isPending}
         className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Confirmar pedido'}

@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { blogService } from '@/app/features/blog/services/blogService';
 
@@ -16,15 +18,15 @@ const FALLBACK = '/banner-catalog.png';
 ---
 
 <PublicLayout
-  title="Journal — NönDecants"
-  description="El journal de NönDecants: artículos sobre perfumería, decants y la cultura de la fragancia."
+  title="Blog — NonDecants"
+  description="El blog de NonDecants: artículos sobre perfumería, decants y la cultura de la fragancia."
 >
   <div class="bg-bg">
     {/* Header editorial */}
     <section class="px-6 pb-8 pt-10 text-center md:px-14 md:pb-12 md:pt-24">
-      <span class="eyebrow">— Journal de la casa</span>
+      <span class="eyebrow">— Blog de la casa</span>
       <h1 class="mt-5 font-display text-6xl font-light italic leading-none tracking-[-0.02em] text-text md:text-8xl">
-        Journal.
+        Blog.
       </h1>
     </section>
 
@@ -96,7 +98,7 @@ const FALLBACK = '/banner-catalog.png';
       </>
     ) : (
       <section class="px-6 py-16 text-center md:px-14 md:py-32">
-        <span class="eyebrow">— Journal</span>
+        <span class="eyebrow">— Blog</span>
         <h2 class="mt-4 font-display text-4xl font-light italic text-text">Próximamente.</h2>
         <p class="mt-3 font-body text-sm text-text-soft">Estamos preparando contenido para ti.</p>
       </section>

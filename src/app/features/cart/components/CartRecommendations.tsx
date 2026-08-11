@@ -11,14 +11,17 @@ import type { Product } from '@/app/types/global.types';
 export default function CartRecommendations() {
   const { data: sections = [], isLoading } = useLandingSectionsActiveQuery('cart');
 
-  // Esqueleto mientras llegan las secciones: mismo grid de 4 cards.
+  // Esqueleto mientras llegan las secciones: misma hilera deslizable en
+  // mobile y mismo grid de 4 en desktop que el contenido cargado.
   if (isLoading) {
     return (
       <section className="mt-12 border-t border-border pt-10 md:mt-16 md:pt-14" aria-hidden="true">
         <div className="mb-6 h-6 w-56 animate-pulse rounded-sm bg-surface-raised md:mb-8" />
-        <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-6">
+        <div className="flex gap-5 overflow-hidden md:grid md:grid-cols-4 md:gap-6">
           {Array.from({ length: 4 }, (_, i) => (
-            <ProductCardSkeleton key={i} />
+            <div key={i} className="shrink-0 basis-[calc(50%-0.625rem)]">
+              <ProductCardSkeleton />
+            </div>
           ))}
         </div>
       </section>
@@ -55,9 +58,13 @@ export default function CartRecommendations() {
         </a>
       </div>
 
-      <div className="grid grid-cols-2 gap-5 md:grid-cols-4 md:gap-6">
+      {/* Mobile: una sola hilera deslizable (2 cards por pantalla, ancho
+          fijo para que el desplazamiento no desfase). Desktop: grid de 4. */}
+      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto md:grid md:snap-none md:grid-cols-4 md:gap-6 md:overflow-visible">
         {products.slice(0, 4).map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <div key={product.id} className="shrink-0 basis-[calc(50%-0.625rem)] snap-start md:snap-align-none">
+            <ProductCard product={product} />
+          </div>
         ))}
       </div>
     </section>

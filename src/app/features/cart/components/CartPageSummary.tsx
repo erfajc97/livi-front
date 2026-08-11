@@ -11,7 +11,7 @@ interface CartPageSummaryProps {
 }
 
 const ASSURANCES = [
-  'Verificado por NönDecants antes del envío',
+  'Verificado por NonDecants antes del envío',
   'Pago seguro · PayPhone · Transferencia',
   'Acceso a referencias raras bajo pedido',
 ];
@@ -78,31 +78,6 @@ export default function CartPageSummary({
             </li>
           ))}
         </ul>
-      </div>
-
-      {/* ── Entregas ── */}
-      <div className="border border-border p-7 md:p-8">
-        <span className="eyebrow">— Entregas</span>
-        <div className="mt-5 flex flex-col gap-5">
-          {immediateCount > 0 && (
-            <div>
-              <div className="flex items-center justify-between font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
-                <span>01 · En stock</span>
-                <span>{immediateCount} {immediateCount === 1 ? 'referencia' : 'referencias'}</span>
-              </div>
-              <p className="mt-1 font-display text-base italic text-text">24 – 72 horas</p>
-            </div>
-          )}
-          {bajoCount > 0 && (
-            <div>
-              <div className="flex items-center justify-between font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
-                <span>{immediateCount > 0 ? '02' : '01'} · Bajo pedido</span>
-                <span>{bajoCount} {bajoCount === 1 ? 'referencia curada' : 'referencias curadas'}</span>
-              </div>
-              <p className="mt-1 font-display text-base italic text-text">13 – 17 días</p>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

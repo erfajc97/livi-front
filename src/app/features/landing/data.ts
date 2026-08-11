@@ -307,17 +307,7 @@ export const FOOTER_PAYMENT_ICONS = [
 ];
 
 export const FOOTER_LINKS_COL1 = [
-  { href: '/catalogo',              label: 'Perfumes' },
-  { href: '/catalogo',              label: 'Sellados' },
-  { href: '/catalogo',              label: 'Decants' },
-  { href: '/catalogo',              label: 'Nondecants' },
-  { href: '/catalogo',              label: 'Combos' },
-];
-
-export const FOOTER_LINKS_COL2 = [
-  { href: '#', label: 'Acerca de' },
-  { href: '#', label: 'Sucursales' },
-  { href: '#', label: 'Blog' },
-  { href: '#', label: 'Bajo pedido' },
-  { href: '#', label: 'FAQ' },
+  { href: '/catalogo/perfumes', label: 'Perfumes' },
+  { href: '/bajo-pedido',       label: 'Bajo pedidos' },
+  { href: '/catalogo/combos',   label: 'Combos' },
 ];

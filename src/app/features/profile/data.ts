@@ -2,6 +2,7 @@ import type { ProfileTabId } from './types';
 
 export const PROFILE_TABS: { id: ProfileTabId; label: string }[] = [
   { id: 'perfil', label: 'Perfil' },
+  { id: 'direcciones', label: 'Direcciones' },
   { id: 'pedidos', label: 'Mis Pedidos' },
 ];
 

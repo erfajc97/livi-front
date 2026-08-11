@@ -74,7 +74,7 @@ export default function ProductInfo({
             <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
           </p>
           <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
-            Curado especialmente para ti. Verificado por NönDecants antes de llegar a tus manos.
+            Curado especialmente para ti. Verificado por NonDecants antes de llegar a tus manos.
           </p>
         </div>
       )}
@@ -136,7 +136,7 @@ export default function ProductInfo({
 
       {/* Confianza — datos reales del servicio */}
       <div className="mt-9 space-y-5 border-t border-border pt-7">
-        <TrustRow label="Autenticidad">Verificado por NönDecants</TrustRow>
+        <TrustRow label="Autenticidad">Verificado por NonDecants</TrustRow>
         <TrustRow label="Entrega">
           {isBajo ? 'Curado bajo pedido · 13–17 días' : 'Servientrega 24–72h · todo el Ecuador'}
         </TrustRow>

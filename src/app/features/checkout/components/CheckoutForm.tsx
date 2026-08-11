@@ -5,8 +5,10 @@ import AddressSection from './AddressSection';
 import DeliverySection, { type DeliveryMode } from './DeliverySection';
 import PaymentSection from './PaymentSection';
 import TransferBankInfoStep from './TransferBankInfoStep';
+import TermsAcceptance from './TermsAcceptance';
 import { validateContact } from '../validators';
 import type { CustomerFormData, DeliveryMethod, PaymentMethod, DeliveryOption } from '../types';
+import type { Address } from '@/app/features/profile/types';
 
 interface CheckoutFormProps {
   step: 1 | 2 | 3;
@@ -21,6 +23,8 @@ interface CheckoutFormProps {
   handleCustomerChange: (field: keyof CustomerFormData, value: string) => void;
   setDeliveryMethod: (val: DeliveryMethod) => void;
   setPaymentMethod: (val: PaymentMethod) => void;
+  termsAccepted: boolean;
+  setTermsAccepted: (val: boolean) => void;
   handleNextStep: () => void;
   handleSubmit: () => void;
   handleTransferSubmit: (receiptFile: File) => void;
@@ -28,6 +32,10 @@ interface CheckoutFormProps {
   setDeliveryMode: (mode: DeliveryMode) => void;
   isAuthenticated: boolean;
   onLogin: () => void;
+  /** Direcciones guardadas del usuario (REQ-062); vacío si es guest. */
+  savedAddresses: Address[];
+  selectedAddressId: string | null;
+  handleSelectAddress: (id: string | null) => void;
 }
 
 export default function CheckoutForm({
@@ -43,6 +51,8 @@ export default function CheckoutForm({
   handleCustomerChange,
   setDeliveryMethod,
   setPaymentMethod,
+  termsAccepted,
+  setTermsAccepted,
   handleNextStep,
   handleSubmit,
   handleTransferSubmit,
@@ -50,6 +60,9 @@ export default function CheckoutForm({
   setDeliveryMode,
   isAuthenticated,
   onLogin,
+  savedAddresses,
+  selectedAddressId,
+  handleSelectAddress,
 }: CheckoutFormProps) {
 
   // El paso 1 solo avanza con los datos completos y un método de entrega
@@ -96,6 +109,9 @@ export default function CheckoutForm({
             customer={customer}
             onChange={handleCustomerChange}
             isPickup={isPickup}
+            savedAddresses={savedAddresses}
+            selectedAddressId={selectedAddressId}
+            onSelectAddress={handleSelectAddress}
           />
           <div className="mt-2">
             <button
@@ -117,9 +133,10 @@ export default function CheckoutForm({
       {step === 2 && (
         <>
           <PaymentSection selected={paymentMethod} onSelect={setPaymentMethod} />
+          <TermsAcceptance checked={termsAccepted} onChange={setTermsAccepted} />
           <button
             type="submit"
-            disabled={isPending || !paymentMethod}
+            disabled={isPending || !paymentMethod || !termsAccepted}
             className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPending ? (
@@ -137,6 +154,8 @@ export default function CheckoutForm({
         <TransferBankInfoStep
           total={total}
           isPending={isPending}
+          termsAccepted={termsAccepted}
+          onTermsChange={setTermsAccepted}
           onConfirm={handleTransferSubmit}
           onBack={() => setStep(2)}
         />

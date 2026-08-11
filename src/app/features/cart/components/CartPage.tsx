@@ -3,13 +3,10 @@ import CartLine from './CartLine';
 import CartPageSummary from './CartPageSummary';
 import CartRecommendations from './CartRecommendations';
 
-function GroupHeader({ num, title, meta, dot }: { num: string; title: string; meta: string; dot?: boolean }) {
+function GroupHeader({ title, meta, dot }: { title: string; meta: string; dot?: boolean }) {
   return (
     <div className="mb-1 flex items-end justify-between border-b border-border pb-4">
-      <div className="flex items-baseline gap-3">
-        <span className="font-body text-[10px] italic tracking-[0.1em] text-text-muted">— {num}</span>
-        <h2 className="font-display text-2xl font-light text-text">{title}</h2>
-      </div>
+      <h2 className="font-display text-2xl font-light text-text">{title}</h2>
       <span className="flex items-center gap-1.5 font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
         {dot && <span className="h-[5px] w-[5px] rounded-full bg-accent" />}
         {meta}
@@ -91,7 +88,6 @@ export default function CartPage() {
   }
 
   const mixed = immediate.length > 0 && bajo.length > 0;
-  const bajoNum = immediate.length > 0 ? '02' : '01';
 
   const renderRow = (row: CartRow, group: 'immediate' | 'bajo') => (
     <CartLine
@@ -128,17 +124,17 @@ export default function CartPage() {
         <div>
           {immediate.length > 0 && (
             <div className="mb-8 md:mb-14">
-              <GroupHeader num="01" title="Envío inmediato" meta="Servientrega · 24–72 h" />
+              <GroupHeader title="Envío inmediato" meta="Servientrega · 24–72 h" />
               <div>{immediate.map((r) => renderRow(r, 'immediate'))}</div>
             </div>
           )}
 
           {bajo.length > 0 && (
             <div>
-              <GroupHeader num={bajoNum} title="Bajo pedido" meta="Entrega 13–17 días" dot />
+              <GroupHeader title="Bajo pedido" meta="Entrega 13–17 días" dot />
               <div>{bajo.map((r) => renderRow(r, 'bajo'))}</div>
               <p className="mt-6 border-l-2 border-accent bg-bg-alt px-4 py-3 font-display text-sm italic text-text-soft">
-                Curado exclusivamente para tu pedido. Verificado por NönDecants antes del envío.
+                Este perfume lo traemos exclusivamente para ti. Verificado por NonDecants antes de enviártelo.
               </p>
             </div>
           )}

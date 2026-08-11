@@ -12,6 +12,10 @@ import { useState } from 'react';
 interface LiquidTabBarProps {
   pathname: string;
   itemCount?: number;
+  /** REQ-039 — pestaña "Cuenta": con sesión navega a /mi-cuenta;
+      sin sesión abre el modal de login (que incluye crear cuenta). */
+  isAuthenticated?: boolean;
+  onAuthOpen?: () => void;
 }
 
 const ico = 'h-[18px] w-[18px]';
@@ -27,8 +31,8 @@ const IconGift = () => (
 const IconTruck = () => (
   <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M2 6h12v10H2z" /><path d="M14 10h4l3 3v3h-7" /><circle cx="6.5" cy="17.5" r="1.6" /><circle cx="16.5" cy="17.5" r="1.6" /></svg>
 );
-const IconArticle = () => (
-  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h13v16H6a2 2 0 0 1-2-2V4z" /><path d="M17 8h3v10a2 2 0 0 1-2 2" /><path d="M7 8h7M7 12h7M7 16h4" /></svg>
+const IconUser = () => (
+  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="9" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
 );
 
 const TABS = [
@@ -36,7 +40,7 @@ const TABS = [
   { id: 'perfumes', label: 'Perfumes', href: '/catalogo/perfumes', Icon: IconVial },
   { id: 'combos', label: 'Combos', href: '/catalogo/combos', Icon: IconGift },
   { id: 'pedidos', label: 'Bajo Pedido', href: '/bajo-pedido', Icon: IconTruck },
-  { id: 'blogs', label: 'Blogs', href: '/blog', Icon: IconArticle },
+  { id: 'cuenta', label: 'Cuenta', href: '/mi-cuenta', Icon: IconUser },
 ] as const;
 
 /* Ondas de la superficie — crestas asimétricas (subida rápida, caída
@@ -50,7 +54,7 @@ const WAVE_B_CURVE =
   'M0 23 C 8 12 17 12 25 23 C 33 34 42 34 50 23 C 58 12 67 12 75 23 C 83 34 92 34 100 23 C 108 12 117 12 125 23 C 133 34 142 34 150 23 C 158 12 167 12 175 23 C 183 34 192 34 200 23';
 const WAVE_B = `${WAVE_B_CURVE} V40 H0 Z`;
 
-export default function LiquidTabBar({ pathname }: LiquidTabBarProps) {
+export default function LiquidTabBar({ pathname, isAuthenticated = false, onAuthOpen }: LiquidTabBarProps) {
   const [imgOk, setImgOk] = useState(true);
 
   // PDP y checkout ya tienen su propia barra fija de conversión
@@ -62,7 +66,7 @@ export default function LiquidTabBar({ pathname }: LiquidTabBarProps) {
     if (pathname.startsWith('/catalogo/perfumes')) return 'perfumes';
     if (pathname.startsWith('/catalogo/combos') || pathname.startsWith('/combo')) return 'combos';
     if (pathname.startsWith('/bajo-pedido')) return 'pedidos';
-    if (pathname.startsWith('/blog')) return 'blogs';
+    if (pathname.startsWith('/mi-cuenta')) return 'cuenta';
     if (pathname === '/') return 'inicio';
     return '';
   })();
@@ -147,6 +151,14 @@ export default function LiquidTabBar({ pathname }: LiquidTabBarProps) {
               <a
                 key={id}
                 href={href}
+                onClick={
+                  id === 'cuenta' && !isAuthenticated
+                    ? (e) => {
+                        e.preventDefault();
+                        onAuthOpen?.();
+                      }
+                    : undefined
+                }
                 className={`relative flex flex-col items-center gap-[3px] py-2 transition-colors ${
                   active ? 'text-[#F8E3AC]' : 'text-[#c8a87a]'
                 }`}

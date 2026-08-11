@@ -6,16 +6,19 @@ import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
 
 /**
  * Medios de pago aceptados — logos oficiales, sin marcos ni fondos: los SVG de
- * las tarjetas ya traen su propia tarjeta blanca, PayPhone su cuadro naranja y
- * el wordmark de Pichincha se lee directo sobre el fondo del sitio.
+ * las tarjetas ya traen su propia tarjeta blanca, Payphone va en su versión
+ * horizontal con nombre y los bancos se leen como wordmark sobre el fondo del
+ * sitio.
  */
 const LOGOS = [
-  { src: '/pagos/payphone-icon.png', alt: 'PayPhone', cls: 'h-10' },
+  { src: '/images/pagos/payphone-horizontal.svg', alt: 'Payphone', cls: 'h-11' },
   { src: visaSvg.src, alt: 'Visa', cls: 'h-10' },
   { src: mastercardSvg.src, alt: 'Mastercard', cls: 'h-10' },
   { src: dinnersSvg.src, alt: 'Diners Club', cls: 'h-10' },
   { src: discoverSvg.src, alt: 'Discover', cls: 'h-10' },
   { src: pichinchaSvg.src, alt: 'Banco Pichincha', cls: 'h-6' },
+  { src: '/images/pagos/banco-guayaquil.svg', alt: 'Banco Guayaquil', cls: 'h-6' },
+  { src: '/images/pagos/produbanco.svg', alt: 'Produbanco', cls: 'h-6' },
 ];
 
 interface PaymentMethodIconsProps {
