@@ -11,9 +11,11 @@ export interface UseCatalogHookProps {
   initialMarcaId?: number;
 }
 
-// REQ-059: máximo 8 por página — filas completas en el grid de 4 columnas
-// (con 9 la última fila quedaba con hueco).
-const LIMIT = 8;
+// Productos por página: 12 en desktop (3 filas del grid de 4) y 10 en móvil
+// (5 filas de 2). En ambos casos la última fila queda completa.
+const DESKTOP_LIMIT = 12;
+const MOBILE_LIMIT = 10;
+const DESKTOP_QUERY = '(min-width: 768px)';
 
 const defaultFilters: CatalogFilters = {
   search: '',
@@ -152,13 +154,36 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     return () => clearTimeout(timer);
   }, [filters.maxPrice]);
 
+  // El tamaño de página sigue al ancho de pantalla; si el usuario gira el
+  // teléfono o cambia el tamaño de la ventana, se vuelve a la primera página
+  // para no quedar en una página que ya no existe.
+  const [limit, setLimit] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(DESKTOP_QUERY).matches
+      ? DESKTOP_LIMIT
+      : MOBILE_LIMIT,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const sync = () => {
+      const next = mq.matches ? DESKTOP_LIMIT : MOBILE_LIMIT;
+      setLimit((prev) => {
+        if (prev !== next) setFilters((f) => ({ ...f, page: 1 }));
+        return next;
+      });
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
   // El flag de la página (bajoPedido={true} en /bajo-pedido, ={false} en
   // /catalogo/perfumes) SIEMPRE se respeta, incluso al navegar a una casa
   // (marca) o categoría. Así la sección "Bajo Pedido" muestra solo bajo
   // pedido y "Perfumes" solo stock, en cualquier nivel de navegación.
   const queryParams = {
     page: filters.page,
-    limit: LIMIT,
+    limit,
     search: debouncedSearch || undefined,
     inStock: filters.inStock || undefined,
     bajoPedido,

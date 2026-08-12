@@ -8,7 +8,11 @@ import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
-type SelectedOption = { type: 'full' } | { type: 'decant'; variant: ProductVariant };
+type SelectedOption =
+  | { type: 'full' }
+  /** Presentación sellada extra (50 ml, 30 ml…) cargada como variante en el admin. */
+  | { type: 'sealed'; variant: ProductVariant }
+  | { type: 'decant'; variant: ProductVariant };
 
 interface ProductPurchaseOptionsProps {
   product: Product;
@@ -74,6 +78,9 @@ export default function ProductPurchaseOptions({
     if (variant && !variant.isFullBottle) {
       setSelected({ type: 'decant', variant });
       onVariantChange?.(variant);
+    } else if (variant && sealedExtras.some((s) => s.id === variant.id)) {
+      setSelected({ type: 'sealed', variant });
+      onVariantChange?.(variant);
     } else {
       setSelected({ type: 'full' });
       onVariantChange?.(null);
@@ -91,12 +98,21 @@ export default function ProductPurchaseOptions({
 
   const variants = product.variants ?? [];
   const decants = variants.filter(v => !v.isFullBottle);
+  // Presentaciones selladas cargadas como variante (REQ-056). El backend crea
+  // además una variante espejo del frasco del producto: esa no se pinta dos
+  // veces, ya es la tarjeta principal.
+  const sealedExtras = variants.filter(
+    (v) => v.isFullBottle && !(v.ml === fullBottleMl && v.price === fullBottlePrice),
+  );
 
   const isFullSelected = selected.type === 'full';
+  const selectedSealed = selected.type === 'sealed' ? selected.variant : null;
   const selectedDecant = selected.type === 'decant' ? selected.variant : null;
 
   // Price display
-  const currentPrice = isFullSelected ? fullBottlePrice : (selectedDecant?.price ?? 0);
+  const currentPrice = isFullSelected
+    ? fullBottlePrice
+    : (selectedSealed?.price ?? selectedDecant?.price ?? 0);
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
   const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
@@ -114,12 +130,21 @@ export default function ProductPurchaseOptions({
   // El frasco va "bajo pedido" cuando está marcado como tal o cuando no queda
   // stock sellado (todas las unidades se importan).
   const fullIsBackorder = isBajoPedidoFlag || fullBottleStock <= 0;
+  /** Las presentaciones selladas se rigen por su propio stock de variante. */
+  const sealedIsBackorder = (v: ProductVariant) =>
+    isBajoPedidoFlag || Number(v.availableQuantity ?? 0) <= 0;
   // Sólo la opción seleccionada determina el tag/modal de bajo pedido.
-  const selectedIsBajoPedido = isFullSelected ? fullIsBackorder : false;
+  const selectedIsBajoPedido = isFullSelected
+    ? fullIsBackorder
+    : selectedSealed
+      ? sealedIsBackorder(selectedSealed)
+      : false;
 
   const inStock = isFullSelected
     ? canBuyFullBottle
-    : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
+    : selectedSealed
+      ? selectedSealed.price > 0
+      : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
 
   const hasImmediateStock = fullBottleStock > 0 || availableMl > 0;
   const statusLabel = hasImmediateStock
@@ -146,6 +171,26 @@ export default function ProductPurchaseOptions({
         stockAvailable: fullIsBackorder ? undefined : fullBottleStock,
         // Pool compartido con los decants: cada frasco vendido lo consume.
         availableMl,
+      };
+    }
+    if (selectedSealed) {
+      const backorder = sealedIsBackorder(selectedSealed);
+      const price = hasDiscount
+        ? selectedSealed.price * (1 - discount / 100)
+        : selectedSealed.price;
+      return {
+        productId: product.id,
+        variantId: selectedSealed.id,
+        name: product.name,
+        image: selectedSealed.images?.[0] || product.image || '',
+        ml: selectedSealed.ml,
+        price,
+        quantity: 1,
+        bajoPedido: backorder,
+        // Frasco sellado: como el principal, se puede pedir de más y el
+        // excedente se desglosa como bajo pedido en el carrito.
+        maxQty: undefined,
+        stockAvailable: backorder ? undefined : Number(selectedSealed.availableQuantity ?? 0),
       };
     }
     if (selectedDecant) {
@@ -266,6 +311,20 @@ export default function ProductPurchaseOptions({
               onClick={canBuyFullBottle ? handleSelectFull : undefined}
             />
           )}
+          {sealedExtras.map((v) => (
+            <SizeCard
+              key={v.id}
+              ml={v.ml}
+              type={sealedIsBackorder(v) ? 'Bajo pedido' : 'Sellada'}
+              price={v.price}
+              discount={discount}
+              active={selectedSealed?.id === v.id}
+              onClick={() => {
+                setSelected({ type: 'sealed', variant: v });
+                onVariantChange?.(v);
+              }}
+            />
+          ))}
           {decants.map((v) => {
             const available = canBuyDecant(v.ml);
             return (
