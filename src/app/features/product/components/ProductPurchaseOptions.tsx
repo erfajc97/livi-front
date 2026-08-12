@@ -130,9 +130,13 @@ export default function ProductPurchaseOptions({
   // El frasco va "bajo pedido" cuando está marcado como tal o cuando no queda
   // stock sellado (todas las unidades se importan).
   const fullIsBackorder = isBajoPedidoFlag || fullBottleStock <= 0;
-  /** Las presentaciones selladas se rigen por su propio stock de variante. */
-  const sealedIsBackorder = (v: ProductVariant) =>
-    isBajoPedidoFlag || Number(v.availableQuantity ?? 0) <= 0;
+  /**
+   * Las presentaciones selladas extra van siempre bajo pedido: no existe stock
+   * por variante en la base —el `availableQuantity` que llega es el del frasco
+   * principal, así que un 50 ml heredaría el stock de los de 100— y prometer
+   * unidades que no están contadas es peor que avisar los 13–17 días.
+   */
+  const sealedIsBackorder = (_v: ProductVariant) => true;
   // Sólo la opción seleccionada determina el tag/modal de bajo pedido.
   const selectedIsBajoPedido = isFullSelected
     ? fullIsBackorder
@@ -174,7 +178,7 @@ export default function ProductPurchaseOptions({
       };
     }
     if (selectedSealed) {
-      const backorder = sealedIsBackorder(selectedSealed);
+      const backorder = true; // ver `sealedIsBackorder`
       const price = hasDiscount
         ? selectedSealed.price * (1 - discount / 100)
         : selectedSealed.price;
@@ -331,7 +335,9 @@ export default function ProductPurchaseOptions({
               <SizeCard
                 key={v.id}
                 ml={v.ml}
-                type="Decant"
+                /* Un decant sin ml suficientes no se puede servir (hay que abrir
+                   un frasco): la tarjeta dice por qué en vez de quedar muda. */
+                type={available ? 'Decant' : 'Sin stock'}
                 price={v.price}
                 discount={discount}
                 active={selectedDecant?.id === v.id}

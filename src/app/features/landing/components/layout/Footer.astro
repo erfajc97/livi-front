@@ -95,6 +95,20 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
+    <!-- Medios de pago: bloque propio bajo las columnas. En la barra legal
+         competían con los enlaces y quedaban apretados contra el borde. -->
+    <div class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2.5 md:gap-x-4 md:gap-y-3">
+      {PAYMENT_ICONS.map((icon) => (
+        <img
+          src={icon.src}
+          alt={icon.alt}
+          title={icon.alt}
+          loading="lazy"
+          class:list={['w-auto object-contain', icon.cls]}
+        />
+      ))}
+    </div>
+
     <div class="h-px bg-border"></div>
 
     <div class="mt-6 flex flex-col items-start justify-between gap-4 font-body text-[11px] tracking-[0.04em] text-text-muted sm:flex-row sm:items-center">
@@ -104,16 +118,6 @@ const year = new Date().getFullYear();
         <a href="/privacidad" class="transition-colors hover:text-text">Privacidad</a>
         <a href="/privacidad" class="transition-colors hover:text-text">Cookies</a>
         <a href="/faq" class="transition-colors hover:text-text">FAQ</a>
-        <div class="flex flex-wrap items-center gap-2">
-          {PAYMENT_ICONS.map((icon) => (
-            <img
-              src={icon.src}
-              alt={icon.alt}
-              title={icon.alt}
-              class:list={['w-auto object-contain', icon.cls]}
-            />
-          ))}
-        </div>
       </div>
     </div>
   </div>
