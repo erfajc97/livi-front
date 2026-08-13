@@ -298,14 +298,6 @@ export const FOOTER_SOCIAL_ICONS = [
   { alt: 'TikTok', href: '#' },
 ];
 
-export const FOOTER_PAYMENT_ICONS = [
-  { alt: 'PayPhone' },
-  { alt: 'Visa' },
-  { alt: 'Diners Club' },
-  { alt: 'American Express' },
-  { alt: 'Discover' },
-];
-
 export const FOOTER_LINKS_COL1 = [
   { href: '/catalogo/perfumes', label: 'Perfumes' },
   { href: '/bajo-pedido',       label: 'Bajo pedidos' },

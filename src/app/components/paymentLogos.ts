@@ -1,7 +1,6 @@
 import visaSvg from '@/assets/svg/visa.svg';
 import mastercardSvg from '@/assets/svg/mastercard.svg';
 import dinnersSvg from '@/assets/svg/dinners.svg';
-import amexSvg from '@/assets/svg/amex.svg';
 import discoverSvg from '@/assets/svg/discover.svg';
 import pichinchaSvg from '@/assets/svg/bancoPichincha.svg';
 
@@ -25,7 +24,7 @@ export const PAYMENT_LOGOS: PaymentLogo[] = [
   { src: visaSvg.src,                  alt: 'Visa',             cls: 'h-7 md:h-8' },
   { src: mastercardSvg.src,            alt: 'Mastercard',       cls: 'h-7 md:h-8' },
   { src: dinnersSvg.src,               alt: 'Diners Club',      cls: 'h-7 md:h-8' },
-  { src: amexSvg.src,                  alt: 'American Express', cls: 'h-7 md:h-8' },
+  // American Express fuera: no se acepta en ningún canal.
   { src: discoverSvg.src,              alt: 'Discover',         cls: 'h-7 md:h-8' },
   { src: pichinchaSvg.src,             alt: 'Banco Pichincha',  cls: 'h-4 md:h-5' },
   { src: '/images/pagos/banco-gye-logo.webp', alt: 'Banco Guayaquil', cls: 'h-5 md:h-6' },

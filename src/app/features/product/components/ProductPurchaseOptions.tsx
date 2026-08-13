@@ -97,13 +97,16 @@ export default function ProductPurchaseOptions({
   const fullBottleMl = Number(product.totalMl ?? 0);
 
   const variants = product.variants ?? [];
-  const decants = variants.filter(v => !v.isFullBottle);
+  // Siempre de menor a mayor: el orden en que llegan del backend depende del id
+  // de creación y dejaba tarjetas salteadas (10 ml antes que 3 ml).
+  const byMl = (a: ProductVariant, b: ProductVariant) => a.ml - b.ml;
+  const decants = variants.filter(v => !v.isFullBottle).sort(byMl);
   // Presentaciones selladas cargadas como variante (REQ-056). El backend crea
   // además una variante espejo del frasco del producto: esa no se pinta dos
   // veces, ya es la tarjeta principal.
-  const sealedExtras = variants.filter(
-    (v) => v.isFullBottle && !(v.ml === fullBottleMl && v.price === fullBottlePrice),
-  );
+  const sealedExtras = variants
+    .filter((v) => v.isFullBottle && !(v.ml === fullBottleMl && v.price === fullBottlePrice))
+    .sort(byMl);
 
   const isFullSelected = selected.type === 'full';
   const selectedSealed = selected.type === 'sealed' ? selected.variant : null;
@@ -235,6 +238,49 @@ export default function ProductPurchaseOptions({
     window.location.href = '/checkout';
   };
 
+  /** Tarjetas del selector, ya ordenadas de menor a mayor ml. */
+  const formatCards = [
+    ...(fullBottlePrice > 0
+      ? [
+          {
+            key: 'full',
+            ml: fullBottleMl,
+            type: fullBottleStock > 0 ? 'Sellada' : 'Bajo pedido',
+            price: fullBottlePrice,
+            active: isFullSelected,
+            disabled: !canBuyFullBottle,
+            onClick: canBuyFullBottle ? handleSelectFull : undefined,
+          },
+        ]
+      : []),
+    ...sealedExtras.map((v) => ({
+      key: v.id,
+      ml: v.ml,
+      type: sealedIsBackorder(v) ? 'Bajo pedido' : 'Sellada',
+      price: v.price,
+      active: selectedSealed?.id === v.id,
+      disabled: false,
+      onClick: () => {
+        setSelected({ type: 'sealed', variant: v });
+        onVariantChange?.(v);
+      },
+    })),
+    ...decants.map((v) => {
+      const available = canBuyDecant(v.ml);
+      return {
+        key: v.id,
+        ml: v.ml,
+        // Un decant sin ml suficientes no se puede servir (hay que abrir un
+        // frasco): la tarjeta dice por qué en vez de quedar muda.
+        type: available ? 'Decant' : 'Sin stock',
+        price: v.price,
+        active: selectedDecant?.id === v.id,
+        disabled: !available,
+        onClick: available ? () => handleSelectDecant(v) : undefined,
+      };
+    }),
+  ].sort((a, b) => a.ml - b.ml);
+
   const handleAddToCart = () => {
     if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
     const item = getCartItem();
@@ -303,49 +349,21 @@ export default function ProductPurchaseOptions({
       <div>
         <p className="eyebrow mb-2.5">Selecciona tu formato</p>
         {/* Tarjetas cuadradas y compactas (tamaño fijo, no se estiran) */}
+        {/* Un solo listado ordenado de menor a mayor ml, sin importar si es
+            decant o frasco: así el cliente lee la escala de un vistazo. */}
         <div className="flex flex-wrap gap-2">
-          {fullBottlePrice > 0 && (
+          {formatCards.map((card) => (
             <SizeCard
-              ml={fullBottleMl}
-              type={fullBottleStock > 0 ? 'Sellada' : 'Bajo pedido'}
-              price={fullBottlePrice}
+              key={card.key}
+              ml={card.ml}
+              type={card.type}
+              price={card.price}
               discount={discount}
-              active={isFullSelected}
-              disabled={!canBuyFullBottle}
-              onClick={canBuyFullBottle ? handleSelectFull : undefined}
-            />
-          )}
-          {sealedExtras.map((v) => (
-            <SizeCard
-              key={v.id}
-              ml={v.ml}
-              type={sealedIsBackorder(v) ? 'Bajo pedido' : 'Sellada'}
-              price={v.price}
-              discount={discount}
-              active={selectedSealed?.id === v.id}
-              onClick={() => {
-                setSelected({ type: 'sealed', variant: v });
-                onVariantChange?.(v);
-              }}
+              active={card.active}
+              disabled={card.disabled}
+              onClick={card.onClick}
             />
           ))}
-          {decants.map((v) => {
-            const available = canBuyDecant(v.ml);
-            return (
-              <SizeCard
-                key={v.id}
-                ml={v.ml}
-                /* Un decant sin ml suficientes no se puede servir (hay que abrir
-                   un frasco): la tarjeta dice por qué en vez de quedar muda. */
-                type={available ? 'Decant' : 'Sin stock'}
-                price={v.price}
-                discount={discount}
-                active={selectedDecant?.id === v.id}
-                disabled={!available}
-                onClick={available ? () => handleSelectDecant(v) : undefined}
-              />
-            );
-          })}
         </div>
       </div>
 
