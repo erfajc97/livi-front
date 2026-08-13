@@ -43,13 +43,15 @@ export default function CarouselProgressTrack({
       aria-valuemax={100}
       aria-valuenow={Math.round(Math.min(1, Math.max(0, progress)) * 100)}
       onClick={handleClick}
-      className={`relative h-4 w-full cursor-pointer ${className}`}
+      /* Riel corto y centrado: a lo ancho de la sección parecía un separador,
+         no un indicador de avance. */
+      className={`relative mx-auto h-4 w-full max-w-[180px] cursor-pointer md:max-w-[220px] ${className}`}
     >
-      {/* Riel gris (hit-area de 16px, trazo visible de 2px centrado) */}
-      <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-border" />
+      {/* Riel gris (hit-area de 16px, trazo visible de 3px centrado) */}
+      <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-border" />
       {/* Tramo activo negro */}
       <div
-        className="absolute left-0 top-1/2 h-0.5 bg-text"
+        className="absolute left-0 top-1/2 h-[3px] rounded-full bg-text"
         style={{ width: `${thumbPct}%`, transform: `translateX(${offsetPct}%) translateY(-50%)` }}
       />
     </div>

@@ -143,7 +143,6 @@ export default function BlogCarousel() {
       <section className="bg-bg px-6 py-8 md:px-14 md:py-12" aria-hidden="true">
         <div className="mx-auto max-w-7xl animate-pulse">
           <div className="mx-auto h-10 w-40 rounded-sm bg-border-soft md:h-12" />
-          <div className="mt-4 border-t border-border-soft md:mt-5" />
           <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <div key={i} className={i > 0 ? 'hidden md:block' : ''}>
@@ -166,10 +165,10 @@ export default function BlogCarousel() {
     <section className="bg-bg px-6 py-8 md:px-14 md:py-12">
       <div className="mx-auto max-w-7xl">
         {/* Título centrado con línea fina debajo */}
+        {/* Sin la línea bajo el título: separaba de más el encabezado del carrusel */}
         <h2 className="text-center font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-5xl">
           Blog
         </h2>
-        <div className="mt-4 border-t border-border md:mt-5" />
 
         {/* Carrusel de tarjetas */}
         <div className="relative mt-6 md:mt-8">

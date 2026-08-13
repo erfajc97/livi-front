@@ -459,6 +459,9 @@ export function useCheckoutHook() {
       if (orderId && receiptFile) {
         const fd = new FormData();
         fd.append('receipt', receiptFile);
+        // Quien compra sin sesión no tiene token: el correo del pedido es lo que
+        // le permite al backend confirmar que la orden es suya.
+        fd.append('email', customer.email);
         await axiosInstance.post(`/payments/${orderId}/upload-receipt`, fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });

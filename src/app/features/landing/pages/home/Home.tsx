@@ -15,9 +15,9 @@ function HomeContent() {
     return (
       <div className="bg-bg">
         <ProductCarouselSection title="" products={[]} isLoading num="01" />
-        <BlogCarousel />
         <HowItWorksSection />
         <ProductRankingSection title="" products={[]} isLoading num="02" />
+        <BlogCarousel />
       </div>
     );
   }
@@ -39,8 +39,6 @@ function HomeContent() {
         />
       )}
 
-      <BlogCarousel />
-
       {/* "Tres pasos hacia tu fragancia" va ANTES del ranking */}
       <HowItWorksSection />
 
@@ -53,6 +51,10 @@ function HomeContent() {
           num="02"
         />
       )}
+
+      {/* El blog cierra después del ranking: cuenta la casa cuando el visitante
+          ya vio los productos que se venden */}
+      <BlogCarousel />
 
       {rest.map((section, index) => (
         <ProductCarouselSection
