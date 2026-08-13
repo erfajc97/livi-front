@@ -134,21 +134,21 @@ h1, h2, h3, h4, h5, h6 {
   background:
     linear-gradient(
       100deg,
-      transparent 12%,
-      color-mix(in srgb, var(--color-accent) 70%, transparent) 34%,
-      #FFF1CC 44%,
-      #FFFDF5 50%,
-      #FFF1CC 56%,
-      color-mix(in srgb, var(--color-accent) 70%, transparent) 66%,
-      transparent 88%
+      transparent 14%,
+      #E8C169 32%,
+      #FFE9A8 43%,
+      #FFFBEC 50%,
+      #FFE9A8 57%,
+      #E8C169 68%,
+      transparent 86%
     ),
     linear-gradient(
-      var(--color-accent),
-      var(--color-accent)
+      color-mix(in srgb, var(--color-accent) 85%, #E8C169),
+      color-mix(in srgb, var(--color-accent) 85%, #E8C169)
     );
-  background-size: 250% 100%, 100% 100%;
+  background-size: 220% 100%, 100% 100%;
   background-repeat: no-repeat;
-  animation: gold-frame-sweep 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: gold-frame-sweep 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -166,62 +166,87 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ── "Nuestro compromiso": cada ícono repite su gesto en loop lento (REQ-061).
-      El ciclo es largo y con pausa: el movimiento se nota de reojo pero no
-      compite con el texto ni marea a quien se queda leyendo. ─────────────── */
+/* ── "Nuestro compromiso": cada ícono repite su gesto en loop (REQ-061).
+      Escudo y frascos se dibujan por partes —el trazo aparece como si alguien
+      lo estuviera trazando—, el camión entra rápido y el mundo gira mientras la
+      lupa se acerca. ─────────────────────────────────────────────────────── */
 .commit-icon {
+  display: inline-block;
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+/* Dibujado de trazo: `pathLength=1` en los SVG deja el largo normalizado, así
+   que la misma medida sirve para cualquier path. */
+@keyframes commit-draw {
+  0%        { stroke-dashoffset: 1; opacity: 0; }
+  6%        { opacity: 1; }
+  38%       { stroke-dashoffset: 0; opacity: 1; }
+  86%       { stroke-dashoffset: 0; opacity: 1; }
+  100%      { stroke-dashoffset: 0; opacity: 0; }
+}
+.commit-icon--seal .ci-part,
+.commit-icon--rise .ci-part {
+  stroke-dasharray: 1;
+  animation-name: commit-draw;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-fill-mode: both;
-  display: inline-block;
-  will-change: transform, opacity;
 }
-/* Autenticidad — el escudo respira: crece y vuelve. */
-@keyframes commit-seal {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.12); }
-}
-.commit-icon--seal {
-  animation-name: commit-seal;
-  animation-duration: 5s;
-}
+/* Autenticidad — primero el escudo, después el check. */
+.commit-icon--seal .ci-part { animation-duration: 3.6s; }
+.commit-icon--seal .ci-part-1 { animation-delay: 0s; }
+.commit-icon--seal .ci-part-2 { animation-delay: 0.5s; }
 
-/* Envíos — el camión entra desde la izquierda, se queda un rato y vuelve a
-   pasar. La pausa larga es la que evita el efecto "letrero parpadeante". */
+/* Catálogo — primero el marco y después los frascos, uno por uno. */
+.commit-icon--rise .ci-part { animation-duration: 3.8s; }
+.commit-icon--rise .ci-part-1 { animation-delay: 0s; }
+.commit-icon--rise .ci-part-2 { animation-delay: 0.35s; }
+.commit-icon--rise .ci-part-3 { animation-delay: 0.55s; }
+.commit-icon--rise .ci-part-4 { animation-delay: 0.75s; }
+
+/* Envíos — el camión entra rápido, se queda un momento y vuelve a pasar. */
 @keyframes commit-drive {
-  0%       { opacity: 0; transform: translateX(-18px); }
-  14%      { opacity: 1; transform: translateX(0); }
-  72%      { opacity: 1; transform: translateX(0); }
-  88%      { opacity: 0; transform: translateX(18px); }
-  100%     { opacity: 0; transform: translateX(-18px); }
+  0%   { opacity: 0; transform: translateX(-20px); }
+  8%   { opacity: 1; transform: translateX(0); }
+  75%  { opacity: 1; transform: translateX(0); }
+  90%  { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 0; transform: translateX(-20px); }
 }
 .commit-icon--drive {
-  animation-name: commit-drive;
-  animation-duration: 6.5s;
+  animation: commit-drive 3.8s cubic-bezier(0.22, 1, 0.36, 1) infinite both;
 }
 
-/* Catálogo — los frascos suben y bajan a su repisa. */
-@keyframes commit-rise {
-  0%, 100% { opacity: 1; transform: translateY(0); }
-  50%      { opacity: 1; transform: translateY(-5px); }
+/* Encargos — el mundo gira sobre su eje y la lupa se acerca y se aleja. */
+@keyframes commit-globe-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
 }
-.commit-icon--rise {
-  animation-name: commit-rise;
-  animation-duration: 5.5s;
+@keyframes commit-lens-zoom {
+  0%, 100% { transform: scale(0.9); }
+  50%      { transform: scale(1.18); }
 }
-
-/* Encargos — la lupa se acerca y se aleja sobre el globo. */
-@keyframes commit-search {
-  0%, 100% { opacity: 1; transform: scale(0.94); }
-  50%      { opacity: 1; transform: scale(1.12); }
+.commit-icon--search .ci-globe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: commit-globe-spin 5s linear infinite;
 }
-.commit-icon--search {
-  animation-name: commit-search;
-  animation-duration: 6s;
+.commit-icon--search .ci-lens {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: commit-lens-zoom 2.6s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .commit-icon { animation: none; opacity: 1; transform: none; }
+  .commit-icon,
+  .commit-icon .ci-part,
+  .commit-icon .ci-globe,
+  .commit-icon .ci-lens {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
 }
 
 /* ── Barra de promociones: los textos rotan solos (o con las flechas) y cada

@@ -514,11 +514,12 @@ function SizeCard({ ml, type, price, discount = 0, active, disabled, highlight, 
         </span>
       )}
 
-      <span className="font-display text-2xl leading-none">
-        {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
-      </span>
+      {/* El tipo va arriba: primero qué es, después cuánto trae */}
       <span className={`font-body text-[9px] uppercase leading-none tracking-[0.14em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
         {type}
+      </span>
+      <span className="font-display text-2xl leading-none">
+        {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
       </span>
       <span className="flex flex-col gap-0.5">
         {hasDiscount && (
