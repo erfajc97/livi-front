@@ -82,6 +82,13 @@ export const mapProduct = (raw: any): Product => {
       : undefined,
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
     marcaId: raw.marcaId != null ? Number(raw.marcaId) : undefined,
+    marca: raw.marca?.name
+      ? {
+          id: Number(raw.marca.id ?? raw.marcaId ?? 0),
+          name: raw.marca.name,
+          slug: raw.marca.slug ?? undefined,
+        }
+      : undefined,
     createdAt: raw.createdAt ?? '',
     // ── PDP editorial ──
     scentProfileTitle: raw.scentProfileTitle ?? undefined,

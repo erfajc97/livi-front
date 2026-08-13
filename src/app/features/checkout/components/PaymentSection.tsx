@@ -5,19 +5,12 @@ interface PaymentSectionProps {
   onSelect: (method: PaymentMethod) => void;
 }
 
-const METHODS: { key: PaymentMethod; label: string; icon: React.ReactNode }[] = [
+/* Solo el nombre del método: los logos de las tarjetas ya se muestran en el
+   resumen del pedido y acá competían con el texto. */
+const METHODS: { key: PaymentMethod; label: string; icon?: React.ReactNode }[] = [
   {
     key: 'PAYPHONE',
     label: 'Tarjeta débito o crédito',
-    icon: (
-      <div className="flex items-center gap-1.5">
-        <span className="text-blue-800 font-bold text-xs italic border border-border rounded px-1.5 py-0.5">VISA</span>
-        <div className="w-5 h-5 rounded-full border border-border overflow-hidden flex items-center justify-center">
-          <div className="w-2.5 h-5 bg-blue-500 skew-x-12" />
-        </div>
-        <span className="text-orange-500 font-bold text-xs border border-border rounded px-1.5 py-0.5">DISCOVER</span>
-      </div>
-    ),
   },
   {
     key: 'TRANSFERENCIA',

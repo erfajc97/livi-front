@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import AppProviders from '@/app/providers/AppProviders';
 import ProductPurchaseOptions from './ProductPurchaseOptions';
 import type { Product, ProductVariant } from '@/app/types/global.types';
@@ -16,24 +17,36 @@ function ProductGallery({
   name: string;
   bajoPedido?: boolean;
 }) {
-  const [active, setActive] = useState(0);
-  const touchStartX = useRef<number | null>(null);
   const list = images.filter(Boolean);
-  const idx = Math.min(active, Math.max(0, list.length - 1));
+  const [idx, setIdx] = useState(0);
 
-  const go = (dir: 1 | -1) =>
-    setActive((a) => (a + dir + list.length) % list.length);
+  /* Arrastre real —con el dedo y con el mouse— en vez del swipe casero, que
+     solo reaccionaba al soltar y se perdía si el gesto empezaba sobre la foto. */
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: list.length > 1,
+    align: 'start',
+    containScroll: false,
+  });
 
-  /* Swipe en mobile: deslizar izquierda/derecha cambia la imagen */
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0]?.clientX ?? null;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current == null || list.length < 2) return;
-    const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current;
-    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-    touchStartX.current = null;
-  };
+  useEffect(() => {
+    if (!emblaApi) return;
+    const sync = () => setIdx(emblaApi.selectedScrollSnap());
+    sync();
+    emblaApi.on('select', sync);
+    emblaApi.on('reInit', sync);
+    return () => {
+      emblaApi.off('select', sync);
+      emblaApi.off('reInit', sync);
+    };
+  }, [emblaApi]);
+
+  // Al cambiar de variante cambia la lista de fotos: volver a la primera.
+  useEffect(() => {
+    emblaApi?.reInit();
+    emblaApi?.scrollTo(0, true);
+  }, [emblaApi, images]);
+
+  const goTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   if (list.length === 0) {
     return (
@@ -52,12 +65,21 @@ function ProductGallery({
        puntos (sin miniaturas); en desktop usa el alto grande con miniaturas. */
     <div className="flex h-[42svh] flex-col gap-2.5 sm:h-[50svh] md:h-[calc(100svh-15rem)] md:max-h-[620px]">
       {/* Imagen principal — botella completa sobre tile blanco (object-contain) */}
-      <div
-        className="relative min-h-0 flex-1 overflow-hidden bg-white"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
-        <img src={list[idx]} alt={name} draggable={false} className="h-full w-full object-contain p-3 transition-opacity duration-300 md:p-4" />
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-white">
+        <div className="h-full overflow-hidden" ref={emblaRef}>
+          <div className="flex h-full">
+            {list.map((img, i) => (
+              <div key={i} className="h-full min-w-0 shrink-0 basis-full">
+                <img
+                  src={img}
+                  alt={i === 0 ? name : `${name} ${i + 1}`}
+                  draggable={false}
+                  className="h-full w-full select-none object-contain p-3 md:p-4"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
         {bajoPedido && (
           <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text md:left-5 md:top-5">
             <span className="h-[5px] w-[5px] rounded-full bg-accent" />
@@ -73,7 +95,7 @@ function ProductGallery({
               key={i}
               type="button"
               aria-label={`Imagen ${i + 1}`}
-              onClick={() => setActive(i)}
+              onClick={() => goTo(i)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 idx === i ? 'w-4 bg-text' : 'w-1.5 bg-text/30'
               }`}
@@ -88,7 +110,7 @@ function ProductGallery({
             <button
               key={i}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => goTo(i)}
               className={`relative aspect-square overflow-hidden border bg-white transition-colors ${
                 idx === i ? 'border-text' : 'border-border opacity-90 hover:opacity-100'
               }`}

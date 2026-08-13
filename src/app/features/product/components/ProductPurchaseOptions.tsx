@@ -245,10 +245,14 @@ export default function ProductPurchaseOptions({
           {
             key: 'full',
             ml: fullBottleMl,
-            type: fullBottleStock > 0 ? 'Sellada' : 'Bajo pedido',
+            // "Disponible" en vez de "Sellada": lo que el cliente necesita saber
+            // es que ese frasco se puede llevar hoy.
+            type: fullBottleStock > 0 ? 'Disponible' : 'Bajo pedido',
             price: fullBottlePrice,
             active: isFullSelected,
             disabled: !canBuyFullBottle,
+            // El frasco completo lleva el marco dorado para que resalte.
+            highlight: true,
             onClick: canBuyFullBottle ? handleSelectFull : undefined,
           },
         ]
@@ -256,10 +260,11 @@ export default function ProductPurchaseOptions({
     ...sealedExtras.map((v) => ({
       key: v.id,
       ml: v.ml,
-      type: sealedIsBackorder(v) ? 'Bajo pedido' : 'Sellada',
+      type: sealedIsBackorder(v) ? 'Bajo pedido' : 'Disponible',
       price: v.price,
       active: selectedSealed?.id === v.id,
       disabled: false,
+      highlight: true,
       onClick: () => {
         setSelected({ type: 'sealed', variant: v });
         onVariantChange?.(v);
@@ -276,6 +281,7 @@ export default function ProductPurchaseOptions({
         price: v.price,
         active: selectedDecant?.id === v.id,
         disabled: !available,
+        highlight: false,
         onClick: available ? () => handleSelectDecant(v) : undefined,
       };
     }),
@@ -330,6 +336,18 @@ export default function ProductPurchaseOptions({
             {detailTags.map((t) => t.value).join(' · ')}
           </span>
         )}
+        {/* La casa, sobre el nombre y enlazada a su catálogo: es lo primero que
+            busca quien ya conoce la marca. */}
+        {product.marca?.name && (
+          <a
+            href={`${product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes'}?marca=${
+              product.marca.slug || product.marca.id
+            }`}
+            className="mt-2 block w-fit font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:text-accent"
+          >
+            {product.marca.name}
+          </a>
+        )}
         <div className="mt-1.5 flex items-start justify-between gap-3">
           <h1 className="font-display text-3xl font-light leading-[0.98] tracking-[-0.025em] text-text md:text-4xl">{product.name}</h1>
           <button className="mt-1 shrink-0 text-text-muted transition-colors hover:text-accent" aria-label="Favorito">
@@ -361,6 +379,7 @@ export default function ProductPurchaseOptions({
               discount={discount}
               active={card.active}
               disabled={card.disabled}
+              highlight={card.highlight}
               onClick={card.onClick}
             />
           ))}
@@ -388,7 +407,11 @@ export default function ProductPurchaseOptions({
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           onClick={handleAddToCart}
-          className="flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          /* Con un decant elegido el botón toma el marco dorado: la tarjeta
+             seleccionada se pinta en negro y el brillo pasa a la acción. */
+          className={`flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent ${
+            selectedDecant ? 'gold-frame' : ''
+          }`}
         >
           Añadir — {formatCurrency(discountedPrice)}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
@@ -456,13 +479,15 @@ export default function ProductPurchaseOptions({
 
 /* Tarjeta de formato (ml + tipo + precio) — estilo editorial Noir.
    Con descuento muestra el % en la esquina y el precio ya rebajado. */
-function SizeCard({ ml, type, price, discount = 0, active, disabled, onClick }: {
+function SizeCard({ ml, type, price, discount = 0, active, disabled, highlight, onClick }: {
   ml: number;
   type: string;
   price: number;
   discount?: number;
   active: boolean;
   disabled?: boolean;
+  /** Marco dorado en loop: distingue el frasco completo del resto de formatos. */
+  highlight?: boolean;
   onClick?: () => void;
 }) {
   const hasDiscount = discount > 0;
@@ -474,6 +499,8 @@ function SizeCard({ ml, type, price, discount = 0, active, disabled, onClick }: 
       disabled={disabled}
       /* Bloque centrado y compacto: tipografía más grande, sin huecos muertos */
       className={`relative flex aspect-square w-26 flex-col items-start justify-center gap-1.5 p-3 text-left transition-all ${
+        highlight && !disabled ? 'gold-frame' : ''
+      } ${
         disabled
           ? 'cursor-not-allowed border border-border opacity-40'
           : active

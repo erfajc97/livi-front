@@ -70,6 +70,8 @@ export interface Product {
   price?: number;
   categoryId?: number;
   marcaId?: number;
+  /** Casa del perfume: la ficha la muestra sobre el título y enlaza a su catálogo. */
+  marca?: { id: number; name: string; slug?: string };
   createdAt: string;
   // ── PDP editorial ──
   scentProfileTitle?: string;

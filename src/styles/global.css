@@ -108,6 +108,49 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
 }
 
+/* ── Marco dorado que recorre el borde de izquierda a derecha. Marca la opción
+      del frasco completo en la ficha y el botón de añadir cuando hay un decant
+      elegido: el brillo solo pinta el borde (máscara), no el interior. ────── */
+@keyframes gold-frame-sweep {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+.gold-frame {
+  position: relative;
+}
+.gold-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in srgb, var(--color-accent) 55%, transparent) 40%,
+    #F3E6C6 50%,
+    color-mix(in srgb, var(--color-accent) 55%, transparent) 60%,
+    transparent 80%
+  );
+  background-size: 250% 100%;
+  animation: gold-frame-sweep 2.8s linear infinite;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gold-frame::after {
+    animation: none;
+    background: var(--color-accent);
+    opacity: 0.6;
+  }
+}
+
 /* ── "Nuestro compromiso": cada ícono entra con un gesto propio al aparecer en
       pantalla (REQ-061). Una sola pasada, sin loops: el bloque es informativo,
       no decorativo. ───────────────────────────────────────────────────────── */
