@@ -180,7 +180,9 @@ export default function TransferBankInfoStep({ total, isPending, termsAccepted, 
         type="button"
         onClick={() => receiptFile && termsAccepted && onConfirm(receiptFile)}
         disabled={!receiptFile || !termsAccepted || isPending}
-        className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+        className={`mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${
+          receiptFile && termsAccepted && !isPending ? 'gold-frame' : ''
+        }`}
       >
         {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Confirmar pedido'}
       </button>

@@ -57,10 +57,10 @@ export default function CartPageSummary({
           Envío e impuestos finales se confirman en el pago.
         </p>
 
-        {/* CTA */}
+        {/* CTA — marco dorado en loop: es el paso que queremos que se siga */}
         <a
           href="/checkout"
-          className="mt-6 flex w-full items-center justify-between gap-2 bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          className="gold-frame mt-6 flex w-full items-center justify-between gap-2 bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
         >
           <span>Pagar — {formatCurrency(total)}</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>

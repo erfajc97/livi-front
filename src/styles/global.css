@@ -109,11 +109,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── Marco dorado que recorre el borde de izquierda a derecha. Marca la opción
-      del frasco completo en la ficha y el botón de añadir cuando hay un decant
-      elegido: el brillo solo pinta el borde (máscara), no el interior. ────── */
+      del frasco completo en la ficha, el botón de añadir cuando hay un decant
+      elegido y los botones que llevan al pago: el brillo solo pinta el borde
+      (máscara), no el interior.
+
+      Con `background-size` mayor que la caja, el porcentaje de
+      `background-position` corre la imagen al revés: por eso el recorrido va de
+      250% a -150% y no al contrario. ─────────────────────────────────────── */
 @keyframes gold-frame-sweep {
-  0%   { background-position: -150% 0; }
-  100% { background-position: 250% 0; }
+  0%   { background-position: 250% 0; }
+  100% { background-position: -150% 0; }
 }
 .gold-frame {
   position: relative;
@@ -122,18 +127,28 @@ h1, h2, h3, h4, h5, h6 {
   content: '';
   position: absolute;
   inset: 0;
-  padding: 1.5px;
+  padding: 2px;
   pointer-events: none;
-  background: linear-gradient(
-    100deg,
-    transparent 20%,
-    color-mix(in srgb, var(--color-accent) 55%, transparent) 40%,
-    #F3E6C6 50%,
-    color-mix(in srgb, var(--color-accent) 55%, transparent) 60%,
-    transparent 80%
-  );
-  background-size: 250% 100%;
-  animation: gold-frame-sweep 2.8s linear infinite;
+  /* Base dorada tenue siempre encendida + banda brillante que la recorre:
+     así el marco se lee como oro y no como una línea gris con un destello. */
+  background:
+    linear-gradient(
+      100deg,
+      transparent 12%,
+      color-mix(in srgb, var(--color-accent) 70%, transparent) 34%,
+      #FFF1CC 44%,
+      #FFFDF5 50%,
+      #FFF1CC 56%,
+      color-mix(in srgb, var(--color-accent) 70%, transparent) 66%,
+      transparent 88%
+    ),
+    linear-gradient(
+      var(--color-accent),
+      var(--color-accent)
+    );
+  background-size: 250% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  animation: gold-frame-sweep 5.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
@@ -151,46 +166,59 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* ── "Nuestro compromiso": cada ícono entra con un gesto propio al aparecer en
-      pantalla (REQ-061). Una sola pasada, sin loops: el bloque es informativo,
-      no decorativo. ───────────────────────────────────────────────────────── */
+/* ── "Nuestro compromiso": cada ícono repite su gesto en loop lento (REQ-061).
+      El ciclo es largo y con pausa: el movimiento se nota de reojo pero no
+      compite con el texto ni marea a quien se queda leyendo. ─────────────── */
 .commit-icon {
-  animation-duration: 900ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
   animation-fill-mode: both;
   display: inline-block;
   will-change: transform, opacity;
 }
-/* Autenticidad — el escudo "sella": entra apretado y asienta. */
+/* Autenticidad — el escudo respira: crece y vuelve. */
 @keyframes commit-seal {
-  0%   { opacity: 0; transform: scale(0.82); }
-  55%  { opacity: 1; transform: scale(1.06); }
-  100% { opacity: 1; transform: scale(1); }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.12); }
 }
-.commit-icon--seal { animation-name: commit-seal; }
+.commit-icon--seal {
+  animation-name: commit-seal;
+  animation-duration: 5s;
+}
 
-/* Envíos — el camión llega desde la izquierda y frena. */
+/* Envíos — el camión entra desde la izquierda, se queda un rato y vuelve a
+   pasar. La pausa larga es la que evita el efecto "letrero parpadeante". */
 @keyframes commit-drive {
-  0%   { opacity: 0; transform: translateX(-14px); }
-  70%  { opacity: 1; transform: translateX(2px); }
-  100% { opacity: 1; transform: translateX(0); }
+  0%       { opacity: 0; transform: translateX(-18px); }
+  14%      { opacity: 1; transform: translateX(0); }
+  72%      { opacity: 1; transform: translateX(0); }
+  88%      { opacity: 0; transform: translateX(18px); }
+  100%     { opacity: 0; transform: translateX(-18px); }
 }
-.commit-icon--drive { animation-name: commit-drive; }
+.commit-icon--drive {
+  animation-name: commit-drive;
+  animation-duration: 6.5s;
+}
 
-/* Catálogo — los frascos suben a su repisa. */
+/* Catálogo — los frascos suben y bajan a su repisa. */
 @keyframes commit-rise {
-  0%   { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50%      { opacity: 1; transform: translateY(-5px); }
 }
-.commit-icon--rise { animation-name: commit-rise; }
+.commit-icon--rise {
+  animation-name: commit-rise;
+  animation-duration: 5.5s;
+}
 
-/* Encargos — la lupa barre el globo. */
+/* Encargos — la lupa se acerca y se aleja sobre el globo. */
 @keyframes commit-search {
-  0%   { opacity: 0; transform: rotate(-10deg) scale(0.92); }
-  60%  { opacity: 1; transform: rotate(4deg) scale(1.02); }
-  100% { opacity: 1; transform: rotate(0) scale(1); }
+  0%, 100% { opacity: 1; transform: scale(0.94); }
+  50%      { opacity: 1; transform: scale(1.12); }
 }
-.commit-icon--search { animation-name: commit-search; }
+.commit-icon--search {
+  animation-name: commit-search;
+  animation-duration: 6s;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .commit-icon { animation: none; opacity: 1; transform: none; }

@@ -114,10 +114,14 @@ export default function CheckoutForm({
             onSelectAddress={handleSelectAddress}
           />
           <div className="mt-2">
+            {/* El marco dorado solo cuando el paso se puede dar: en gris sería
+                una invitación a un botón que no responde. */}
             <button
               type="submit"
               disabled={!canContinue}
-              className="w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40"
+              className={`w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40 ${
+                canContinue ? 'gold-frame' : ''
+              }`}
             >
               Continuar
             </button>
@@ -137,7 +141,9 @@ export default function CheckoutForm({
           <button
             type="submit"
             disabled={isPending || !paymentMethod || !termsAccepted}
-            className="mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
+            className={`mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${
+              !isPending && paymentMethod && termsAccepted ? 'gold-frame' : ''
+            }`}
           >
             {isPending ? (
               <Loader size={18} color="#fff" className="mx-auto" />
