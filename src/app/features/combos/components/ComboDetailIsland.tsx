@@ -226,7 +226,9 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           <button
             onClick={comboInStock ? handleBuyNow : undefined}
             disabled={!comboInStock}
-            className="flex w-full items-center justify-between bg-text px-6 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+            className={`flex w-full items-center justify-between bg-text px-6 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 ${
+              comboInStock ? 'gold-frame' : ''
+            }`}
           >
             <span>{comboInStock ? `Comprar — ${formatCurrency(actualPrice)}` : 'Combo agotado'}</span>
             {comboInStock && (

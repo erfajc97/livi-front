@@ -141,7 +141,10 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
         <button
           onClick={inStock ? handleAdd : undefined}
           disabled={!inStock}
-          className="inline-flex items-center gap-2 bg-text px-7 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+          /* Marco dorado en loop, igual que el resto del camino a la compra */
+          className={`inline-flex items-center gap-2 bg-text px-7 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40 ${
+            inStock ? 'gold-frame' : ''
+          }`}
         >
           {inStock ? 'Añadir al carrito' : 'Combo agotado'}
           {inStock && (
