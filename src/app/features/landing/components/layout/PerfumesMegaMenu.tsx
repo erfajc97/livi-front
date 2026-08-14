@@ -147,7 +147,7 @@ export default function PerfumesMegaMenu({
                 <a
                   href={`${basePath}?category=${cat.id}`}
                   onClick={onClose}
-                  className="eyebrow mt-6 inline-block border-b border-border pb-1 text-text-muted transition-colors hover:text-accent"
+                  className="mt-6 inline-block border-b border-border pb-1 font-display text-base font-medium italic leading-none text-text transition-colors hover:text-accent"
                 >
                   Catálogo decants →
                 </a>

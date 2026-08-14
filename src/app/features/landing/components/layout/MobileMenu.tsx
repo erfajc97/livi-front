@@ -43,7 +43,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     // Al cambiar de sección se cierran las categorías abiertas
                     setExpandedCat(null);
                   }}
-                  className="flex w-full items-center justify-between py-4 font-display text-xl font-light italic leading-none tracking-[-0.01em]"
+                  className="flex w-full items-center justify-between py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em]"
                   aria-expanded={isOpen}
                 >
                   <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
@@ -60,7 +60,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     <a
                       href={basePath}
                       onClick={onClose}
-                      className="eyebrow mb-6 inline-block border-b border-text pb-1 font-semibold text-text transition-colors hover:text-accent"
+                      className="mb-6 inline-block border-b border-text pb-1 font-display text-base font-medium italic leading-none text-text transition-colors hover:text-accent"
                     >
                       Catálogo decants →
                     </a>
@@ -81,11 +81,11 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                                 aria-expanded={catOpen}
                                 className="flex w-full items-baseline gap-3 pb-1.5 text-left"
                               >
-                                {/* La categoría abierta se marca en negrita y en
-                                    tinta: antes se aclaraba y parecía apagada */}
+                                {/* Mismo serif curvo de los banners, con peso:
+                                    en versalitas finas se perdían contra la línea */}
                                 <span
-                                  className={`eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70 ${
-                                    catOpen ? 'font-semibold text-text' : ''
+                                  className={`font-display text-lg font-medium italic leading-none tracking-[-0.01em] transition-colors hover:underline underline-offset-4 decoration-accent/70 ${
+                                    catOpen ? 'text-accent' : 'text-text'
                                   }`}
                                 >
                                   {cat.name}
@@ -105,7 +105,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                                       key={sub.id}
                                       href={`${basePath}?category=${cat.id}&marca=${sub.id}`}
                                       onClick={onClose}
-                                      className="font-display text-lg font-normal not-italic leading-none text-text-soft transition-colors hover:text-accent hover:underline underline-offset-4 decoration-accent/70"
+                                      className="font-display text-base font-normal italic leading-none text-text-soft transition-colors hover:text-accent hover:underline underline-offset-4 decoration-accent/70"
                                     >
                                       {sub.name}
                                     </a>
@@ -128,7 +128,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-display text-xl font-light italic leading-none tracking-[-0.01em] transition-colors hover:text-accent ${active ? "text-accent" : "text-text"}`}
+              className={`border-b border-border py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em] transition-colors hover:text-accent ${active ? "text-accent" : "text-text"}`}
             >
               {link.label}
             </a>
