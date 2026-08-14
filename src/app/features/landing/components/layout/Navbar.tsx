@@ -43,7 +43,8 @@ export default function Navbar() {
     : openDropdown === 'bajoPedido' ? 'bajoPedido'
     : null;
 
-  // Enlace simple — DM Sans en versalitas, sin cambio de fuente/color al hover (ref. Atelier)
+  // Enlace simple — mismo serif cursivo que los títulos del mega menú, sin
+  // cambio de fuente/color al hover (ref. Atelier)
   const NavLink = ({ label, href, muted = false }: { label: string; href: string; muted?: boolean }) => (
     <a
       href={href}
@@ -63,9 +64,11 @@ export default function Navbar() {
       className="relative flex cursor-pointer items-center gap-2 text-text"
     >
       <a href={href}>{label}</a>
+      {/* Trazo grueso: a 1.4 la flecha se perdía junto al serif */}
       <svg
-        className={`h-2.5 w-2.5 transition-transform ${openDropdown === id ? 'rotate-180' : ''}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
+        className={`h-3 w-3 transition-transform ${openDropdown === id ? 'rotate-180' : ''}`}
+        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+        strokeLinecap="round" strokeLinejoin="round"
       >
         <path d="M6 9l6 6 6-6" />
       </svg>
@@ -97,12 +100,12 @@ export default function Navbar() {
               </button>
 
               <nav
-                className="hidden items-center gap-9 font-body text-xs uppercase tracking-[0.18em] md:flex"
+                className="hidden items-center gap-9 font-display text-xl font-normal italic leading-none tracking-[-0.01em] md:flex"
                 aria-label="Navegación principal"
               >
                 <MegaTrigger id="perfumes" label="Perfumes" href="/catalogo/perfumes" />
                 <NavLink label="Combos" href="/catalogo/combos" />
-                <MegaTrigger id="bajoPedido" label="Bajo Pedido" href="/bajo-pedido" />
+                <MegaTrigger id="bajoPedido" label="Bajo pedido" href="/bajo-pedido" />
                 <NavLink label="Blog" href="/blog" muted />
               </nav>
             </div>

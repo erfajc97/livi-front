@@ -35,6 +35,9 @@ export default function PerfumesMegaMenu({
 }: MegaMenuProps) {
   const isBajoPedido = mode === 'bajoPedido';
   const basePath = isBajoPedido ? '/bajo-pedido' : '/catalogo/perfumes';
+  // Bajo pedido se vende sellado: nombrar "decants" ahí prometía algo que
+  // esa sección no tiene.
+  const catalogLabel = isBajoPedido ? 'Ver catálogo →' : 'Catálogo decants →';
 
   // Ambas queries están cacheadas (staleTime 5min); se elige por modo.
   const normal = useNormalCategoriesQuery();
@@ -149,7 +152,7 @@ export default function PerfumesMegaMenu({
                   onClick={onClose}
                   className="mt-6 inline-block border-b border-border pb-1 font-display text-base font-medium italic leading-none text-text transition-colors hover:text-accent"
                 >
-                  Catálogo decants →
+                  {catalogLabel}
                 </a>
               </div>
             ))

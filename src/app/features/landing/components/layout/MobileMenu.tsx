@@ -33,7 +33,10 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               (link.dropdownId === 'perfumes' ? normalCategories : bajoPedidoCategories)
                 .filter((c) => c.name.toLowerCase() !== 'all'),
             );
-            const basePath = link.dropdownId === 'perfumes' ? '/catalogo/perfumes' : '/bajo-pedido';
+            const isPerfumes = link.dropdownId === 'perfumes';
+            const basePath = isPerfumes ? '/catalogo/perfumes' : '/bajo-pedido';
+            // Bajo pedido se vende sellado: ahí no hay decants que ofrecer.
+            const catalogLabel = isPerfumes ? 'Catálogo decants →' : 'Ver catálogo →';
 
             return (
               <div key={link.label} className="border-b border-border">
@@ -46,10 +49,21 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                   className="flex w-full items-center justify-between py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em]"
                   aria-expanded={isOpen}
                 >
-                  <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
+                  {/* El estado activo se marca con el subrayado dorado, no
+                      pintando el texto: el dorado sobre marfil se leía
+                      apagado, como si la opción estuviera deshabilitada. */}
+                  <span
+                    className={`text-text ${
+                      active || isOpen ? 'underline decoration-accent decoration-2 underline-offset-[6px]' : ''
+                    }`}
+                  >
+                    {link.label}
+                  </span>
+                  {/* Trazo grueso: a 1.4 la flecha se perdía junto al serif */}
                   <svg
-                    className={`h-3 w-3 text-text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
-                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
+                    className={`h-4 w-4 text-text transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                    strokeLinecap="round" strokeLinejoin="round"
                   >
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -62,7 +76,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                       onClick={onClose}
                       className="mb-6 inline-block border-b border-text pb-1 font-display text-base font-medium italic leading-none text-text transition-colors hover:text-accent"
                     >
-                      Catálogo decants →
+                      {catalogLabel}
                     </a>
 
                     {categories.length === 0 ? (
@@ -84,16 +98,17 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                                 {/* Mismo serif curvo de los banners, con peso:
                                     en versalitas finas se perdían contra la línea */}
                                 <span
-                                  className={`font-display text-lg font-medium italic leading-none tracking-[-0.01em] transition-colors hover:underline underline-offset-4 decoration-accent/70 ${
-                                    catOpen ? 'text-accent' : 'text-text'
+                                  className={`font-display text-lg font-medium italic leading-none tracking-[-0.01em] text-text transition-colors hover:underline underline-offset-4 decoration-accent/70 ${
+                                    catOpen ? 'underline decoration-accent decoration-2 underline-offset-[6px]' : ''
                                   }`}
                                 >
                                   {cat.name}
                                 </span>
                                 <span className="h-px flex-1 bg-border" />
                                 <svg
-                                  className={`h-2.5 w-2.5 shrink-0 self-center text-text-muted transition-transform ${catOpen ? 'rotate-180' : ''}`}
-                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"
+                                  className={`h-3.5 w-3.5 shrink-0 self-center text-text transition-transform ${catOpen ? 'rotate-180' : ''}`}
+                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
+                                  strokeLinecap="round" strokeLinejoin="round"
                                 >
                                   <path d="M6 9l6 6 6-6" />
                                 </svg>
@@ -128,7 +143,9 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em] transition-colors hover:text-accent ${active ? "text-accent" : "text-text"}`}
+              className={`border-b border-border py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em] text-text transition-colors hover:text-accent ${
+                active ? 'underline decoration-accent decoration-2 underline-offset-[6px]' : ''
+              }`}
             >
               {link.label}
             </a>
