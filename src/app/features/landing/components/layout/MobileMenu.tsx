@@ -62,7 +62,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                       onClick={onClose}
                       className="eyebrow mb-6 inline-block border-b border-text pb-1 text-text transition-colors hover:text-accent"
                     >
-                      Ver todo →
+                      Ver catálogo →
                     </a>
 
                     {categories.length === 0 ? (
@@ -81,7 +81,13 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                                 aria-expanded={catOpen}
                                 className="flex w-full items-baseline gap-3 pb-1.5 text-left"
                               >
-                                <span className={`eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70 ${catOpen ? 'text-accent' : ''}`}>
+                                {/* La categoría abierta se marca en negrita y en
+                                    tinta: antes se aclaraba y parecía apagada */}
+                                <span
+                                  className={`eyebrow transition-colors hover:underline underline-offset-4 decoration-accent/70 ${
+                                    catOpen ? 'font-semibold text-text' : ''
+                                  }`}
+                                >
                                   {cat.name}
                                 </span>
                                 <span className="h-px flex-1 bg-border" />

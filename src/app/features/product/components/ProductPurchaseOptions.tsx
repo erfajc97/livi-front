@@ -227,8 +227,9 @@ export default function ProductPurchaseOptions({
     const item = getCartItem();
     if (!item) return;
     addItem(item);
+    // Se queda en la ficha: agregar no debería sacar al cliente de lo que está
+    // mirando. Para ir a pagar está "Comprar ahora" y el ícono del carrito.
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
-    window.location.href = '/carrito';
   };
 
   const proceedFastPurchase = () => {

@@ -35,8 +35,10 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         role="dialog"
         aria-modal="true"
       >
+        {/* Solo el formulario: el panel con la foto se quitó, así que la caja
+            es angosta y centrada en lugar de partida en dos. */}
         <div
-          className="relative flex w-full max-w-4xl flex-col overflow-hidden bg-bg shadow-2xl md:flex-row"
+          className="relative flex w-full max-w-md flex-col overflow-hidden bg-bg shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
@@ -51,8 +53,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             </svg>
           </button>
 
-          {/* Left: Form side */}
-          <div className="max-h-[90vh] flex-1 overflow-y-auto px-8 py-10 sm:px-12 sm:py-14">
+          <div className="max-h-[90vh] overflow-y-auto px-8 py-10 sm:px-10 sm:py-12">
             {/* Wordmark */}
             <div className="mb-8 flex justify-center">
               <img src="/logonondecants.png" alt="NönDecants" width={543} height={127} className="h-8 w-auto" />
@@ -78,21 +79,6 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
             )}
           </div>
 
-          {/* Right: Banner image */}
-          <div className="hidden md:block md:w-[320px] lg:w-[360px] shrink-0 relative">
-            <img
-              src="/loginbanner.png"
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            {/* Overlay with brand text */}
-            <div className="absolute inset-0 flex flex-col items-center justify-between bg-black/40 px-6 py-10">
-              <img src="/logo.svg" alt="NönDecants" className="h-6" />
-              <p className="max-w-[260px] text-center font-display text-sm italic leading-relaxed text-white/90">
-                Compra 100% segura — aprovecha nuestros descuentos y compra con confianza.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </>

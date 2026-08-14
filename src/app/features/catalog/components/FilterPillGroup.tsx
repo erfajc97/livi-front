@@ -27,7 +27,9 @@ export default function FilterPillGroup({
 
   return (
     <div>
-      <p className="eyebrow mb-3">{label}</p>
+      {/* Título del grupo en negrita y en tinta: los rótulos apagados se perdían
+          entre las opciones */}
+      <p className="eyebrow mb-3 font-semibold text-text">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => {
           const isActive = selected.includes(opt.value);

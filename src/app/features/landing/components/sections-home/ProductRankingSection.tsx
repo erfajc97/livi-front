@@ -106,16 +106,20 @@ export default function ProductRankingSection({
   }
   if (!products || products.length === 0) return null;
 
-  const top = products[0];
-  const t = derive(top);
-
-  // La lista lateral pagina de 4 en 4 (02–05, 06–09, …) con la misma barrita
-  // de posición de los carruseles.
-  const rest = products.slice(1);
-  const totalPages = Math.max(1, Math.ceil(rest.length / PER_PAGE));
+  // Cada página es un tramo completo del ranking: el primero de la página va
+  // destacado y los siguientes en la lista. Antes el destacado se quedaba fijo
+  // en el nº1 y al pasar de página seguía mostrando el mismo perfume.
+  const PAGE_SIZE = PER_PAGE + 1;
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
-  const list = rest.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE);
-  const rankAt = (i: number) => String(safePage * PER_PAGE + i + 2).padStart(2, '0');
+  const pageItems = products.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+
+  const top = pageItems[0] ?? products[0];
+  const t = derive(top);
+  const topRank = String(safePage * PAGE_SIZE + 1).padStart(2, '0');
+
+  const list = pageItems.slice(1);
+  const rankAt = (i: number) => String(safePage * PAGE_SIZE + i + 2).padStart(2, '0');
 
   // Móvil: misma paginación, incluyendo el #1 en la primera página.
   const mobilePages = Math.max(1, Math.ceil(products.length / MOBILE_PER_PAGE));
@@ -138,9 +142,9 @@ export default function ProductRankingSection({
 
         {/* ── Desktop: #1 destacado (card compacta con marco, ref. ANX-10) + lista 02–05 ── */}
         <div className="hidden items-start gap-12 md:grid md:grid-cols-[0.75fr_1.25fr]">
-          {/* Featured #1 */}
+          {/* Destacado de la página (01, 06, 11…) */}
           <a href={t.href} className="group block border border-border bg-surface-raised p-6 transition-colors duration-300 hover:border-text-muted md:p-8">
-            <span className="font-display text-3xl leading-none text-text md:text-4xl">01</span>
+            <span className="font-display text-3xl leading-none text-text md:text-4xl">{topRank}</span>
             <div className="mx-auto mt-4 aspect-square w-full max-w-[240px] overflow-hidden md:max-w-[280px]">
               {t.image && (
                 <img src={t.image} alt={top.name} className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.02]" />
