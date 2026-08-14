@@ -179,11 +179,12 @@ h1, h2, h3, h4, h5, h6 {
 /* Dibujado de trazo: `pathLength=1` en los SVG deja el largo normalizado, así
    que la misma medida sirve para cualquier path. */
 @keyframes commit-draw {
-  0%        { stroke-dashoffset: 1; opacity: 0; }
-  6%        { opacity: 1; }
-  38%       { stroke-dashoffset: 0; opacity: 1; }
-  86%       { stroke-dashoffset: 0; opacity: 1; }
-  100%      { stroke-dashoffset: 0; opacity: 0; }
+  /* Se traza, descansa y se borra: sin el fundido de antes, que dejaba el ícono
+     en blanco un instante y se leía como "se paró". */
+  0%   { stroke-dashoffset: 1; }
+  30%  { stroke-dashoffset: 0; }
+  75%  { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 1; }
 }
 .commit-icon--seal .ci-part,
 .commit-icon--rise .ci-part {
