@@ -49,16 +49,10 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                   className="flex w-full items-center justify-between py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em]"
                   aria-expanded={isOpen}
                 >
-                  {/* El estado activo se marca con el subrayado dorado, no
-                      pintando el texto: el dorado sobre marfil se leía
-                      apagado, como si la opción estuviera deshabilitada. */}
-                  <span
-                    className={`text-text ${
-                      active || isOpen ? 'underline decoration-accent decoration-2 underline-offset-[6px]' : ''
-                    }`}
-                  >
-                    {link.label}
-                  </span>
+                  {/* Sin marca de activo: la flecha ya dice si está abierto y
+                      cualquier subrayado aquí compite con el de las
+                      categorías, que sí significa "toca de nuevo para ver". */}
+                  <span className="text-text">{link.label}</span>
                   {/* Trazo grueso: a 1.4 la flecha se perdía junto al serif */}
                   <svg
                     className={`h-4 w-4 text-text transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -87,12 +81,25 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                           const catOpen = expandedCat === String(cat.id);
                           return (
                             <div key={cat.id}>
-                              {/* Categoría colapsada por defecto: solo el nombre
-                                  con su flecha; al tocarla se despliegan sus
-                                  marcas para que el menú no sea infinito */}
+                              {/* Dos toques, dos intenciones: el primero abre
+                                  las marcas (el menú no puede ser infinito) y
+                                  el segundo, ya con la fila subrayada, lleva
+                                  al catálogo filtrado por esa categoría. */}
                               <button
-                                onClick={() => setExpandedCat(catOpen ? null : String(cat.id))}
+                                onClick={() => {
+                                  if (catOpen) {
+                                    onClose();
+                                    window.location.href = `${basePath}?category=${cat.id}`;
+                                    return;
+                                  }
+                                  setExpandedCat(String(cat.id));
+                                }}
                                 aria-expanded={catOpen}
+                                title={
+                                  catOpen
+                                    ? `Ver los perfumes de ${cat.name}`
+                                    : `Ver las marcas de ${cat.name}`
+                                }
                                 className="flex w-full items-baseline gap-3 pb-1.5 text-left"
                               >
                                 {/* Mismo serif curvo de los banners, con peso:
@@ -143,9 +150,8 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em] text-text transition-colors hover:text-accent ${
-                active ? 'underline decoration-accent decoration-2 underline-offset-[6px]' : ''
-              }`}
+              aria-current={active ? 'page' : undefined}
+              className="border-b border-border py-4 font-display text-xl font-medium italic leading-none tracking-[-0.01em] text-text transition-colors hover:text-accent"
             >
               {link.label}
             </a>
