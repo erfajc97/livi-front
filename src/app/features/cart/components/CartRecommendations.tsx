@@ -48,7 +48,7 @@ export default function CartRecommendations() {
       <div className="mb-6 flex items-baseline justify-between md:mb-8">
         <div className="flex items-baseline gap-4">
           <span className="font-body text-[10px] uppercase tracking-[0.24em] text-text-muted">—</span>
-          <h2 className="font-display text-2xl font-light text-text md:text-3xl">{title}</h2>
+          <h2 className="font-display text-2xl font-light italic leading-none text-text md:text-3xl">{title}</h2>
         </div>
         <a
           href="/catalogo/perfumes"

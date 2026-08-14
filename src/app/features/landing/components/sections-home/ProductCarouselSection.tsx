@@ -52,7 +52,7 @@ export default function ProductCarouselSection({
           {isLoading ? (
             <div className="h-8 w-52 animate-pulse rounded-sm bg-bg-alt md:h-10 md:w-72" />
           ) : (
-            <h2 className="font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-5xl">
+            <h2 className="font-display text-3xl font-light italic leading-none tracking-[-0.01em] text-text md:text-5xl">
               {title}
             </h2>
           )}

@@ -70,9 +70,12 @@ export default function CommitmentStrip() {
   return (
     <div ref={ref} className="shrink-0 border-t border-border bg-bg-alt">
       <div className="mx-auto max-w-[1400px] px-4 py-8 md:px-12 md:py-12">
+        {/* Mismo tratamiento que los títulos de banner y de sección */}
         <div className="mb-7 flex items-center justify-center gap-4 md:mb-10">
           <span className="h-px w-8 bg-border" />
-          <span className="eyebrow">Nuestro compromiso</span>
+          <h2 className="font-display text-2xl font-light italic leading-none tracking-[-0.01em] text-text md:text-3xl">
+            Nuestro compromiso
+          </h2>
           <span className="h-px w-8 bg-border" />
         </div>
 

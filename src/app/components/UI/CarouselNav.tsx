@@ -163,10 +163,11 @@ export function CarouselProgressBar({
             onClick={() => onSelect(i)}
             aria-label={`Ir a la página ${i + 1} de ${snapCount}`}
             aria-current={active}
-            className="group flex h-4 w-10 items-center justify-center"
+            className="group flex h-5 w-10 items-center justify-center"
           >
+            {/* Trazo de 3 px: a 2 px casi no se veía en móvil */}
             <span
-              className={`block h-0.5 w-full transition-colors ${
+              className={`block h-[3px] w-full rounded-full transition-colors ${
                 active ? 'bg-text' : 'bg-border group-hover:bg-text-muted'
               }`}
             />

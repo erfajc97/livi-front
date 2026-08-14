@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { productUrl } from '@/app/helpers/productUrl';
 import { CarouselProgressBar } from '@/app/components/UI/CarouselNav';
@@ -68,6 +68,7 @@ export default function ProductRankingSection({
 }: ProductRankingSectionProps) {
   // Página actual de la lista (hook antes de cualquier return condicional).
   const [page, setPage] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   if (isLoading) {
     // Esqueleto del layout del ranking: destacado + lista de 4.
@@ -134,7 +135,7 @@ export default function ProductRankingSection({
       <div className="mx-auto max-w-7xl">
         {/* Header de sección — título en Cormorant Garamond (REQ-028) */}
         <div className="mb-6 flex items-baseline justify-between md:mb-12">
-          <h2 className="font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-5xl">{title}</h2>
+          <h2 className="font-display text-3xl font-light italic leading-none tracking-[-0.01em] text-text md:text-5xl">{title}</h2>
           <a href={viewAllHref} className="hidden shrink-0 border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block">
             Ver el ranking completo
           </a>
@@ -202,8 +203,26 @@ export default function ProductRankingSection({
           </div>
         </div>
 
-        {/* ── Móvil: lista paginada ── */}
-        <div className="flex flex-col md:hidden">
+        {/* ── Móvil: lista paginada, se pasa deslizando ── */}
+        <div
+          className="flex touch-pan-y flex-col md:hidden"
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(e) => {
+            const start = touchStartX.current;
+            touchStartX.current = null;
+            if (start == null) return;
+            const dx = (e.changedTouches[0]?.clientX ?? 0) - start;
+            // 45 px: lo justo para no confundir el gesto con un toque torcido.
+            if (Math.abs(dx) < 45) return;
+            setPage((p) =>
+              dx < 0
+                ? Math.min(p + 1, mobilePages - 1)
+                : Math.max(p - 1, 0),
+            );
+          }}
+        >
           {mobileList.map((p, i) => {
             const d = derive(p);
             const rank = String(safeMobilePage * MOBILE_PER_PAGE + i + 1).padStart(2, '0');

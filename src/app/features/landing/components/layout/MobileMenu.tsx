@@ -43,7 +43,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     // Al cambiar de sección se cierran las categorías abiertas
                     setExpandedCat(null);
                   }}
-                  className="flex w-full items-center justify-between py-4 font-display text-base tracking-[0.04em]"
+                  className="flex w-full items-center justify-between py-4 font-display text-xl font-light italic leading-none tracking-[-0.01em]"
                   aria-expanded={isOpen}
                 >
                   <span className={active || isOpen ? 'text-accent' : 'text-text'}>{link.label}</span>
@@ -128,7 +128,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
               key={link.label}
               href={link.href}
               onClick={onClose}
-              className={`border-b border-border py-4 font-display text-base tracking-[0.04em] transition-colors hover:text-accent ${active ? 'text-accent' : 'text-text'}`}
+              className={`border-b border-border py-4 font-display text-xl font-light italic leading-none tracking-[-0.01em] transition-colors hover:text-accent ${active ? "text-accent" : "text-text"}`}
             >
               {link.label}
             </a>

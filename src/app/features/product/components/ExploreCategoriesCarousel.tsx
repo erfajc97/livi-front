@@ -42,7 +42,7 @@ export default function ExploreCategoriesCarousel({ products }: ExploreCategorie
     <section className="mb-8 mt-8 md:mb-10 md:mt-16">
       {/* Título de sección: Cormorant Garamond destacado (REQ-028), sin
           numeración editorial (REQ-032) */}
-      <h2 className="mb-6 font-display text-3xl font-light leading-[1.05] tracking-[-0.02em] text-text md:mb-10 md:text-4xl">
+      <h2 className="mb-6 font-display text-3xl font-light italic leading-none tracking-[-0.02em] text-text md:mb-10 md:text-4xl">
         De la misma familia
       </h2>
 

@@ -122,7 +122,7 @@ export default function PerfumesMegaMenu({
                   onClick={onClose}
                   className="group block"
                 >
-                  <span className="block font-display text-[28px] font-normal leading-tight tracking-[-0.01em] text-text transition-colors group-hover:text-accent group-hover:underline underline-offset-[6px] decoration-accent/70">
+                  <span className="block font-display text-[28px] font-light italic leading-none tracking-[-0.01em] text-text transition-colors group-hover:text-accent group-hover:underline underline-offset-[6px] decoration-accent/70">
                     {cat.name}
                   </span>
                 </a>
@@ -149,7 +149,7 @@ export default function PerfumesMegaMenu({
                   onClick={onClose}
                   className="eyebrow mt-6 inline-block border-b border-border pb-1 text-text-muted transition-colors hover:text-accent"
                 >
-                  Ver todo {cat.name.toLowerCase()} →
+                  Catálogo decants →
                 </a>
               </div>
             ))
