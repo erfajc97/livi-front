@@ -60,9 +60,9 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
                     <a
                       href={basePath}
                       onClick={onClose}
-                      className="eyebrow mb-6 inline-block border-b border-text pb-1 text-text transition-colors hover:text-accent"
+                      className="eyebrow mb-6 inline-block border-b border-text pb-1 font-semibold text-text transition-colors hover:text-accent"
                     >
-                      Ver catálogo →
+                      Catálogo decants →
                     </a>
 
                     {categories.length === 0 ? (

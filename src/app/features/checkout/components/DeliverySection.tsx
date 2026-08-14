@@ -7,6 +7,23 @@ export const PICKUP_METHODS: DeliveryMethod[] = ['ENTREGA_PERSONAL', 'RETIRO_PIW
 export const isPickupMethod = (method: DeliveryMethod | null) =>
   method != null && PICKUP_METHODS.includes(method);
 
+/**
+ * Puntos de retiro con su ubicación real en Google Maps: quien retira necesita
+ * saber a dónde ir, y un nombre suelto no alcanza.
+ */
+const PICKUP_PLACES: Record<string, { name: string; hint: string; mapsUrl: string }> = {
+  RETIRO_PIWU: {
+    name: 'Piwu Market',
+    hint: 'Retiro en el local',
+    mapsUrl: 'https://maps.app.goo.gl/3FCd8dkjYzYPcq7Z7',
+  },
+  ENTREGA_PERSONAL: {
+    name: 'Plaza Tía — La Joya',
+    hint: 'Entrega personal en el punto acordado',
+    mapsUrl: 'https://maps.app.goo.gl/eBEhWag2Xwp3DSnT6',
+  },
+};
+
 export type DeliveryMode = 'shipping' | 'pickup';
 
 interface DeliverySectionProps {
@@ -82,31 +99,58 @@ export default function DeliverySection({
           <div className="flex flex-col gap-2.5">
             {visibleOptions.map((opt) => {
               const active = selected === opt.method;
+              const place = PICKUP_PLACES[opt.method];
               return (
-                <button
+                <div
                   key={opt.id}
-                  type="button"
-                  onClick={() => onSelect(opt.method)}
-                  className={`flex items-center justify-between gap-4 border px-4 py-3.5 text-left transition-colors ${
+                  className={`border transition-colors ${
                     active ? 'border-text bg-bg-alt' : 'border-border hover:border-text'
                   }`}
                 >
-                  <span className="flex items-center gap-3">
-                    <span
-                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
-                        active ? 'border-text' : 'border-border'
-                      }`}
-                    >
-                      {active && <span className="h-2 w-2 rounded-full bg-text" />}
-                    </span>
-                    <span className="font-body text-[13px] leading-snug text-text">{opt.label}</span>
-                  </span>
-                  <span
-                    className={`shrink-0 font-body text-sm ${opt.cost === 0 ? 'text-accent' : 'text-text'}`}
+                  <button
+                    type="button"
+                    onClick={() => onSelect(opt.method)}
+                    className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-left"
                   >
-                    {opt.cost === 0 ? 'Gratis' : formatCurrency(opt.cost)}
-                  </span>
-                </button>
+                    <span className="flex items-center gap-3">
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                          active ? 'border-text' : 'border-border'
+                        }`}
+                      >
+                        {active && <span className="h-2 w-2 rounded-full bg-text" />}
+                      </span>
+                      <span className="font-body text-[13px] leading-snug text-text">
+                        {place?.name ?? opt.label}
+                        {place && (
+                          <span className="block font-body text-[11px] text-text-muted">
+                            {place.hint}
+                          </span>
+                        )}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 font-body text-sm ${opt.cost === 0 ? 'text-accent' : 'text-text'}`}
+                    >
+                      {opt.cost === 0 ? 'Gratis' : formatCurrency(opt.cost)}
+                    </span>
+                  </button>
+
+                  {place && (
+                    <a
+                      href={place.mapsUrl}
+                      target="_blank"
+                      rel="noopener"
+                      className="flex items-center gap-1.5 border-t border-border px-4 py-2.5 font-body text-[11px] uppercase tracking-[0.16em] text-text-muted transition-colors hover:text-text"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      Ver ubicación en Maps
+                    </a>
+                  )}
+                </div>
               );
             })}
           </div>

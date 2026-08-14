@@ -22,7 +22,7 @@ export default function HowItWorksSection() {
       <div className="mx-auto mt-8 grid max-w-[1200px] gap-8 md:mt-12 md:grid-cols-3 md:gap-14">
         {STEPS.map((s) => (
           <div key={s.n}>
-            <div className="font-display text-5xl font-light italic leading-none tracking-[-0.02em] text-accent md:text-6xl">
+            <div className="font-display text-5xl font-light italic leading-none tracking-[-0.02em] text-text md:text-6xl">
               {s.n}
             </div>
             <div className="mb-3 mt-3 h-px bg-border md:mb-4 md:mt-4" />

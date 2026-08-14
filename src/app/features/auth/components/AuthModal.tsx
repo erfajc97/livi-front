@@ -38,7 +38,7 @@ export default function AuthModal({ open, onClose }: AuthModalProps) {
         {/* Solo el formulario: el panel con la foto se quitó, así que la caja
             es angosta y centrada en lugar de partida en dos. */}
         <div
-          className="relative flex w-full max-w-md flex-col overflow-hidden bg-bg shadow-2xl"
+          className="relative flex w-full max-w-lg flex-col overflow-hidden bg-bg shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}

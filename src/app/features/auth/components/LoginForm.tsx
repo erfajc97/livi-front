@@ -117,13 +117,18 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
           />
         </div>
 
-        {/* Switch to register */}
-        <p className="mt-2 text-center font-body text-sm text-text-soft">
-          ¿No tienes cuenta?{' '}
-          <button type="button" onClick={onSwitchToRegister} className="border-b border-text pb-0.5 text-text transition-colors hover:border-accent hover:text-accent">
-            Regístrate
+        {/* Crear cuenta: la acción secundaria del modal, con el tratamiento
+            editorial del sitio en vez de un enlace suelto */}
+        <div className="mt-4 border-t border-border pt-5 text-center">
+          <p className="eyebrow mb-2 text-text-muted">¿Primera vez en NonDecants?</p>
+          <button
+            type="button"
+            onClick={onSwitchToRegister}
+            className="w-full border border-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-text transition-colors hover:bg-text hover:text-bg"
+          >
+            Crear cuenta
           </button>
-        </p>
+        </div>
       </form>
     </div>
   );

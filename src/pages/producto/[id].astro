@@ -23,11 +23,12 @@ if (Astro.url.pathname !== canonical) {
   return Astro.redirect(`${canonical}${Astro.url.search}`, 301);
 }
 
-// Relacionados: misma categoría, distinta marca (productos de la categoría
-// de otras casas). Si el producto no trae categoría, no se muestra el carrusel.
-const relatedProducts = product.categoryId
-  ? (await fetchProducts({ categoryId: product.categoryId, limit: 12 })).content
-      .filter((p) => p.id !== product.id && (product.marcaId == null || p.marcaId !== product.marcaId))
+// "De la misma familia": el resto de perfumes de la MISMA casa. Antes traía la
+// categoría entera excluyendo la marca, que es justo lo contrario de lo que
+// espera quien acaba de entrar por una marca.
+const relatedProducts = product.marcaId
+  ? (await fetchProducts({ marcaId: product.marcaId, limit: 12 })).content
+      .filter((p) => p.id !== product.id)
   : [];
 ---
 

@@ -209,7 +209,7 @@ export default function ProductRankingSection({
             const rank = String(safeMobilePage * MOBILE_PER_PAGE + i + 1).padStart(2, '0');
             return (
               <a key={p.id} href={d.href} className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-                <span className="font-display text-2xl italic leading-none text-accent">{rank}</span>
+                <span className="font-display text-2xl italic leading-none text-text">{rank}</span>
                 <div className="h-24 w-full overflow-hidden bg-surface-raised">
                   {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-cover" />}
                 </div>

@@ -175,14 +175,17 @@ export default function AddressSection({
           />
         )}
 
-        <SearchableSelect
-          value={customer.city}
-          options={customer.province ? cantonsOf(customer.province) : ALL_CANTONS}
-          placeholder="Ciudad *"
-          inputClassName={SELECT_CLASS}
-          onChange={(v) => onChange('city', v)}
-          className={isPickup ? 'md:col-span-2' : ''}
-        />
+        {/* En retiro no se pregunta ciudad: el punto de retiro ya la define y
+            pedirla obligaba a llenar un dato que no cambia nada. */}
+        {!isPickup && (
+          <SearchableSelect
+            value={customer.city}
+            options={customer.province ? cantonsOf(customer.province) : ALL_CANTONS}
+            placeholder="Ciudad *"
+            inputClassName={SELECT_CLASS}
+            onChange={(v) => onChange('city', v)}
+          />
+        )}
 
         <input
           type="text"

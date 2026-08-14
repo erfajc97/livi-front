@@ -45,7 +45,8 @@ export function validateContact(
   if (c.cedula && !isValidCedula(c.cedula))
     return 'La cédula debe tener 10 dígitos (o 13 si es RUC).';
   if (requiresAddress && !c.address.trim()) return 'Ingresa tu dirección.';
-  if (!c.city) return 'Selecciona tu ciudad.';
+  // La ciudad solo importa cuando hay envío: en retiro la define el punto.
+  if (requiresAddress && !c.city) return 'Selecciona tu ciudad.';
   if (!c.phone.trim()) return 'Ingresa tu número telefónico.';
   if (!isValidPhone(c.phone)) return 'El teléfono debe tener 10 dígitos.';
   return null;
