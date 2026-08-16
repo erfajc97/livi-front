@@ -74,6 +74,20 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-muted);
 }
 
+/* Misma etiqueta pero en tinta: para los rótulos que encabezan un bloque
+   (los pasos numerados de los filtros). El gris de .eyebrow los dejaba
+   casi beige sobre el marfil y no se leían como títulos.
+   Nota: .eyebrow vive fuera de @layer, así que gana a `text-text`; por eso
+   hace falta una clase propia y no basta con añadir la utilidad. */
+.eyebrow-strong {
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
 /* ── Entrega destacada (detalle de producto): brillo que recorre el texto
    + punto pulsante, para que el ojo caiga ahí sin ser estridente. ──────── */
 @keyframes delivery-shimmer {

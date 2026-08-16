@@ -15,12 +15,12 @@ const PICKUP_PLACES: Record<string, { name: string; hint: string; mapsUrl: strin
   RETIRO_PIWU: {
     name: 'Piwu Market',
     hint: 'Retiro en el local',
-    mapsUrl: 'https://maps.app.goo.gl/3FCd8dkjYzYPcq7Z7',
+    mapsUrl: 'https://maps.app.goo.gl/D2wHX9e1yFdRVpmAA',
   },
   ENTREGA_PERSONAL: {
     name: 'Plaza Tía — La Joya',
     hint: 'Entrega personal en el punto acordado',
-    mapsUrl: 'https://maps.app.goo.gl/eBEhWag2Xwp3DSnT6',
+    mapsUrl: 'https://maps.app.goo.gl/gHDxiQzobtaQyameA',
   },
 };
 

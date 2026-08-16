@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { productUrl } from '@/app/helpers/productUrl';
-import { CarouselProgressBar } from '@/app/components/UI/CarouselNav';
+import { CarouselProgressBar, useCarouselNav } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
 /** Productos por página en la lista lateral (desktop) y en la lista móvil. */
@@ -68,7 +69,15 @@ export default function ProductRankingSection({
 }: ProductRankingSectionProps) {
   // Página actual de la lista (hook antes de cualquier return condicional).
   const [page, setPage] = useState(0);
-  const touchStartX = useRef<number | null>(null);
+
+  // Móvil: carrusel real en vez de detectar el swipe a mano. El gesto casero
+  // no dejaba volver atrás —el navegador se quedaba el arrastre hacia la
+  // derecha— y el cambio de página era un corte seco, sin desplazamiento.
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    containScroll: 'trimSnaps',
+  });
+  const mobileNav = useCarouselNav(emblaApi);
 
   if (isLoading) {
     // Esqueleto del layout del ranking: destacado + lista de 4.
@@ -122,12 +131,11 @@ export default function ProductRankingSection({
   const list = pageItems.slice(1);
   const rankAt = (i: number) => String(safePage * PAGE_SIZE + i + 2).padStart(2, '0');
 
-  // Móvil: misma paginación, incluyendo el #1 en la primera página.
+  // Móvil: misma paginación, incluyendo el #1 en la primera página. Cada
+  // página es una diapositiva del carrusel.
   const mobilePages = Math.max(1, Math.ceil(products.length / MOBILE_PER_PAGE));
-  const safeMobilePage = Math.min(page, mobilePages - 1);
-  const mobileList = products.slice(
-    safeMobilePage * MOBILE_PER_PAGE,
-    safeMobilePage * MOBILE_PER_PAGE + MOBILE_PER_PAGE,
+  const mobileChunks = Array.from({ length: mobilePages }, (_, i) =>
+    products.slice(i * MOBILE_PER_PAGE, i * MOBILE_PER_PAGE + MOBILE_PER_PAGE),
   );
 
   return (
@@ -204,61 +212,58 @@ export default function ProductRankingSection({
         </div>
 
         {/* ── Móvil: lista paginada, se pasa deslizando ── */}
-        <div
-          className="flex touch-pan-y flex-col md:hidden"
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0]?.clientX ?? null;
-          }}
-          onTouchEnd={(e) => {
-            const start = touchStartX.current;
-            touchStartX.current = null;
-            if (start == null) return;
-            const dx = (e.changedTouches[0]?.clientX ?? 0) - start;
-            // 45 px: lo justo para no confundir el gesto con un toque torcido.
-            if (Math.abs(dx) < 45) return;
-            setPage((p) =>
-              dx < 0
-                ? Math.min(p + 1, mobilePages - 1)
-                : Math.max(p - 1, 0),
-            );
-          }}
-        >
-          {mobileList.map((p, i) => {
-            const d = derive(p);
-            const rank = String(safeMobilePage * MOBILE_PER_PAGE + i + 1).padStart(2, '0');
-            return (
-              <a key={p.id} href={d.href} className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-                <span className="font-display text-2xl italic leading-none text-text">{rank}</span>
-                <div className="h-24 w-full overflow-hidden bg-surface-raised">
-                  {d.image && <img src={d.image} alt={p.name} className="h-full w-full object-cover" />}
-                </div>
-                <div>
-                  {d.tags && <span className="eyebrow">{d.tags}</span>}
-                  <div className="mt-1 font-display text-lg font-light leading-tight text-text">{p.name}</div>
-                  <div className="mt-1 font-body text-[11px] text-text-soft">Desde {formatCurrency(d.entryPrice)}</div>
-                </div>
-              </a>
-            );
-          })}
+        <div className="md:hidden">
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex">
+              {mobileChunks.map((chunk, pageIndex) => (
+                <div key={pageIndex} className="min-w-0 flex-[0_0_100%]">
+                  {chunk.map((p, i) => {
+                    const d = derive(p);
+                    const rank = String(pageIndex * MOBILE_PER_PAGE + i + 1).padStart(2, '0');
+                    return (
+                      <a
+                        key={p.id}
+                        href={d.href}
+                        // Sin esto el arrastre horizontal empieza a "llevarse"
+                        // la imagen y el carrusel pierde el gesto.
+                        draggable={false}
+                        className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5"
+                      >
+                        <span className="font-display text-2xl italic leading-none text-text">{rank}</span>
+                        <div className="h-24 w-full overflow-hidden bg-surface-raised">
+                          {d.image && <img src={d.image} alt={p.name} draggable={false} className="h-full w-full object-cover" />}
+                        </div>
+                        <div>
+                          {d.tags && <span className="eyebrow">{d.tags}</span>}
+                          <div className="mt-1 font-display text-lg font-light leading-tight text-text">{p.name}</div>
+                          <div className="mt-1 font-body text-[11px] text-text-soft">Desde {formatCurrency(d.entryPrice)}</div>
+                        </div>
+                      </a>
+                    );
+                  })}
 
-          {/* Igual que en desktop, la última página incompleta reserva sus filas
-              (REQ-014): la sección mide lo mismo en todas las páginas y no da el
-              salto al pasar a la última */}
-          {Array.from({ length: MOBILE_PER_PAGE - mobileList.length }, (_, i) => (
-            <div key={`ph-m-${i}`} aria-hidden className="invisible grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-              <span className="font-display text-2xl italic leading-none">00</span>
-              <div className="h-24 w-full" />
-              <div>
-                <div className="mt-1 font-display text-lg font-light leading-tight">&nbsp;</div>
-                <div className="mt-1 font-body text-[11px]">&nbsp;</div>
-              </div>
+                  {/* Igual que en desktop, la última página incompleta reserva
+                      sus filas (REQ-014): la sección mide lo mismo en todas las
+                      páginas y no da el salto al pasar a la última */}
+                  {Array.from({ length: MOBILE_PER_PAGE - chunk.length }, (_, i) => (
+                    <div key={`ph-m-${i}`} aria-hidden className="invisible grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
+                      <span className="font-display text-2xl italic leading-none">00</span>
+                      <div className="h-24 w-full" />
+                      <div>
+                        <div className="mt-1 font-display text-lg font-light leading-tight">&nbsp;</div>
+                        <div className="mt-1 font-body text-[11px]">&nbsp;</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
 
           <CarouselProgressBar
-            snapCount={mobilePages}
-            selectedIndex={safeMobilePage}
-            onSelect={setPage}
+            snapCount={mobileNav.snapCount || mobilePages}
+            selectedIndex={mobileNav.selectedIndex}
+            onSelect={mobileNav.scrollToIndex}
             className="mt-6"
           />
         </div>

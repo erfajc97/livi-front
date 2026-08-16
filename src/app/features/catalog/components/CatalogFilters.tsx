@@ -167,7 +167,7 @@ export default function CatalogFilters({
       {/* 4. Marca — buscador + lista */}
       {marcas.length > 0 && (
         <div>
-          <p className="eyebrow mb-3 font-semibold text-text">4. Marca</p>
+          <p className="eyebrow-strong mb-3">4. Marca</p>
           {marcas.length > 5 && (
             <input
               type="search"
@@ -195,7 +195,7 @@ export default function CatalogFilters({
 
       {/* 5. Concentración — lista */}
       <div>
-        <p className="eyebrow mb-3 font-semibold text-text">5. Concentración</p>
+        <p className="eyebrow-strong mb-3">5. Concentración</p>
         <div className="space-y-2.5">
           {CATALOG_CONCENTRATIONS.map((opt) => (
             <CheckRow

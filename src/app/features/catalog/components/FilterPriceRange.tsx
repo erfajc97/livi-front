@@ -19,7 +19,7 @@ export default function FilterPriceRange({
 
   return (
     <div>
-      <p className="eyebrow mb-3">{label}</p>
+      <p className="eyebrow-strong mb-3">{label}</p>
       <div className="flex items-center justify-between gap-2 mb-3">
         <span className="font-body text-sm text-text-muted">{min}</span>
         <span className="font-body text-sm text-text">${value}</span>

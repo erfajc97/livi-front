@@ -101,7 +101,9 @@ export default function CommitmentStrip() {
               <h3 className="mt-2.5 whitespace-pre-line font-display text-[10px] font-light uppercase leading-tight tracking-[0.08em] text-text sm:text-sm sm:tracking-[0.12em] md:mt-5 md:text-lg">
                 {title}
               </h3>
-              <p className="mt-1.5 line-clamp-3 font-display text-[9px] italic leading-snug text-text-muted sm:line-clamp-none sm:text-xs md:mt-2 md:text-sm">
+              {/* En tinta, no en gris: a este tamaño el gris sobre marfil
+                  quedaba ilegible. Se mantiene el cuerpo pequeño. */}
+              <p className="mt-1.5 line-clamp-3 font-display text-[9px] italic leading-snug text-text sm:line-clamp-none sm:text-xs md:mt-2 md:text-sm">
                 {text}
               </p>
             </div>
