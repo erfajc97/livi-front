@@ -242,7 +242,7 @@ export default function ProfileTab() {
               <option value="ENTREGA_PERSONAL">Entrega personal Plaza Tía — Gratis</option>
               <option value="RETIRO_PIWU">Retiro en Piwu Market (Urdesa) — $2</option>
               <option value="SERVIENTREGA_GYE">Servientrega (GYE - Durán - Samborondón) — $3</option>
-              <option value="SERVIENTREGA_NACIONAL">Servientrega Nacional (Provincias) — $7</option>
+              <option value="SERVIENTREGA_NACIONAL">Servientrega Nacional (Provincias) — $6.50</option>
             </select>
           </div>
         </div>
