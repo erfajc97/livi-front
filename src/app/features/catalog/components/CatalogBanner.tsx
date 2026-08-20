@@ -19,14 +19,24 @@ function useBannerData(
   const { data: categories = [] } = useRawCategoriesQuery();
 
   if (categoryId == null || categories.length === 0) {
-    return { title: defaultTitle, description: defaultDescription, imageUrl: null };
+    return {
+      title: defaultTitle,
+      description: defaultDescription,
+      imageUrl: null,
+      mobileImageUrl: null,
+    };
   }
 
   const category =
     categories.find((c: NavCategory) => Number(c.id) === Number(categoryId)) ?? null;
 
   if (!category) {
-    return { title: defaultTitle, description: defaultDescription, imageUrl: null };
+    return {
+      title: defaultTitle,
+      description: defaultDescription,
+      imageUrl: null,
+      mobileImageUrl: null,
+    };
   }
 
   // Con marca seleccionada, mostrar su nombre e imagen.
@@ -38,6 +48,7 @@ function useBannerData(
         description: `Explora nuestra selección de ${marca.name}`,
         // Imagen de la marca; si no tuviera, cae a la de la categoría.
         imageUrl: marca.imageUrl || category.imageUrl,
+        mobileImageUrl: marca.mobileImageUrl || category.mobileImageUrl,
       };
     }
   }
@@ -46,22 +57,34 @@ function useBannerData(
     title: category.name,
     description: category.description || `Explora nuestra selección de ${category.name.toLowerCase()}`,
     imageUrl: category.imageUrl,
+    mobileImageUrl: category.mobileImageUrl,
   };
 }
 
 export default function CatalogBanner({ defaultTitle, defaultDescription, categoryId, marcaId }: CatalogBannerProps) {
-  const { title, description, imageUrl } = useBannerData(defaultTitle, defaultDescription, categoryId, marcaId);
+  const { title, description, imageUrl, mobileImageUrl } = useBannerData(
+    defaultTitle,
+    defaultDescription,
+    categoryId,
+    marcaId,
+  );
   const bannerSrc = imageUrl || '/banner-catalog.png';
+  // Arte vertical solo si el admin lo subió; si no, el <source> no se emite y
+  // el teléfono usa la misma imagen que escritorio.
+  const mobileSrc = mobileImageUrl || null;
 
   return (
     /* Banner-strip: alto moderado en todos los breakpoints (antes quedaba
        demasiado alto y "desbordaba" la vista). */
     <div className="relative h-48 w-full overflow-hidden sm:h-60 md:h-72">
-      <img
-        src={bannerSrc}
-        alt={title}
-        className="absolute inset-0 h-full w-full object-cover object-center brightness-[0.6]"
-      />
+      <picture>
+        {mobileSrc && <source media="(max-width: 767px)" srcSet={mobileSrc} />}
+        <img
+          src={bannerSrc}
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover object-center brightness-[0.6]"
+        />
+      </picture>
       <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
       <div className="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
         <span className="eyebrow text-white/80">Selección curada</span>

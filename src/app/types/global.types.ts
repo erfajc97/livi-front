@@ -91,6 +91,8 @@ export interface Banner {
   subtitle?: string;
   image?: string;
   imageUrl?: string;
+  /** Arte vertical subido para teléfono. Si falta se usa `imageUrl`. */
+  mobileImageUrl?: string;
   link?: string;
   buttonText?: string;
   type?: 'hero' | 'category';

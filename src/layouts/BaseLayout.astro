@@ -17,6 +17,12 @@ const {
 // Texto que ve quien recibe el enlace por WhatsApp: WhatsApp lee og:description,
 // no la meta description normal, y necesita URLs absolutas para la imagen.
 const SHARE_DESCRIPTION = 'Perfumes sellados y decants 100% originales';
+
+// WhatsApp y varias apps renderizan la diéresis con una tipografía que no la
+// trae y sale un caracter roto, así que la tarjeta al compartir dice
+// "NonDecants" en texto plano. En la página el nombre sigue con ö.
+const plainBrand = (text: string) => text.replace(/ö/g, 'o').replace(/Ö/g, 'O');
+const shareTitle = plainBrand(title);
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
 ---
@@ -32,9 +38,9 @@ const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
 
     <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram) -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="NönDecants" />
+    <meta property="og:site_name" content="NonDecants" />
     <meta property="og:locale" content="es_EC" />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={SHARE_DESCRIPTION} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
@@ -42,11 +48,11 @@ const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="NönDecants — Perfumes sellados y decants 100% originales" />
+    <meta property="og:image:alt" content="NonDecants — Perfumes sellados y decants 100% originales" />
 
     <!-- X / Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={shareTitle} />
     <meta name="twitter:description" content={SHARE_DESCRIPTION} />
     <meta name="twitter:image" content={ogImageUrl.href} />
 

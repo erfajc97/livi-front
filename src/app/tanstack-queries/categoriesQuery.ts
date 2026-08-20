@@ -7,6 +7,8 @@ export interface NavMarca {
   name: string
   slug: string
   imageUrl: string | null
+  /** Portada vertical para teléfono. Si es null se usa `imageUrl`. */
+  mobileImageUrl: string | null
   isActive: boolean
   bajoPedido: boolean
 }
@@ -17,6 +19,8 @@ export interface NavCategory {
   slug: string
   description: string
   imageUrl: string | null
+  /** Portada vertical para teléfono. Si es null se usa `imageUrl`. */
+  mobileImageUrl: string | null
   isActive: boolean
   bajoPedido: boolean
   marcas: NavMarca[]
@@ -30,6 +34,7 @@ function mapCategories(raw: any[]): NavCategory[] {
     slug: c.slug ?? c.name.toLowerCase(),
     description: c.description ?? '',
     imageUrl: c.imageUrl ?? null,
+    mobileImageUrl: c.mobileImageUrl ?? null,
     isActive: c.isActive !== false,
     bajoPedido: c.bajoPedido ?? false,
     marcas: (c.marcas ?? []).map((s: any) => ({
@@ -37,6 +42,7 @@ function mapCategories(raw: any[]): NavCategory[] {
       name: s.name,
       slug: s.slug ?? s.name.toLowerCase(),
       imageUrl: s.imageUrl ?? null,
+      mobileImageUrl: s.mobileImageUrl ?? null,
       isActive: s.isActive !== false,
       bajoPedido: s.bajoPedido ?? false,
     })),

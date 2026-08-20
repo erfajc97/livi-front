@@ -1,32 +1,43 @@
+import { useRef } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { useLandingSectionsActiveQuery } from '@/app/tanstack-queries/landingSectionsQuery';
 import ProductCard from '@/app/features/product/components/ProductCard';
 import ProductCardSkeleton from '@/app/components/UI/ProductCardSkeleton';
+import {
+  useCarouselNav,
+  useMediaCenterTop,
+  CarouselArrow,
+} from '@/app/components/UI/CarouselNav';
+import CarouselProgressTrack from '@/app/components/UI/CarouselProgressTrack';
 import type { Product } from '@/app/types/global.types';
 
 /**
  * "No te pierdas estos productos" — publicidad de productos al pie del
  * carrito. Los productos salen de las secciones que el admin marcó con
  * ubicación "carrito" (mismo CRUD que las secciones de la landing).
+ *
+ * Antes se cortaba en los primeros 4: el resto de lo que el admin ponía en la
+ * sección no se veía nunca. Ahora entran todos y se recorren con flechas, de a
+ * una pantalla (2 en móvil, 3 en tablet, 4 en desktop).
  */
 export default function CartRecommendations() {
   const { data: sections = [], isLoading } = useLandingSectionsActiveQuery('cart');
 
-  // Esqueleto mientras llegan las secciones: misma hilera deslizable en
-  // mobile y mismo grid de 4 en desktop que el contenido cargado.
-  if (isLoading) {
-    return (
-      <section className="mt-12 border-t border-border pt-10 md:mt-16 md:pt-14" aria-hidden="true">
-        <div className="mb-6 h-6 w-56 animate-pulse rounded-sm bg-surface-raised md:mb-8" />
-        <div className="flex gap-5 overflow-hidden md:grid md:grid-cols-4 md:gap-6">
-          {Array.from({ length: 4 }, (_, i) => (
-            <div key={i} className="shrink-0 basis-[calc(50%-0.625rem)]">
-              <ProductCardSkeleton />
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: 'start',
+    duration: 32,
+    containScroll: 'trimSnaps',
+    slidesToScroll: 2,
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 3 },
+      '(min-width: 1024px)': { slidesToScroll: 4 },
+    },
+  });
+  const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
+    useCarouselNav(emblaApi);
+
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   // Una sola fila: se juntan las secciones de carrito y se quitan repetidos.
   const seen = new Set<string>();
@@ -37,6 +48,25 @@ export default function CartRecommendations() {
       seen.add(product.id);
       products.push(product);
     }
+  }
+
+  const arrowTop = useMediaCenterTop(viewportRef, isLoading ? 0 : products.length);
+
+  // Esqueleto mientras llegan las secciones: mismo ancho por slide que el
+  // carrusel cargado, así nada salta al aparecer los productos.
+  if (isLoading) {
+    return (
+      <section className="mt-12 border-t border-border pt-10 md:mt-16 md:pt-14" aria-hidden="true">
+        <div className="mb-6 h-6 w-56 animate-pulse rounded-sm bg-surface-raised md:mb-8" />
+        <div className="flex gap-5 overflow-hidden md:gap-6">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className="shrink-0 basis-[calc(50%-0.625rem)] md:basis-1/3 lg:basis-1/4">
+              <ProductCardSkeleton />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
   }
 
   if (products.length === 0) return null;
@@ -58,14 +88,50 @@ export default function CartRecommendations() {
         </a>
       </div>
 
-      {/* Mobile: una sola hilera deslizable (2 cards por pantalla, ancho
-          fijo para que el desplazamiento no desfase). Desktop: grid de 4. */}
-      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto md:grid md:snap-none md:grid-cols-4 md:gap-6 md:overflow-visible">
-        {products.slice(0, 4).map((product) => (
-          <div key={product.id} className="shrink-0 basis-[calc(50%-0.625rem)] snap-start md:snap-align-none">
-            <ProductCard product={product} />
+      <div className="relative" ref={viewportRef}>
+        {/* Las flechas solo aparecen cuando hay más de una pantalla que
+            recorrer: con 4 productos o menos el carrusel no se mueve. */}
+        {snapCount > 1 && (
+          <CarouselArrow
+            direction="prev"
+            onClick={scrollPrev}
+            disabled={!canPrev}
+            top={arrowTop}
+            className="absolute left-0 top-[34%] -translate-y-1/2"
+          />
+        )}
+
+        <div className="w-full overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="shrink-0 basis-1/2 pr-5 md:basis-1/3 md:pr-6 lg:basis-1/4"
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {snapCount > 1 && (
+          <CarouselArrow
+            direction="next"
+            onClick={scrollNext}
+            disabled={!canNext}
+            top={arrowTop}
+            className="absolute right-0 top-[34%] -translate-y-1/2"
+          />
+        )}
+
+        {snapCount > 1 && (
+          <CarouselProgressTrack
+            progress={progress}
+            snapCount={snapCount}
+            onSeek={seekRatio}
+            className="mt-5 md:mt-7"
+          />
+        )}
       </div>
     </section>
   );

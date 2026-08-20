@@ -50,14 +50,21 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
           <div className="flex h-full">
             {banners.map((banner) => (
               <div key={banner.id} className="relative h-full min-w-full">
-                <img
-                  src={banner.imageUrl ?? banner.image ?? ''}
-                  alt={banner.title || 'Banner NönDecants'}
-                  /* Mobile: encuadra hacia el centro-alto (no corta caras/frascos);
-                     desktop vuelve a centro. */
-                  className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
-                  fetchPriority="high"
-                />
+                {/* Si el admin subió arte vertical, el teléfono usa ese; si no,
+                    el <source> no se emite y cae al de escritorio. */}
+                <picture>
+                  {banner.mobileImageUrl && (
+                    <source media="(max-width: 767px)" srcSet={banner.mobileImageUrl} />
+                  )}
+                  <img
+                    src={banner.imageUrl ?? banner.image ?? ''}
+                    alt={banner.title || 'Banner NönDecants'}
+                    /* Mobile: encuadra hacia el centro-alto (no corta caras/frascos);
+                       desktop vuelve a centro. */
+                    className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
+                    fetchPriority="high"
+                  />
+                </picture>
                 {/* Desktop: gradiente sutil, deja apreciar la foto (ref. Atelier).
                     Mobile: scrim oscuro real para que el texto blanco se lea sobre
                     fotos de tono medio (antes el titular ink quedaba ilegible). */}
