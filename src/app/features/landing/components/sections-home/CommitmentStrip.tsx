@@ -23,7 +23,7 @@ const COMMITMENTS = [
   {
     Icon: BottlesFrameLineIcon,
     title: 'Más de 300\nreferencias',
-    text: 'Un catálogo curado, disponible para ti.',
+    text: 'Un catálogo pensado, disponible para ti.',
     motion: 'commit-icon--rise',
   },
   {

@@ -26,17 +26,20 @@ export default function ProductCarouselSection({
   showCTA = false,
   viewAllHref = '/catalogo',
 }: ProductCarouselSectionProps) {
-  // Avance de a una tarjeta (REQ-004 / REQ-014): con `slidesToScroll: 'auto'`
-  // la última página avanzaba una distancia distinta —el "salto" al llegar al
-  // final— y con pocos productos Embla llegaba a crear una sola página, con lo
-  // que las flechas quedaban muertas. De a una, el paso es siempre el mismo y
-  // hay flecha activa mientras sobre aunque sea media tarjeta.
+  // El paso de la flecha = las tarjetas visibles: 2 en móvil, 3 en tablet y 4
+  // en desktop (mismo corte que el basis de cada slide). Se fija por
+  // breakpoint en vez de `slidesToScroll: 'auto'` porque 'auto' hacía que la
+  // última página avanzara una distancia distinta —el "salto" del final—.
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
     duration: 32,
     containScroll: 'trimSnaps',
-    slidesToScroll: 1,
+    slidesToScroll: 2,
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 3 },
+      '(min-width: 1024px)': { slidesToScroll: 4 },
+    },
   });
   const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
     useCarouselNav(emblaApi);

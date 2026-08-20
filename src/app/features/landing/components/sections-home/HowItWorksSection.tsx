@@ -12,22 +12,29 @@ const STEPS = [
  */
 export default function HowItWorksSection() {
   return (
-    <section className="border-y border-border bg-surface-raised px-6 py-10 md:px-14 md:py-16">
+    <section className="border-y border-border bg-surface-raised px-6 py-8 md:px-14 md:py-16">
       <div className="mx-auto max-w-[720px] text-center">
-        <h2 className="font-display text-4xl font-light leading-none tracking-[-0.02em] text-text md:text-6xl">
+        <h2 className="font-display text-3xl font-light leading-none tracking-[-0.02em] text-text md:text-6xl">
           Tres pasos hacia <span className="italic">tu fragancia.</span>
         </h2>
       </div>
 
-      <div className="mx-auto mt-8 grid max-w-[1200px] gap-8 md:mt-12 md:grid-cols-3 md:gap-14">
+      {/* Mobile: número y título en la misma línea para no alargar el scroll. */}
+      <div className="mx-auto mt-6 grid max-w-[1200px] gap-5 md:mt-12 md:grid-cols-3 md:gap-14">
         {STEPS.map((s) => (
-          <div key={s.n}>
-            <div className="font-display text-5xl font-light italic leading-none tracking-[-0.02em] text-text md:text-6xl">
-              {s.n}
+          <div key={s.n} className="border-t border-border pt-4 md:border-t-0 md:pt-0">
+            <div className="flex items-baseline gap-3 md:block">
+              <span className="font-display text-2xl font-light italic leading-none tracking-[-0.02em] text-text md:block md:text-6xl">
+                {s.n}
+              </span>
+              <span className="hidden md:mb-4 md:mt-4 md:block md:h-px md:bg-border" />
+              <span className="font-display text-2xl font-light tracking-[-0.01em] text-text md:block md:text-3xl">
+                {s.h}
+              </span>
             </div>
-            <div className="mb-3 mt-3 h-px bg-border md:mb-4 md:mt-4" />
-            <div className="font-display text-3xl font-light tracking-[-0.01em] text-text">{s.h}</div>
-            <p className="mt-2 font-body text-sm leading-[1.7] text-text-soft md:mt-3">{s.t}</p>
+            <p className="mt-1.5 font-body text-[13px] leading-[1.6] text-text-soft md:mt-3 md:text-sm md:leading-[1.7]">
+              {s.t}
+            </p>
           </div>
         ))}
       </div>
