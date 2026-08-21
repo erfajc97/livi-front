@@ -22,8 +22,6 @@ interface CatalogFiltersProps {
   onConcentrationChange: (v: Concentration | '') => void;
   projection: Projection | '';
   onProjectionChange: (v: Projection | '') => void;
-  hasDiscount: boolean;
-  onHasDiscountChange: (v: boolean) => void;
   minPrice?: number;
   maxPrice?: number;
   onPriceRangeChange: (min?: number, max?: number) => void;
@@ -85,8 +83,6 @@ export default function CatalogFilters({
   onConcentrationChange,
   projection,
   onProjectionChange,
-  hasDiscount,
-  onHasDiscountChange,
   maxPrice,
   onPriceRangeChange,
   categoryId,
@@ -221,31 +217,6 @@ export default function CatalogFilters({
         }}
         singleSelect
       />
-
-      {/* Con descuento — toggle */}
-      <div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={hasDiscount}
-          onClick={() => onHasDiscountChange(!hasDiscount)}
-          className="group flex items-center gap-3"
-        >
-          <span
-            aria-hidden
-            className={`relative h-5 w-9 rounded-full transition-colors ${hasDiscount ? 'bg-text' : 'bg-border'}`}
-          >
-            <span
-              className={`absolute top-0.5 h-4 w-4 rounded-full bg-surface transition-transform ${
-                hasDiscount ? 'translate-x-4.5' : 'translate-x-0.5'
-              }`}
-            />
-          </span>
-          <span className="font-body text-sm uppercase tracking-[0.12em] text-text-soft transition-colors group-hover:text-text">
-            Con descuento
-          </span>
-        </button>
-      </div>
 
       <FilterPriceRange
         label="Precio máximo"

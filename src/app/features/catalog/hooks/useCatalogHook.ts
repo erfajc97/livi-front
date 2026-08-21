@@ -24,7 +24,6 @@ const defaultFilters: CatalogFilters = {
   timeOfDay: '',
   concentration: '',
   projection: '',
-  hasDiscount: false,
   page: 1,
   sortBy: 'createdAt',
   order: 'desc',
@@ -50,7 +49,6 @@ function getUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const categoryParam = params.get('category');
   const marcaParam = params.get('marca');
-  const desc = params.get('descuento');
   return {
     // Formato viejo: IDs numéricos (los menús aún pueden generarlos).
     categoryId: categoryParam && /^\d+$/.test(categoryParam) ? Number(categoryParam) : undefined,
@@ -59,7 +57,6 @@ function getUrlParams() {
     categorySlug: params.get('categoria') ?? undefined,
     marcaSlug: marcaParam && !/^\d+$/.test(marcaParam) ? marcaParam : undefined,
     search: params.get('search') ?? undefined,
-    hasDiscount: desc === '1' || desc === 'true' ? true : undefined,
   };
 }
 
@@ -73,7 +70,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     search: urlParams.search ?? '',
     categoryId: catId,
     marcaId: subId,
-    hasDiscount: urlParams.hasDiscount ?? false,
   });
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search);
   const [debouncedMaxPrice, setDebouncedMaxPrice] = useState(filters.maxPrice);
@@ -138,11 +134,13 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     else params.delete('categoria');
     if (marca) params.set('marca', marca.slug);
     else params.delete('marca');
-    if (filters.hasDiscount) params.set('descuento', '1');
-    else params.delete('descuento');
+    // El filtro "con descuento" se retiró del panel: se limpia el parámetro
+    // viejo para que un enlace guardado no deje el catálogo filtrado sin forma
+    // de quitarlo.
+    params.delete('descuento');
     const qs = params.toString();
     window.history.replaceState(null, '', qs ? `${window.location.pathname}?${qs}` : window.location.pathname);
-  }, [filters.categoryId, filters.marcaId, filters.hasDiscount, rawCategories, slugsResolved]);
+  }, [filters.categoryId, filters.marcaId, rawCategories, slugsResolved]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(filters.search), 300);
@@ -193,7 +191,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     timeOfDay: filters.timeOfDay || undefined,
     concentration: filters.concentration || undefined,
     projection: filters.projection || undefined,
-    hasDiscount: filters.hasDiscount || undefined,
     minPrice: filters.minPrice,
     maxPrice: debouncedMaxPrice,
     sortBy: filters.sortBy,
@@ -224,10 +221,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
 
   const setProjection = useCallback((projection: Projection | '') => {
     setFilters((f) => ({ ...f, projection, page: 1 }));
-  }, []);
-
-  const setHasDiscount = useCallback((hasDiscount: boolean) => {
-    setFilters((f) => ({ ...f, hasDiscount, page: 1 }));
   }, []);
 
   const setPriceRange = useCallback((minPrice?: number, maxPrice?: number) => {
@@ -272,7 +265,7 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
   const hasActiveFilters = !!(
     filters.search || filters.gender ||
     filters.timeOfDay || filters.concentration || filters.projection ||
-    filters.hasDiscount || filters.minPrice || filters.maxPrice ||
+    filters.minPrice || filters.maxPrice ||
     (filters.categoryId && filters.categoryId !== catId)
   );
 
@@ -290,7 +283,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     setTimeOfDay,
     setConcentration,
     setProjection,
-    setHasDiscount,
     setPriceRange,
     setCategoryId,
     setMarcaId,

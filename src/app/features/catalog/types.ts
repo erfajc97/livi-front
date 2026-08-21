@@ -10,7 +10,6 @@ export interface CatalogFilters {
   timeOfDay: TimeOfDay | '';
   concentration: Concentration | '';
   projection: Projection | '';
-  hasDiscount: boolean;
   minPrice?: number;
   maxPrice?: number;
   page: number;

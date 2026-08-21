@@ -49,7 +49,6 @@ function CatalogContent({
     setTimeOfDay,
     setConcentration,
     setProjection,
-    setHasDiscount,
     setPriceRange,
     setCategoryId,
     setMarcaId,
@@ -71,8 +70,6 @@ function CatalogContent({
     activeChips.push({ key: 'conc', label: labelOf(CATALOG_CONCENTRATIONS, filters.concentration), onRemove: () => setConcentration('') });
   if (filters.projection)
     activeChips.push({ key: 'proj', label: labelOf(CATALOG_PROJECTIONS, filters.projection), onRemove: () => setProjection('') });
-  if (filters.hasDiscount)
-    activeChips.push({ key: 'disc', label: 'Con descuento', onRemove: () => setHasDiscount(false) });
   if (filters.maxPrice)
     activeChips.push({ key: 'price', label: `Hasta $${filters.maxPrice}`, onRemove: () => setPriceRange(undefined, undefined) });
   if (filters.search)
@@ -99,8 +96,6 @@ function CatalogContent({
       onConcentrationChange={setConcentration}
       projection={filters.projection}
       onProjectionChange={setProjection}
-      hasDiscount={filters.hasDiscount}
-      onHasDiscountChange={setHasDiscount}
       minPrice={filters.minPrice}
       maxPrice={filters.maxPrice}
       onPriceRangeChange={setPriceRange}
