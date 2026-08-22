@@ -4,6 +4,11 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /**
+   * Título de la tarjeta al compartir (WhatsApp, Linktree, etc.).
+   * Si no viene, se usa el título SEO de la página.
+   */
+  shareTitle?: string;
   /** Imagen de la vista previa al compartir. Ruta absoluta desde la raíz. */
   ogImage?: string;
 }
@@ -11,20 +16,28 @@ interface Props {
 const {
   title = 'NonDecants — Perfumes sellados, decants y nondecants',
   description = 'Compra perfumes sellados, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega.',
+  shareTitle: shareTitleProp,
   ogImage = '/og-image.jpg',
 } = Astro.props;
 
-// Texto que ve quien recibe el enlace por WhatsApp: WhatsApp lee og:description,
-// no la meta description normal, y necesita URLs absolutas para la imagen.
+// Copy de la tarjeta al compartir. WhatsApp lee og:description; Linktree y
+// Iframely pintan og:title como único texto del link — por eso el título de
+// compartir no puede ser el título SEO largo ("…nondecants en Ecuador").
 const SHARE_DESCRIPTION = 'Perfumes sellados y decants 100% originales';
+const SHARE_TITLE = 'NonDecants — Perfumes sellados y decants 100% originales';
 
 // WhatsApp y varias apps renderizan la diéresis con una tipografía que no la
 // trae y sale un caracter roto, así que la tarjeta al compartir dice
 // "NonDecants" en texto plano. En la página el nombre sigue con ö.
 const plainBrand = (text: string) => text.replace(/ö/g, 'o').replace(/Ö/g, 'O');
-const shareTitle = plainBrand(title);
+const shareTitle = plainBrand(
+  shareTitleProp ?? (Astro.url.pathname === '/' ? SHARE_TITLE : title),
+);
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
 const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
+// Linktree / Iframely cachean og:image por URL exacta. Sin `v=` siguen
+// sirviendo la foto vieja aunque el archivo en disco ya cambió.
+ogImageUrl.searchParams.set('v', '20260822');
 ---
 
 <!doctype html>
@@ -35,8 +48,9 @@ const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="canonical" href={canonical.href} />
+    <link rel="image_src" href={ogImageUrl.href} />
 
-    <!-- Vista previa al compartir (WhatsApp, Facebook, Telegram) -->
+    <!-- Vista previa al compartir (WhatsApp, Linktree, Facebook, Telegram) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="NonDecants" />
     <meta property="og:locale" content="es_EC" />
@@ -45,16 +59,24 @@ const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
     <meta property="og:image:secure_url" content={ogImageUrl.href} />
+    <meta property="og:image:url" content={ogImageUrl.href} />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="NonDecants — Perfumes sellados y decants 100% originales" />
+    <meta property="og:image:alt" content={SHARE_TITLE} />
+    <meta property="og:updated_time" content="2026-08-22T15:00:00.000Z" />
+
+    <!-- Scrapers que ignoran Open Graph (algunos de Linktree / Iframely) -->
+    <meta itemprop="name" content={shareTitle} />
+    <meta itemprop="description" content={SHARE_DESCRIPTION} />
+    <meta itemprop="image" content={ogImageUrl.href} />
 
     <!-- X / Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={shareTitle} />
     <meta name="twitter:description" content={SHARE_DESCRIPTION} />
     <meta name="twitter:image" content={ogImageUrl.href} />
+    <meta name="twitter:image:alt" content={SHARE_TITLE} />
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />

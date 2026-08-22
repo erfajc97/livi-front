@@ -6,12 +6,13 @@ import Footer from '@/app/features/landing/components/layout/Footer.astro';
 interface Props {
   title?: string;
   description?: string;
+  shareTitle?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, shareTitle } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} shareTitle={shareTitle}>
   <Navbar client:load />
   <main>
     <slot />
