@@ -10,6 +10,7 @@ const { id } = Astro.params;
 <PublicLayout
   title="Orden confirmada — NonDecants"
   description="Detalle y seguimiento de tu orden en NönDecants."
+  robots="noindex,nofollow"
 >
   <OrderDetail orderId={id!} client:visible />
 </PublicLayout>

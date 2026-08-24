@@ -2,12 +2,15 @@
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import BannerCarouselIsland from '@/app/features/landing/components/sections-home/BannerCarouselIsland';
 import Home from '@/app/features/landing/pages/home/Home';
+import { websiteJsonLd } from '@/app/helpers/seoMeta';
 ---
 
 <PublicLayout
-  title="NonDecants — Perfumes sellados, decants y nondecants en Ecuador"
-  description="Compra perfumes sellados originales, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega."
+  title="Perfumes originales y decants en Ecuador | NonDecants"
+  description="Perfumes árabes, nicho y de diseñador 100 % originales. Pruébalos en decant. Envío nacional 24–72 h."
+  jsonLd={[websiteJsonLd()]}
 >
+  <h1 class="sr-only">Perfumes originales y decants en Ecuador</h1>
   <BannerCarouselIsland client:load />
   <Home client:load />
 </PublicLayout>

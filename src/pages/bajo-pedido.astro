@@ -1,11 +1,15 @@
 ---
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import Catalog from '@/app/features/catalog/Catalog';
+
+const robots = Astro.url.search ? 'noindex,follow' : 'index,follow';
 ---
 
 <PublicLayout
-  title="Bajo Pedido — NonDecants"
-  description="Solicita perfumes personalizados bajo pedido en NönDecants."
+  title="Perfumes por encargo en Ecuador | NonDecants"
+  description="Traemos el perfume que no se vende en Ecuador. Rarezas árabes, nicho y diseñador. Entrega en 13–17 días."
+  canonical="/bajo-pedido"
+  robots={robots}
 >
   <div class="bg-bg min-h-screen">
     <div class="border-t border-border"></div>

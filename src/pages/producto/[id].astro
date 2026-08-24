@@ -4,6 +4,13 @@ export const prerender = false;
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/productsQuery';
 import { productUrl } from '@/app/helpers/productUrl';
+import {
+  absoluteImageUrl,
+  breadcrumbJsonLd,
+  productJsonLd,
+  productSeoDescription,
+  productSeoTitle,
+} from '@/app/helpers/seoMeta';
 import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
 import ProductEditorial from '@/app/features/product/components/ProductEditorial.astro';
 import ExploreCategoriesCarousel from '@/app/features/product/components/ExploreCategoriesCarousel';
@@ -30,9 +37,28 @@ const relatedProducts = product.marcaId
   ? (await fetchProducts({ marcaId: product.marcaId, limit: 12 })).content
       .filter((p) => p.id !== product.id)
   : [];
+
+const productImage = absoluteImageUrl(product.image || product.imageUrl || product.images?.[0]);
+const listingHref = product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes';
+const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
 ---
 
-<PublicLayout title={`${product.name} — NonDecants`}>
+<PublicLayout
+  title={productSeoTitle(product)}
+  description={productSeoDescription(product)}
+  shareTitle={productSeoTitle(product)}
+  ogImage={productImage}
+  ogType="product"
+  canonical={canonical}
+  jsonLd={[
+    productJsonLd(product),
+    breadcrumbJsonLd([
+      { name: 'Inicio', href: '/' },
+      { name: listingLabel, href: listingHref },
+      { name: product.name, href: canonical },
+    ]),
+  ]}
+>
   <div class="bg-bg min-h-screen pt-3 md:pt-5">
     {/* pb mobile compacto (REQ-035): el bloque PAGO cierra la columna y
         "Perfil olfativo" arranca enseguida; en desktop se mantiene pb-10 */}

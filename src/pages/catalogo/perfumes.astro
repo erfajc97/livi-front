@@ -1,11 +1,15 @@
 ---
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import Catalog from '@/app/features/catalog/Catalog';
+
+const robots = Astro.url.search ? 'noindex,follow' : 'index,follow';
 ---
 
 <PublicLayout
-  title="Perfumes — Catálogo — NonDecants"
-  description="Explora nuestro catálogo de perfumes sellados, decants y nondecants en Ecuador."
+  title="Perfumes originales en Ecuador | NonDecants"
+  description="Perfumes originales árabes, nicho y de diseñador. Decant o frasco sellado. Envío 24–72 h en Ecuador."
+  canonical="/catalogo/perfumes"
+  robots={robots}
 >
   <div class="bg-bg min-h-screen">
     <div class="border-t border-border"></div>

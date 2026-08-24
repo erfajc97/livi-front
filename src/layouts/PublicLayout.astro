@@ -2,17 +2,44 @@
 import BaseLayout from './BaseLayout.astro';
 import Navbar from '@/app/features/landing/components/layout/Navbar';
 import Footer from '@/app/features/landing/components/layout/Footer.astro';
+import { organizationJsonLd } from '@/app/helpers/seoMeta';
 
 interface Props {
   title?: string;
   description?: string;
   shareTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  robots?: string;
+  canonical?: string;
+  ogType?: string;
+  jsonLd?: unknown[];
 }
 
-const { title, description, shareTitle } = Astro.props;
+const {
+  title,
+  description,
+  shareTitle,
+  ogDescription,
+  ogImage,
+  robots,
+  canonical,
+  ogType,
+  jsonLd = [],
+} = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} shareTitle={shareTitle}>
+<BaseLayout
+  title={title}
+  description={description}
+  shareTitle={shareTitle}
+  ogDescription={ogDescription}
+  ogImage={ogImage}
+  robots={robots}
+  canonical={canonical}
+  ogType={ogType}
+  jsonLd={[organizationJsonLd(), ...jsonLd]}
+>
   <Navbar client:load />
   <main>
     <slot />

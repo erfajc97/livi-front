@@ -3,6 +3,7 @@ export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { blogService } from '@/app/features/blog/services/blogService';
+import { articleJsonLd, breadcrumbJsonLd, clipMeta } from '@/app/helpers/seoMeta';
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect('/blog');
@@ -24,8 +25,20 @@ const FALLBACK = '/banner-catalog.png';
 ---
 
 <PublicLayout
-  title={`${post.title} — Blog NonDecants`}
-  description={post.excerpt || `Lee sobre ${post.title} en el blog de NonDecants.`}
+  title={`${post.title} | NonDecants`}
+  description={clipMeta(post.excerpt || `Lee «${post.title}» en el blog de NonDecants.`)}
+  shareTitle={post.title}
+  ogImage={post.imageUrl || undefined}
+  ogType="article"
+  canonical={`/blog/${post.slug}`}
+  jsonLd={[
+    articleJsonLd(post),
+    breadcrumbJsonLd([
+      { name: 'Inicio', href: '/' },
+      { name: 'Blog', href: '/blog' },
+      { name: post.title, href: `/blog/${post.slug}` },
+    ]),
+  ]}
 >
   <article class="bg-bg">
     <div class="mx-auto max-w-3xl px-6 pb-4 pt-8 md:pt-20">

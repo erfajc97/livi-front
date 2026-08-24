@@ -3,6 +3,7 @@ export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchComboById } from '@/app/tanstack-queries/combosQuery';
+import { absoluteImageUrl, comboSeoDescription } from '@/app/helpers/seoMeta';
 import ComboDetailIsland from '@/app/features/combos/components/ComboDetailIsland';
 
 const { id } = Astro.params;
@@ -13,7 +14,13 @@ if (!combo) {
 }
 ---
 
-<PublicLayout title={`${combo.name} — Combo — NonDecants`}>
+<PublicLayout
+  title={`${combo.name} | NonDecants`}
+  description={comboSeoDescription(combo)}
+  shareTitle={combo.name}
+  ogImage={absoluteImageUrl(combo.imageUrl)}
+  canonical={`/combo/${combo.id}`}
+>
   <div class="bg-bg min-h-screen">
     <div class="max-w-[1400px] mx-auto px-6 md:px-14 py-6 pb-12 md:pb-24">
       {/* Breadcrumb */}

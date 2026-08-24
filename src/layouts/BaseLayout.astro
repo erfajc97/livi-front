@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { SITE_ORIGIN } from '@/app/helpers/seoMeta';
 
 interface Props {
   title?: string;
@@ -9,15 +10,27 @@ interface Props {
    * Si no viene, se usa el título SEO de la página.
    */
   shareTitle?: string;
-  /** Imagen de la vista previa al compartir. Ruta absoluta desde la raíz. */
+  /** Description de Open Graph. Si no viene: home usa el copy de Linktree; el resto, `description`. */
+  ogDescription?: string;
+  /** Imagen de la vista previa al compartir. Ruta absoluta o URL completa. */
   ogImage?: string;
+  robots?: string;
+  /** Canonical override (path o URL). Si no viene, se arma con el pathname actual. */
+  canonical?: string;
+  ogType?: string;
+  jsonLd?: unknown[];
 }
 
 const {
   title = 'NonDecants — Perfumes sellados, decants y nondecants',
   description = 'Compra perfumes sellados, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega.',
   shareTitle: shareTitleProp,
+  ogDescription: ogDescriptionProp,
   ogImage = '/og-image.jpg',
+  robots = 'index,follow',
+  canonical: canonicalProp,
+  ogType = 'website',
+  jsonLd = [],
 } = Astro.props;
 
 // Copy de la tarjeta al compartir. WhatsApp lee og:description; Linktree y
@@ -30,14 +43,24 @@ const SHARE_TITLE = 'NonDecants — Perfumes sellados y decants 100% originales'
 // trae y sale un caracter roto, así que la tarjeta al compartir dice
 // "NonDecants" en texto plano. En la página el nombre sigue con ö.
 const plainBrand = (text: string) => text.replace(/ö/g, 'o').replace(/Ö/g, 'O');
+const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
 const shareTitle = plainBrand(
-  shareTitleProp ?? (Astro.url.pathname === '/' ? SHARE_TITLE : title),
+  shareTitleProp ?? (isHome ? SHARE_TITLE : title),
 );
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
-const ogImageUrl = new URL(ogImage, Astro.site ?? Astro.url.origin);
-// Linktree / Iframely cachean og:image por URL exacta. Sin `v=` siguen
-// sirviendo la foto vieja aunque el archivo en disco ya cambió.
-ogImageUrl.searchParams.set('v', '20260822');
+const ogDescription = plainBrand(
+  ogDescriptionProp ?? (isHome ? SHARE_DESCRIPTION : description),
+);
+const site = Astro.site ?? SITE_ORIGIN;
+const canonical = canonicalProp
+  ? new URL(canonicalProp, site)
+  : new URL(Astro.url.pathname, site);
+const ogImageUrl = new URL(ogImage, site);
+if (!/^https?:\/\//i.test(ogImage)) {
+  // Linktree / Iframely cachean og:image por URL exacta. Sin `v=` siguen
+  // sirviendo la foto vieja aunque el archivo en disco ya cambió.
+  ogImageUrl.searchParams.set('v', '20260822');
+}
+const jsonLdPayload = jsonLd.filter(Boolean);
 ---
 
 <!doctype html>
@@ -46,37 +69,42 @@ ogImageUrl.searchParams.set('v', '20260822');
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
     <title>{title}</title>
     <link rel="canonical" href={canonical.href} />
     <link rel="image_src" href={ogImageUrl.href} />
 
     <!-- Vista previa al compartir (WhatsApp, Linktree, Facebook, Telegram) -->
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content="NonDecants" />
     <meta property="og:locale" content="es_EC" />
     <meta property="og:title" content={shareTitle} />
-    <meta property="og:description" content={SHARE_DESCRIPTION} />
+    <meta property="og:description" content={ogDescription} />
     <meta property="og:url" content={canonical.href} />
     <meta property="og:image" content={ogImageUrl.href} />
     <meta property="og:image:secure_url" content={ogImageUrl.href} />
     <meta property="og:image:url" content={ogImageUrl.href} />
-    <meta property="og:image:type" content="image/jpeg" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={SHARE_TITLE} />
+    {!/^https?:\/\//i.test(ogImage) && (
+      <>
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    )}
+    <meta property="og:image:alt" content={shareTitle} />
     <meta property="og:updated_time" content="2026-08-22T15:00:00.000Z" />
 
     <!-- Scrapers que ignoran Open Graph (algunos de Linktree / Iframely) -->
     <meta itemprop="name" content={shareTitle} />
-    <meta itemprop="description" content={SHARE_DESCRIPTION} />
+    <meta itemprop="description" content={ogDescription} />
     <meta itemprop="image" content={ogImageUrl.href} />
 
     <!-- X / Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={shareTitle} />
-    <meta name="twitter:description" content={SHARE_DESCRIPTION} />
+    <meta name="twitter:description" content={ogDescription} />
     <meta name="twitter:image" content={ogImageUrl.href} />
-    <meta name="twitter:image:alt" content={SHARE_TITLE} />
+    <meta name="twitter:image:alt" content={shareTitle} />
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
@@ -89,6 +117,9 @@ ogImageUrl.searchParams.set('v', '20260822');
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
       rel="stylesheet"
     />
+    {jsonLdPayload.map((block) => (
+      <script type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
   </head>
   <body>
     <!-- Sin AppProviders aquí: cada island gestiona su propio QueryClientProvider
