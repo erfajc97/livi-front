@@ -22,11 +22,18 @@ export function deliveryWindow(offsetDays = 0): string {
     : `${withMonth(first)} y ${withMonth(second)}`;
 }
 
+function dateShort(d: Date): string {
+  return d.toLocaleDateString('es-EC', { day: 'numeric', month: 'short' }).replace('.', '');
+}
+
+/** Fecha de hoy en el mismo formato corto de la ficha: "26 ago". */
+export function todayShort(): string {
+  return dateShort(new Date());
+}
+
 /** Rango corto para la ficha/carrito: "27 ago – 28 ago". */
 export function deliveryRangeShort(offsetDays = 0): string {
-  const short = (d: Date) =>
-    d.toLocaleDateString('es-EC', { day: 'numeric', month: 'short' }).replace('.', '');
-  return `${short(addDaysFromToday(1 + offsetDays))} – ${short(addDaysFromToday(2 + offsetDays))}`;
+  return `${dateShort(addDaysFromToday(1 + offsetDays))} – ${dateShort(addDaysFromToday(2 + offsetDays))}`;
 }
 
 /** Días que tarda una importación bajo pedido. */

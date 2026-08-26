@@ -4,18 +4,11 @@ import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore } from '@/app/store/cart/cartStore';
 /* Medios de pago aceptados — mismo componente que la ficha de producto (ANX-28). */
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
+import TrustIcons from '@/app/components/UI/TrustIcons';
 import type { Combo } from '@/app/types/global.types';
 
 interface ComboDetailIslandProps {
   combo: Combo;
-}
-
-function Tick() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="shrink-0 text-accent">
-      <path d="M5 12.5L10 17.5L20 7" />
-    </svg>
-  );
 }
 
 function ComboDetailContent({ combo }: ComboDetailIslandProps) {
@@ -255,13 +248,9 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
           </div>
         </div>
 
-        {/* Garantías + pago — mismo formato que la ficha de producto (ANX-28).
-            La entrega ya sale destacada arriba; aquí solo las garantías. */}
+        {/* Garantías + pago — mismos iconos que la ficha de producto. */}
         <div className="mt-5 border-t border-border pt-4">
-          <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
-            <span className="flex items-center gap-2"><Tick /> Autenticidad garantizada</span>
-            <span className="flex items-center gap-2"><Tick /> Envíos nacionales a todo Ecuador</span>
-          </div>
+          <TrustIcons />
         </div>
 
         <div className="mt-4 border-t border-border pt-4">

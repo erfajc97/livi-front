@@ -1,4 +1,4 @@
-import { BACKORDER_LABEL, deliveryRangeShort } from '@/app/helpers/deliveryWindow';
+import { BACKORDER_LABEL, deliveryRangeShort, todayShort } from '@/app/helpers/deliveryWindow';
 
 interface DeliveryEtaProps {
   variant: 'immediate' | 'backorder';
@@ -22,7 +22,9 @@ export default function DeliveryEta({
     >
       <span className="inline-flex items-baseline gap-1.5">
         <span aria-hidden>📦</span>
-        <span className="font-medium">{isBackorder ? 'Bajo pedido' : 'Se despacha hoy'}</span>
+        <span className="font-medium">
+          {isBackorder ? 'Bajo pedido' : `Se despacha hoy ${todayShort()}`}
+        </span>
       </span>
       <span className="text-text-muted" aria-hidden>
         →

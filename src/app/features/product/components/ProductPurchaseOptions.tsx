@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import DeliveryEta from '@/app/components/UI/DeliveryEta';
+import TrustIcons from '@/app/components/UI/TrustIcons';
 import { productUrl } from '@/app/helpers/productUrl';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
@@ -391,6 +392,9 @@ export default function ProductPurchaseOptions({
           variant={selectedIsBajoPedido ? 'backorder' : 'immediate'}
           offsetDays={deliveryOffset}
         />
+        <div className="mt-3.5 border-t border-border/80 pt-3.5">
+          <TrustIcons />
+        </div>
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
@@ -421,15 +425,6 @@ export default function ProductPurchaseOptions({
               <path d="M11.996 2C6.474 2 2 6.474 2 11.996C2 13.921 2.548 15.717 3.511 17.25L2.146 22.18L7.204 20.852C8.683 21.688 10.297 22.158 11.996 22.158C17.518 22.158 22 17.684 22 12.162C22 6.64 17.518 2.166 11.996 2.166V2ZM17.152 16.315C16.94 16.91 16.1 17.433 15.441 17.545C14.945 17.625 14.284 17.682 11.838 16.669C8.91 15.452 7.027 12.441 6.884 12.253C6.741 12.064 5.72 10.71 5.72 9.31C5.72 7.91 6.442 7.238 6.741 6.93C6.983 6.681 7.404 6.551 7.82 6.551C7.962 6.551 8.089 6.558 8.199 6.564C8.484 6.577 8.627 6.602 8.814 7.051C9.05 7.618 9.623 9.022 9.693 9.172C9.764 9.322 9.851 9.531 9.742 9.742C9.643 9.941 9.551 10.035 9.408 10.203C9.266 10.372 9.13 10.493 8.979 10.672C8.847 10.832 8.694 10.992 8.865 11.282C9.036 11.571 9.625 12.532 10.489 13.303C11.603 14.298 12.51 14.611 12.83 14.743C13.151 14.875 13.34 14.856 13.568 14.613C13.797 14.368 14.441 13.621 14.713 13.313C14.985 13.003 15.241 13.041 15.526 13.144C15.811 13.248 17.324 13.996 17.625 14.145C17.925 14.295 18.125 14.369 18.196 14.494C18.267 14.618 18.267 15.308 17.965 15.939L17.152 16.315Z" />
             </svg>
           </button>
-        </div>
-      </div>
-
-      {/* Entrega */}
-      <div className="border-t border-border pt-4">
-        {/* La entrega ya sale destacada arriba: aquí solo las garantías */}
-        <div className="flex flex-col gap-1.5 font-body text-[12px] text-text-soft">
-          <span className="flex items-center gap-2"><Tick /> Autenticidad garantizada</span>
-          <span className="flex items-center gap-2"><Tick /> Envíos nacionales a todo Ecuador</span>
         </div>
       </div>
 
@@ -519,13 +514,5 @@ function SizeCard({ ml, type, price, discount = 0, active, disabled, highlight, 
         <span className="font-body text-[13px] leading-none">{formatCurrency(finalPrice)}</span>
       </span>
     </button>
-  );
-}
-
-function Tick() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" className="shrink-0 text-accent">
-      <path d="M5 12.5L10 17.5L20 7" />
-    </svg>
   );
 }

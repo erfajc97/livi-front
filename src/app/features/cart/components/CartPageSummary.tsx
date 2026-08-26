@@ -1,5 +1,6 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
+import TrustIcons from '@/app/components/UI/TrustIcons';
 
 interface CartPageSummaryProps {
   immediateSubtotal: number;
@@ -9,12 +10,6 @@ interface CartPageSummaryProps {
   immediateCount: number;
   bajoCount: number;
 }
-
-const ASSURANCES = [
-  'Verificado por NonDecants antes del envío',
-  'Pago seguro · PayPhone · Transferencia',
-  'Acceso a referencias raras bajo pedido',
-];
 
 export default function CartPageSummary({
   immediateSubtotal,
@@ -70,14 +65,9 @@ export default function CartPageSummary({
           <PaymentMethodIcons />
         </div>
 
-        <ul className="mt-6 flex flex-col gap-2.5">
-          {ASSURANCES.map((a) => (
-            <li key={a} className="flex items-start gap-2.5 font-body text-xs text-text-soft">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="mt-0.5 shrink-0 text-accent"><polyline points="20 6 9 17 4 12" /></svg>
-              {a}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-6">
+          <TrustIcons />
+        </div>
       </div>
     </div>
   );

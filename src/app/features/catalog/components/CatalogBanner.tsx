@@ -62,20 +62,15 @@ export default function CatalogBanner({
   if (showMarcaHeader) {
     const title = found?.marca.name ?? defaultTitle;
     return (
-      <div className="border-b border-border px-6 py-8 md:px-14 md:py-12">
+      <div className="border-b border-border px-6 py-5 md:px-14 md:py-8">
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
           <div className="min-w-0 max-w-2xl">
-            <span className="eyebrow">Selección curada</span>
-            <h1 className="mt-3 font-display text-4xl font-light italic leading-none text-text sm:text-5xl md:text-6xl">
+            <h1 className="font-display text-4xl font-light italic leading-none text-text sm:text-5xl md:text-6xl">
               {title}
             </h1>
-            <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-text-soft">
-              Explora nuestra selección de {title}
-            </p>
           </div>
           <div className="w-full shrink-0 border border-border bg-bg p-5 md:max-w-xs">
-            <span className="eyebrow">En cifras</span>
-            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-4">
               <StatCell label="Referencias" value={String(stats.total)} loading={stats.isLoading} />
               <StatCell
                 label="En decant"
