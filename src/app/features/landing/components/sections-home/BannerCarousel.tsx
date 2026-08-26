@@ -3,7 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import CommitmentStrip from './CommitmentStrip';
 import BannerHeroCopy from './BannerHeroCopy';
-import { useCarouselNav, CarouselArrow, CarouselProgressBar } from '@/app/components/UI/CarouselNav';
+import { useCarouselNav, CarouselArrow, CarouselProgressBar, EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 import type { Banner } from '@/app/types/global.types';
 
 interface BannerCarouselProps {
@@ -12,7 +12,7 @@ interface BannerCarouselProps {
 }
 
 export default function BannerCarousel({ banners, isLoading = false }: BannerCarouselProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, duration: EMBLA_DURATION }, [
     Autoplay({ delay: 6000, stopOnInteraction: true }),
   ]);
   const [selected, setSelected] = useState(0);

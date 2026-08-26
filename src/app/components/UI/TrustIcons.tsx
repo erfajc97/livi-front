@@ -12,9 +12,9 @@ interface TrustIconsProps {
   size?: number;
 }
 
-export default function TrustIcons({ size = 28 }: TrustIconsProps) {
+export default function TrustIcons({ size = 36 }: TrustIconsProps) {
   return (
-    <ul className="flex items-center justify-center gap-8" aria-label="Compra con confianza">
+    <ul className="flex items-center justify-center gap-10" aria-label="Compra con confianza">
       {ITEMS.map(({ Icon, label }) => (
         <li key={label} className="text-text">
           <Icon size={size} />

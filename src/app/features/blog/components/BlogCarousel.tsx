@@ -1,6 +1,6 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import { useBlogPostsQuery, type BlogPost } from '@/app/tanstack-queries/blogQuery';
-import { useCarouselNav } from '@/app/components/UI/CarouselNav';
+import { useCarouselNav, EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 
 /**
  * Sección Blog del home (REQ-006): carrusel de tarjetas editoriales.
@@ -134,7 +134,7 @@ function RoundArrow({
 
 export default function BlogCarousel() {
   const { data: posts = [], isLoading } = useBlogPostsQuery();
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start', duration: EMBLA_DURATION });
   const { canPrev, canNext, snapCount, selectedIndex, scrollPrev, scrollNext, scrollToIndex } =
     useCarouselNav(emblaApi);
 

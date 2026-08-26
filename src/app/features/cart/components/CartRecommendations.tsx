@@ -7,6 +7,7 @@ import {
   useCarouselNav,
   useMediaCenterTop,
   CarouselArrow,
+  EMBLA_DURATION,
 } from '@/app/components/UI/CarouselNav';
 import CarouselProgressTrack from '@/app/components/UI/CarouselProgressTrack';
 import type { Product } from '@/app/types/global.types';
@@ -26,7 +27,7 @@ export default function CartRecommendations() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: 'start',
-    duration: 32,
+    duration: EMBLA_DURATION,
     containScroll: 'trimSnaps',
     slidesToScroll: 2,
     breakpoints: {

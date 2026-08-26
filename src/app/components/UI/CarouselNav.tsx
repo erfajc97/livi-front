@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { EmblaCarouselType } from 'embla-carousel';
 
+/** Tween de Embla: el default (25) se siente seco. Más alto = más suave. */
+export const EMBLA_DURATION = 50;
+
 /**
  * Estado de navegación de un carrusel Embla: flechas (con extremos) y posición
  * para la barra inferior. Se comparte entre todas las secciones de la landing.

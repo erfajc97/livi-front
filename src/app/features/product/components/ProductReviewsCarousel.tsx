@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
+import { EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 import { MOCK_REVIEWS } from '../data';
 
 function CarouselArrow({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) {
@@ -22,7 +23,7 @@ function CarouselArrow({ direction, onClick }: { direction: 'left' | 'right'; on
 }
 
 export default function ProductReviewsCarousel({ name }: { name: string }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start', duration: EMBLA_DURATION });
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { productUrl } from '@/app/helpers/productUrl';
-import { CarouselProgressBar, useCarouselNav } from '@/app/components/UI/CarouselNav';
+import { CarouselProgressBar, useCarouselNav, EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
 /** Productos por página en la lista lateral (desktop) y en la lista móvil. */
@@ -76,6 +76,7 @@ export default function ProductRankingSection({
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     containScroll: 'trimSnaps',
+    duration: EMBLA_DURATION,
   });
   const mobileNav = useCarouselNav(emblaApi);
 

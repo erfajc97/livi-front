@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import ProductCard from '@/app/features/product/components/ProductCard';
 import Loader from '@/app/components/Loader';
+import { EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
 interface FeaturedProductsSectionProps {
@@ -10,7 +11,7 @@ interface FeaturedProductsSectionProps {
 }
 
 export default function FeaturedProductsSection({ products, isLoading }: FeaturedProductsSectionProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start', duration: EMBLA_DURATION });
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);

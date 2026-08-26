@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import AppProviders from '@/app/providers/AppProviders';
 import ProductPurchaseOptions from './ProductPurchaseOptions';
+import { EMBLA_DURATION } from '@/app/components/UI/CarouselNav';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
 interface ProductDetailIslandProps {
@@ -26,6 +27,7 @@ function ProductGallery({
     loop: list.length > 1,
     align: 'start',
     containScroll: false,
+    duration: EMBLA_DURATION,
   });
 
   useEffect(() => {

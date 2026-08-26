@@ -6,6 +6,7 @@ import {
   useCarouselNav,
   useMediaCenterTop,
   CarouselArrow,
+  EMBLA_DURATION,
 } from '@/app/components/UI/CarouselNav';
 import type { Product } from '@/app/types/global.types';
 
@@ -21,6 +22,7 @@ export default function ExploreCategoriesCarousel({ products }: ExploreCategorie
     align: 'start',
     containScroll: 'trimSnaps',
     slidesToScroll: 1,
+    duration: EMBLA_DURATION,
   });
   const { canPrev, canNext, progress, snapCount, scrollPrev, scrollNext, seekRatio } =
     useCarouselNav(emblaApi);
