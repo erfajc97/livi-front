@@ -1,10 +1,11 @@
 interface IconProps {
   size?: number;
   className?: string;
+  strokeWidth?: number;
 }
 
 /** Envíos — camión de reparto, trazo fino. */
-export default function TruckLineIcon({ size = 30, className }: IconProps) {
+export default function TruckLineIcon({ size = 30, className, strokeWidth = 1 }: IconProps) {
   return (
     <svg
       width={size}
@@ -12,7 +13,7 @@ export default function TruckLineIcon({ size = 30, className }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
