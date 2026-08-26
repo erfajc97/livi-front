@@ -14,7 +14,7 @@ export const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; description
   {
     value:       'EFECTIVO',
     label:       'Efectivo',
-    description: 'Solo para retiro en tienda (Daule).',
+    description: 'Solo para retiro en tienda.',
   },
 ];
 

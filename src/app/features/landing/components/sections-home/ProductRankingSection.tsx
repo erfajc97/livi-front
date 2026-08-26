@@ -82,7 +82,7 @@ export default function ProductRankingSection({
   if (isLoading) {
     // Esqueleto del layout del ranking: destacado + lista de 4.
     return (
-      <section className="bg-bg px-6 py-10 md:px-14 md:py-20" aria-hidden="true">
+      <section className="bg-bg px-6 pb-0 pt-10 md:px-14 md:pb-10 md:pt-20" aria-hidden="true">
         <div className="mx-auto max-w-7xl animate-pulse">
           <div className="mb-6 h-8 w-52 rounded-sm bg-bg-alt md:mb-12 md:h-10 md:w-72" />
           <div className="hidden items-start gap-12 md:grid md:grid-cols-[0.75fr_1.25fr]">
@@ -102,7 +102,7 @@ export default function ProductRankingSection({
             </div>
           </div>
           <div className="flex flex-col md:hidden">
-            {Array.from({ length: 5 }, (_, i) => (
+            {Array.from({ length: 4 }, (_, i) => (
               <div key={i} className="grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
                 <div className="h-6 w-6 rounded-sm bg-bg-alt" />
                 <div className="h-24 w-full bg-bg-alt" />
@@ -139,7 +139,7 @@ export default function ProductRankingSection({
   );
 
   return (
-    <section className="bg-bg px-6 py-10 md:px-14 md:py-20">
+    <section className="bg-bg px-6 pb-0 pt-10 md:px-14 md:pb-10 md:pt-20">
       <div className="mx-auto max-w-7xl">
         {/* Header de sección — título en Cormorant Garamond (REQ-028) */}
         <div className="mb-6 flex items-baseline justify-between md:mb-12">
@@ -188,19 +188,6 @@ export default function ProductRankingSection({
               );
             })}
 
-            {/* Placeholders invisibles: reservan el alto de las filas que
-                faltan en la última página para evitar el salto de altura */}
-            {Array.from({ length: PER_PAGE - list.length }, (_, i) => (
-              <div key={`ph-d-${i}`} aria-hidden className="invisible grid grid-cols-[40px_120px_1fr_auto] items-center gap-6 border-b border-border py-6 first:border-t">
-                <span className="font-display text-3xl leading-none">00</span>
-                <div className="h-32 w-full" />
-                <div>
-                  <div className="font-display text-[22px] font-light leading-tight">&nbsp;</div>
-                </div>
-                <div className="font-body text-[13px]">&nbsp;</div>
-              </div>
-            ))}
-
             {/* Barrita de posición — arrastra para ver los siguientes */}
             <CarouselProgressBar
               snapCount={totalPages}
@@ -241,20 +228,6 @@ export default function ProductRankingSection({
                       </a>
                     );
                   })}
-
-                  {/* Igual que en desktop, la última página incompleta reserva
-                      sus filas (REQ-014): la sección mide lo mismo en todas las
-                      páginas y no da el salto al pasar a la última */}
-                  {Array.from({ length: MOBILE_PER_PAGE - chunk.length }, (_, i) => (
-                    <div key={`ph-m-${i}`} aria-hidden className="invisible grid grid-cols-[28px_84px_1fr] items-center gap-4 border-b border-border py-3.5">
-                      <span className="font-display text-2xl italic leading-none">00</span>
-                      <div className="h-24 w-full" />
-                      <div>
-                        <div className="mt-1 font-display text-lg font-light leading-tight">&nbsp;</div>
-                        <div className="mt-1 font-body text-[11px]">&nbsp;</div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               ))}
             </div>

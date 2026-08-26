@@ -14,7 +14,7 @@ const PAYMENT_LABELS: Record<string, string> = {
 };
 
 const DELIVERY_LABELS: Record<string, string> = {
-  RETIRO:                  'Retiro en tienda (Daule)',
+  RETIRO:                  'Retiro en tienda',
   SERVIENTREGA_GYE:        'Servientrega GYE/Sam/Durán',
   SERVIENTREGA_NACIONAL:   'Servientrega Nacional',
 };

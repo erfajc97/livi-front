@@ -3,14 +3,11 @@ import CartLine from './CartLine';
 import CartPageSummary from './CartPageSummary';
 import CartRecommendations from './CartRecommendations';
 
-function GroupHeader({ title, meta, dot }: { title: string; meta: string; dot?: boolean }) {
+function GroupHeader({ title, meta }: { title: string; meta: string }) {
   return (
     <div className="mb-1 flex items-end justify-between border-b border-border pb-4">
       <h2 className="font-display text-2xl font-light text-text">{title}</h2>
-      <span className="flex items-center gap-1.5 font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
-        {dot && <span className="h-[5px] w-[5px] rounded-full bg-accent" />}
-        {meta}
-      </span>
+      <span className="font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">{meta}</span>
     </div>
   );
 }
@@ -27,6 +24,7 @@ export default function CartPage() {
     removeItem,
     updateQty,
     hasHydrated,
+    deliveryOffset,
   } = useCartPageHook();
 
   // Esqueleto mientras se hidrata el carrito desde localStorage: evita el
@@ -94,6 +92,7 @@ export default function CartPage() {
       key={`${group}-${row.item.variantId}`}
       row={row}
       group={group}
+      deliveryOffset={deliveryOffset}
       onSetTotal={updateQty}
       onRemove={removeItem}
     />
@@ -131,7 +130,7 @@ export default function CartPage() {
 
           {bajo.length > 0 && (
             <div>
-              <GroupHeader title="Bajo pedido" meta="Entrega 13–17 días" dot />
+              <GroupHeader title="Bajo pedido" meta="Entrega 13–17 días" />
               <div>{bajo.map((r) => renderRow(r, 'bajo'))}</div>
               <p className="mt-6 border-l-2 border-accent bg-bg-alt px-4 py-3 font-display text-sm italic text-text-soft">
                 Este perfume lo traemos exclusivamente para ti. Verificado por NonDecants antes de enviártelo.

@@ -1,0 +1,43 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import DecantsPage from '@/app/features/landing/pages/decants/DecantsPage.astro';
+import { breadcrumbJsonLd, faqPageJsonLd } from '@/app/helpers/seoMeta';
+
+const FAQ = [
+  {
+    question: '¿El decant es el mismo perfume que el frasco?',
+    answer: 'Sí. Sale de la botella original de la casa. Lo único que cambia es el envase.',
+  },
+  {
+    question: '¿Cuántos usos trae un decant de 3 ml?',
+    answer: 'Unas 33 pulsaciones. Con cuatro al día, alrededor de una semana — suficiente para saber si vale el frasco.',
+  },
+  {
+    question: '¿Puedo comprar el frasco después?',
+    answer: 'Sí, y es la idea. Cada ficha ofrece los tres decants y el frasco sellado en la misma página.',
+  },
+  {
+    question: '¿Y si el perfume que quiero no está en decant?',
+    answer: 'Lo traemos por encargo en frasco, en 13 a 17 días. Y si nos lo piden lo suficiente, abrimos una botella para decants.',
+  },
+  {
+    question: '¿Cómo sé que es original?',
+    answer: 'Cada frasco se verifica antes de abrirlo. El proceso está explicado en cada ficha de producto.',
+  },
+];
+---
+
+<PublicLayout
+  title="Decants de perfumes originales en Ecuador | NonDecants"
+  description="Un decant es 3, 5 o 10 ml del perfume original. Prueba desde $3,75 antes de comprar el frasco. Envío en Ecuador."
+  canonical="/decants"
+  jsonLd={[
+    breadcrumbJsonLd([
+      { name: 'Inicio', href: '/' },
+      { name: 'Decants', href: '/decants' },
+    ]),
+    faqPageJsonLd(FAQ),
+  ]}
+>
+  <DecantsPage faq={FAQ} />
+</PublicLayout>

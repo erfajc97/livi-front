@@ -199,6 +199,19 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
 
   const { data, isLoading, isFetching } = useProductsQuery({ queryParams });
 
+  const showBrandBackorder = bajoPedido === false && filters.marcaId != null && slugsResolved;
+  const brandBackorderQuery = useProductsQuery({
+    queryParams: {
+      page: 1,
+      limit: DESKTOP_LIMIT,
+      marcaId: filters.marcaId,
+      bajoPedido: true,
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
+    },
+    enabled: showBrandBackorder,
+  });
+
   const setSearch = useCallback((search: string) => {
     setFilters((f) => ({ ...f, search, page: 1 }));
   }, []);
@@ -277,6 +290,14 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     isFetching,
     sortValue,
     hasActiveFilters,
+    showBrandBackorder,
+    brandBackorderProducts: brandBackorderQuery.data?.content ?? [],
+    brandBackorderTotal: brandBackorderQuery.data?.pagination?.total ?? 0,
+    brandBackorderLoading: brandBackorderQuery.isLoading,
+    brandBackorderFetching: brandBackorderQuery.isFetching,
+    selectedMarca: filters.marcaId != null
+      ? rawCategories.flatMap((c) => c.marcas).find((m) => Number(m.id) === filters.marcaId)
+      : undefined,
     setSearch,
     setInStock,
     setGender,

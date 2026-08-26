@@ -140,7 +140,7 @@ export default function BlogCarousel() {
 
   if (isLoading) {
     return (
-      <section className="bg-bg px-6 py-8 md:px-14 md:py-12" aria-hidden="true">
+      <section className="bg-bg px-6 pb-8 pt-6 md:px-14 md:py-12" aria-hidden="true">
         <div className="mx-auto max-w-7xl animate-pulse">
           <div className="mx-auto h-10 w-40 rounded-sm bg-border-soft md:h-12" />
           <div className="mt-6 grid gap-6 md:mt-8 md:grid-cols-3">
@@ -162,7 +162,7 @@ export default function BlogCarousel() {
 
   return (
     /* Sección compacta (REQ-006): mismo diseño, menos aire vertical */
-    <section className="bg-bg px-6 py-8 md:px-14 md:py-12">
+    <section className="bg-bg px-6 pb-8 pt-6 md:px-14 md:py-12">
       <div className="mx-auto max-w-7xl">
         {/* Título centrado con línea fina debajo */}
         {/* Sin la línea bajo el título: separaba de más el encabezado del carrusel */}

@@ -18,7 +18,7 @@ const fetchDeliveryMethods = async (city: string): Promise<DeliveryOption[]> => 
       {
         id: zone,
         method: zone === 'retiro' ? 'RETIRO' : zone === 'gye' ? 'SERVIENTREGA_GYE' : 'SERVIENTREGA_NACIONAL',
-        label: zone === 'retiro' ? 'Retiro en tienda (Daule)' : zone === 'gye' ? 'Servientrega GYE/Sam/Durán' : 'Servientrega Provincias',
+        label: zone === 'retiro' ? 'Retiro en tienda' : zone === 'gye' ? 'Servientrega GYE/Sam/Durán' : 'Servientrega Provincias',
         cost,
         cities: [],
       },

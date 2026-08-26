@@ -1,86 +1,119 @@
 import { useRawCategoriesQuery } from '@/app/tanstack-queries/categoriesQuery';
-import type { NavCategory } from '@/app/tanstack-queries/categoriesQuery';
+import type { NavCategory, NavMarca } from '@/app/tanstack-queries/categoriesQuery';
+import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { useMarcaStats } from '../hooks/useMarcaStats';
 
 interface CatalogBannerProps {
   defaultTitle: string;
   defaultDescription: string;
-  /** Categoría/marca SELECCIONADA (estado del filtro). El banner reacciona a
-   *  estos, no a la URL, para que cambie al usar el filtro sin recargar. */
   categoryId?: number;
   marcaId?: number;
 }
 
-function useBannerData(
-  defaultTitle: string,
-  defaultDescription: string,
-  categoryId?: number,
-  marcaId?: number,
-) {
-  const { data: categories = [] } = useRawCategoriesQuery();
-
-  if (categoryId == null || categories.length === 0) {
-    return {
-      title: defaultTitle,
-      description: defaultDescription,
-      imageUrl: null,
-      mobileImageUrl: null,
-    };
+function findMarca(
+  categories: NavCategory[],
+  marcaId: number,
+): { marca: NavMarca; category: NavCategory } | null {
+  for (const category of categories) {
+    const marca = category.marcas.find((item) => Number(item.id) === Number(marcaId));
+    if (marca) return { marca, category };
   }
-
-  const category =
-    categories.find((c: NavCategory) => Number(c.id) === Number(categoryId)) ?? null;
-
-  if (!category) {
-    return {
-      title: defaultTitle,
-      description: defaultDescription,
-      imageUrl: null,
-      mobileImageUrl: null,
-    };
-  }
-
-  // Con marca seleccionada, mostrar su nombre e imagen.
-  if (marcaId != null) {
-    const marca = category.marcas.find((s) => Number(s.id) === Number(marcaId));
-    if (marca) {
-      return {
-        title: marca.name,
-        description: `Explora nuestra selección de ${marca.name}`,
-        // Imagen de la marca; si no tuviera, cae a la de la categoría.
-        imageUrl: marca.imageUrl || category.imageUrl,
-        mobileImageUrl: marca.mobileImageUrl || category.mobileImageUrl,
-      };
-    }
-  }
-
-  return {
-    title: category.name,
-    description: category.description || `Explora nuestra selección de ${category.name.toLowerCase()}`,
-    imageUrl: category.imageUrl,
-    mobileImageUrl: category.mobileImageUrl,
-  };
+  return null;
 }
 
-export default function CatalogBanner({ defaultTitle, defaultDescription, categoryId, marcaId }: CatalogBannerProps) {
-  const { title, description, imageUrl, mobileImageUrl } = useBannerData(
-    defaultTitle,
-    defaultDescription,
-    categoryId,
-    marcaId,
+function StatCell({
+  label,
+  value,
+  loading,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  loading: boolean;
+  valueClassName?: string;
+}) {
+  return (
+    <div>
+      <p className="font-body text-[11px] text-text-muted">{label}</p>
+      <p className={`mt-0.5 font-display text-[22px] leading-none ${valueClassName ?? 'text-text'}`}>
+        {loading ? '—' : value}
+      </p>
+    </div>
   );
-  const bannerSrc = imageUrl || '/banner-catalog.png';
-  // Arte vertical solo si el admin lo subió; si no, el <source> no se emite y
-  // el teléfono usa la misma imagen que escritorio.
-  const mobileSrc = mobileImageUrl || null;
+}
+
+export default function CatalogBanner({
+  defaultTitle,
+  defaultDescription,
+  categoryId,
+  marcaId,
+}: CatalogBannerProps) {
+  const { data: categories = [] } = useRawCategoriesQuery();
+  const stats = useMarcaStats(marcaId);
+
+  const found = marcaId != null ? findMarca(categories, marcaId) : null;
+  const category =
+    categoryId != null
+      ? categories.find((item) => Number(item.id) === Number(categoryId))
+      : found?.category;
+
+  const showMarcaHeader = marcaId != null && (categories.length === 0 || found != null);
+
+  if (showMarcaHeader) {
+    const title = found?.marca.name ?? defaultTitle;
+    return (
+      <div className="border-b border-border px-6 py-8 md:px-14 md:py-12">
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-16">
+          <div className="min-w-0 max-w-2xl">
+            <span className="eyebrow">Selección curada</span>
+            <h1 className="mt-3 font-display text-4xl font-light italic leading-none text-text sm:text-5xl md:text-6xl">
+              {title}
+            </h1>
+            <p className="mt-4 max-w-xl font-body text-sm leading-relaxed text-text-soft">
+              Explora nuestra selección de {title}
+            </p>
+          </div>
+          <div className="w-full shrink-0 border border-border bg-bg p-5 md:max-w-xs">
+            <span className="eyebrow">En cifras</span>
+            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4">
+              <StatCell label="Referencias" value={String(stats.total)} loading={stats.isLoading} />
+              <StatCell
+                label="En decant"
+                value={String(stats.decants)}
+                loading={stats.isLoading}
+                valueClassName="text-success"
+              />
+              <StatCell
+                label="Por encargo"
+                value={String(stats.bajoPedido)}
+                loading={stats.isLoading}
+                valueClassName="text-warning"
+              />
+              <StatCell
+                label="Desde"
+                value={stats.fromPrice != null ? formatCurrency(stats.fromPrice) : '—'}
+                loading={stats.isLoading}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const title = category?.name ?? defaultTitle;
+  const description =
+    category?.description ||
+    (category ? `Explora nuestra selección de ${category.name.toLowerCase()}` : defaultDescription);
+  const imageUrl = category?.imageUrl || '/banner-catalog.png';
+  const mobileSrc = category?.mobileImageUrl || null;
 
   return (
-    /* Banner-strip: alto moderado en todos los breakpoints (antes quedaba
-       demasiado alto y "desbordaba" la vista). */
     <div className="relative h-48 w-full overflow-hidden sm:h-60 md:h-72">
       <picture>
         {mobileSrc && <source media="(max-width: 767px)" srcSet={mobileSrc} />}
         <img
-          src={bannerSrc}
+          src={imageUrl}
           alt={title}
           className="absolute inset-0 h-full w-full object-cover object-center brightness-[0.6]"
         />

@@ -1,13 +1,17 @@
+function addDaysFromToday(days: number): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
 /**
  * Ventana de entrega en texto: mañana y pasado mañana ("6 y 7 de agosto").
  * `offsetDays` viene del setting `delivery_days_offset` del admin (días
  * adicionales que se suman a la promesa de entrega).
  */
 export function deliveryWindow(offsetDays = 0): string {
-  const first = new Date();
-  first.setDate(first.getDate() + 1 + offsetDays);
-  const second = new Date();
-  second.setDate(second.getDate() + 2 + offsetDays);
+  const first = addDaysFromToday(1 + offsetDays);
+  const second = addDaysFromToday(2 + offsetDays);
 
   const withMonth = (d: Date) =>
     d.toLocaleDateString('es-EC', { day: 'numeric', month: 'long' });
@@ -16,6 +20,13 @@ export function deliveryWindow(offsetDays = 0): string {
   return first.getMonth() === second.getMonth()
     ? `${first.getDate()} y ${withMonth(second)}`
     : `${withMonth(first)} y ${withMonth(second)}`;
+}
+
+/** Rango corto para la ficha/carrito: "27 ago – 28 ago". */
+export function deliveryRangeShort(offsetDays = 0): string {
+  const short = (d: Date) =>
+    d.toLocaleDateString('es-EC', { day: 'numeric', month: 'short' }).replace('.', '');
+  return `${short(addDaysFromToday(1 + offsetDays))} – ${short(addDaysFromToday(2 + offsetDays))}`;
 }
 
 /** Días que tarda una importación bajo pedido. */

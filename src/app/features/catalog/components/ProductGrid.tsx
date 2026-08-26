@@ -6,9 +6,10 @@ interface ProductGridProps {
   products: Product[];
   isLoading: boolean;
   isFetching: boolean;
+  hideEmpty?: boolean;
 }
 
-export default function ProductGrid({ products, isLoading, isFetching }: ProductGridProps) {
+export default function ProductGrid({ products, isLoading, isFetching, hideEmpty = false }: ProductGridProps) {
   if (isLoading) {
     // 8 = LIMIT del catálogo: el grid ya ocupa su altura final al cargar.
     return (
@@ -21,6 +22,7 @@ export default function ProductGrid({ products, isLoading, isFetching }: Product
   }
 
   if (products.length === 0) {
+    if (hideEmpty) return null;
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center md:py-20">
         <p className="font-body text-sm text-text-muted">

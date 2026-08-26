@@ -1,15 +1,17 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import DeliveryEta from '@/app/components/UI/DeliveryEta';
 import type { CartRow } from '../hooks/useCartPageHook';
 
 interface CartLineProps {
   row: CartRow;
   group: 'immediate' | 'bajo';
+  deliveryOffset?: number;
   /** Fija la cantidad TOTAL del item (el split se recalcula solo). */
   onSetTotal: (variantId: string, total: number) => void;
   onRemove: (variantId: string) => void;
 }
 
-export default function CartLine({ row, group, onSetTotal, onRemove }: CartLineProps) {
+export default function CartLine({ row, group, deliveryOffset = 0, onSetTotal, onRemove }: CartLineProps) {
   const { item, portionQty, total, split } = row;
   const isBajo = group === 'bajo';
   const isCombo = item.comboId != null;
@@ -58,17 +60,13 @@ export default function CartLine({ row, group, onSetTotal, onRemove }: CartLineP
         </h3>
         <p className="mt-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft">{variantLabel}</p>
 
-        {/* Estado según grupo */}
-        <p className="mt-2.5 flex items-center gap-1.5 font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
-          {isBajo ? (
-            <>
-              <span className="h-[5px] w-[5px] rounded-full bg-accent" />
-              Bajo pedido · Entrega 13–17 días
-            </>
-          ) : (
-            <>En stock · Listo para envío</>
-          )}
-        </p>
+        <div className="mt-2.5">
+          <DeliveryEta
+            variant={isBajo ? 'backorder' : 'immediate'}
+            offsetDays={deliveryOffset}
+            compact
+          />
+        </div>
         {split && !isBajo && (
           <p className="mt-1 font-body text-[10px] uppercase tracking-[0.14em] text-text-muted">
             El resto va bajo pedido ↓

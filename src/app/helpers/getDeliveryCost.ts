@@ -2,7 +2,7 @@
 export type DeliveryZone = 'retiro' | 'gye' | 'provincias';
 
 const DELIVERY_COSTS: Record<DeliveryZone, number> = {
-  retiro:     0,   // Retiro en tienda (Daule)
+  retiro:     0,   // Retiro en tienda
   gye:        3,   // Guayaquil / Samborondón / Durán
   provincias: 6.5, // Resto del país
 };

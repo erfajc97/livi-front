@@ -14,6 +14,16 @@ export interface FooterLink {
   label: string;
 }
 
+export interface ExploreCategoryCard {
+  id: string;
+  href: string;
+  heading: string;
+  imageUrl: string | null;
+  brandLineDesktop: string;
+  brandLineMobile: string;
+  marcaCount: number;
+}
+
 export interface SocialIcon {
   src: string;
   alt: string;

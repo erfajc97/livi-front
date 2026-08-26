@@ -61,7 +61,6 @@ export function organizationJsonLd() {
     },
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'Daule',
       addressCountry: 'EC',
     },
   };
@@ -243,5 +242,20 @@ export function articleJsonLd(post: {
       logo: { '@type': 'ImageObject', url: absoluteUrl('/logonondecants.png') },
     },
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
+  };
+}
+
+export function faqPageJsonLd(items: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
   };
 }

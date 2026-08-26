@@ -6,6 +6,8 @@ import CatalogBanner from './components/CatalogBanner';
 import CatalogFilters from './components/CatalogFilters';
 import ProductGrid from './components/ProductGrid';
 import CatalogPagination from './components/CatalogPagination';
+import CatalogQuickFilters from './components/CatalogQuickFilters';
+import CatalogBrandBackorder from './components/CatalogBrandBackorder';
 import {
   CATALOG_GENDERS,
   CATALOG_TIME_OF_DAY,
@@ -53,12 +55,23 @@ function CatalogContent({
     setCategoryId,
     setMarcaId,
     clearFilters,
+    showBrandBackorder,
+    brandBackorderProducts,
+    brandBackorderTotal,
+    brandBackorderLoading,
+    brandBackorderFetching,
+    selectedMarca,
   } = useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMarcaId });
 
   const { data: categories = [] } = useCategoriesWithMarcasQuery();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const resultCount = pagination?.total ?? products.length;
+  const resultCount =
+    (pagination?.total ?? products.length) + (showBrandBackorder ? brandBackorderTotal : 0);
+
+  const marcas = Array.from(
+    new Map(categories.flatMap((c) => c.marcas).map((m) => [String(m.id), m])).values(),
+  );
 
   // Chips de filtros activos (cada uno se puede quitar)
   const activeChips: { key: string; label: string; onRemove: () => void }[] = [];
@@ -119,7 +132,7 @@ function CatalogContent({
       />
 
       {/* Búsqueda */}
-      <div className="border-b border-border px-6 py-7 md:px-14 md:py-9">
+      <div className="border-b border-border px-6 py-4 md:px-14 md:py-6">
         <input
           type="search"
           value={filters.search}
@@ -132,25 +145,39 @@ function CatalogContent({
       {/* Barra de filtros sticky: activos · conteo · orden */}
       <div className="sticky top-0 z-20 border-b border-border bg-bg/95 backdrop-blur-sm">
         <div className="flex flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between md:px-14">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Acceso a filtros — solo mobile: botón oscuro claro y visible
-                (la barra lateral ya está siempre visible en desktop). */}
+          {/* Móvil: Filtros + Género + Marca en UNA fila propia. Los chips
+              activos no entran aquí: si no, se pisan al elegir un filtro. */}
+          <div className="flex items-center gap-2 md:hidden">
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
-              className="inline-flex items-center gap-2 bg-text px-4 py-2.5 font-body text-[11px] uppercase tracking-[0.14em] text-bg transition-colors hover:bg-accent md:hidden"
+              className="inline-flex shrink-0 items-center gap-2 bg-text px-3.5 py-2.5 font-body text-[11px] uppercase tracking-[0.14em] text-bg transition-colors hover:bg-accent"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
               </svg>
               Filtros{activeChips.length ? ` (${activeChips.length})` : ''}
             </button>
+            <CatalogQuickFilters
+              gender={filters.gender}
+              onGenderChange={setGender}
+              marcaId={filters.marcaId}
+              onMarcaChange={setMarcaId}
+              marcas={marcas}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
             {activeChips.map((chip) => (
               <button
                 key={chip.key}
                 type="button"
                 onClick={chip.onRemove}
-                className="inline-flex items-center gap-1.5 border border-border px-3 py-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft transition-colors hover:border-accent hover:text-accent"
+                className={`items-center gap-1.5 border border-border px-3 py-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft transition-colors hover:border-accent hover:text-accent ${
+                  chip.key === 'gender' || chip.key === 'marca'
+                    ? 'hidden md:inline-flex'
+                    : 'inline-flex'
+                }`}
               >
                 {chip.label} <span aria-hidden>×</span>
               </button>
@@ -166,7 +193,7 @@ function CatalogContent({
             )}
           </div>
 
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <span className="font-body text-xs text-text-soft">
               Mostrando {resultCount} {resultCount === 1 ? 'resultado' : 'resultados'}
             </span>
@@ -216,8 +243,34 @@ function CatalogContent({
         )}
 
         <div className="min-w-0 px-6 py-6 md:px-14 md:py-10">
-          <ProductGrid products={products} isLoading={isLoading} isFetching={isFetching} />
+          <ProductGrid
+            products={products}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            hideEmpty={showBrandBackorder}
+          />
+          {showBrandBackorder &&
+            !isLoading &&
+            !brandBackorderLoading &&
+            products.length === 0 &&
+            brandBackorderProducts.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 text-center md:py-20">
+                <p className="font-body text-sm text-text-muted">
+                  No se encontraron productos con esos filtros.
+                </p>
+              </div>
+            )}
           {pagination && <CatalogPagination pagination={pagination} onPageChange={setPage} />}
+          {showBrandBackorder && (
+            <CatalogBrandBackorder
+              products={brandBackorderProducts}
+              isLoading={brandBackorderLoading}
+              isFetching={brandBackorderFetching}
+              marcaName={selectedMarca?.name}
+              marcaSlug={selectedMarca?.slug}
+              total={brandBackorderTotal}
+            />
+          )}
         </div>
       </div>
     </div>

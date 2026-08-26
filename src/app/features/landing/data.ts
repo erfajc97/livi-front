@@ -300,6 +300,7 @@ export const FOOTER_SOCIAL_ICONS = [
 
 export const FOOTER_LINKS_COL1 = [
   { href: '/catalogo/perfumes', label: 'Perfumes' },
+  { href: '/decants',           label: 'Cómo funcionan los decants' },
   { href: '/bajo-pedido',       label: 'Bajo pedidos' },
   { href: '/catalogo/combos',   label: 'Combos' },
 ];

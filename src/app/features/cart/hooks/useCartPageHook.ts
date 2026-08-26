@@ -1,6 +1,7 @@
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { ESTIMATED_SHIPPING } from '@/app/features/checkout/data';
 import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
+import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
 
 export interface CartRow {
   item: CartItem;
@@ -24,6 +25,7 @@ export function useCartPageHook() {
   const removeItem  = useCartStore((s) => s.removeItem);
   const updateQty   = useCartStore((s) => s.updateQty);
   const hasHydrated = useCartStore((s) => s._hasHydrated);
+  const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
 
   const immediate: CartRow[] = [];
   const bajo: CartRow[] = [];
@@ -67,5 +69,6 @@ export function useCartPageHook() {
     removeItem,
     updateQty,
     hasHydrated,
+    deliveryOffset,
   };
 }

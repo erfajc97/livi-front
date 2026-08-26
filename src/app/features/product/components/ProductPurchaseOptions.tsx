@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
-import { deliveryWindow } from '@/app/helpers/deliveryWindow';
+import DeliveryEta from '@/app/components/UI/DeliveryEta';
 import { productUrl } from '@/app/helpers/productUrl';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
@@ -341,9 +341,7 @@ export default function ProductPurchaseOptions({
             busca quien ya conoce la marca. */}
         {product.marca?.name && (
           <a
-            href={`${product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes'}?marca=${
-              product.marca.slug || product.marca.id
-            }`}
+            href={`/catalogo/perfumes?marca=${product.marca.slug || product.marca.id}`}
             className="mt-2 block w-fit font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:text-accent"
           >
             {product.marca.name}
@@ -387,22 +385,12 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      {/* Entrega — destacada con brillo animado + punto pulsante para que
-          el usuario no pase por alto el tiempo de entrega */}
       <div className="border-y border-border bg-bg-alt/60 px-4 py-3.5 -mx-4">
-        <p className="eyebrow mb-1 flex items-center gap-2 text-text-muted">
-          <span className="delivery-dot inline-block h-[6px] w-[6px] rounded-full bg-accent" />
-          Entrega
-        </p>
-        <p className="font-display text-2xl font-light leading-tight">
-          <span className="delivery-highlight">
-            {selectedIsBajoPedido ? (
-              <>Bajo pedido · <span className="italic">13–17 días</span></>
-            ) : (
-              <>Recibe entre el <span className="italic">{deliveryWindow(deliveryOffset)}</span></>
-            )}
-          </span>
-        </p>
+        <p className="eyebrow mb-1.5 text-text-muted">Entrega</p>
+        <DeliveryEta
+          variant={selectedIsBajoPedido ? 'backorder' : 'immediate'}
+          offsetDays={deliveryOffset}
+        />
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
