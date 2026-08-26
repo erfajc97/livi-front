@@ -19,11 +19,11 @@ interface EtaStepProps {
 function EtaStep({ Icon, label, value, compact }: EtaStepProps) {
   const size = compact ? 16 : 20;
   return (
-    <div className="flex min-w-0 items-start gap-2">
+    <div className="flex shrink-0 items-start gap-3">
       <span className="mt-0.5 shrink-0 text-text-soft">
         <Icon size={size} />
       </span>
-      <span className="min-w-0">
+      <span>
         <span
           className={`block font-body uppercase tracking-[0.16em] text-text-muted ${
             compact ? 'text-[9px]' : 'text-[10px]'
@@ -52,14 +52,19 @@ export default function DeliveryEta({
   const eta = isBackorder ? BACKORDER_LABEL : deliveryRangeShort(offsetDays);
 
   return (
-    <div className={`flex flex-wrap items-start ${compact ? 'gap-x-3 gap-y-2' : 'gap-x-4 gap-y-2'}`}>
+    <div
+      className={`flex w-full items-start justify-between ${compact ? 'gap-5' : 'gap-10'}`}
+    >
       <EtaStep
         Icon={PackageLineIcon}
         label={isBackorder ? 'Despacho' : 'Se despacha'}
         value={isBackorder ? 'Bajo pedido' : `Hoy ${todayShort()}`}
         compact={compact}
       />
-      <span className={`mt-4 font-body text-text-muted ${compact ? 'text-xs' : 'text-sm'}`} aria-hidden>
+      <span
+        className={`shrink-0 self-center px-2 font-body text-text-muted ${compact ? 'text-xs' : 'text-sm'}`}
+        aria-hidden
+      >
         →
       </span>
       <EtaStep Icon={TruckLineIcon} label="Entrega estimada" value={eta} compact={compact} />
