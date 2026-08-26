@@ -1,9 +1,46 @@
+import type { ComponentType } from 'react';
+import PackageLineIcon from '@/assets/svg/PackageLineIcon';
+import TruckLineIcon from '@/assets/svg/TruckLineIcon';
 import { BACKORDER_LABEL, deliveryRangeShort, todayShort } from '@/app/helpers/deliveryWindow';
 
 interface DeliveryEtaProps {
   variant: 'immediate' | 'backorder';
   offsetDays?: number;
   compact?: boolean;
+}
+
+interface EtaStepProps {
+  Icon: ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  value: string;
+  compact: boolean;
+}
+
+function EtaStep({ Icon, label, value, compact }: EtaStepProps) {
+  const size = compact ? 16 : 20;
+  return (
+    <div className="flex min-w-0 items-start gap-2">
+      <span className="mt-0.5 shrink-0 text-text-soft">
+        <Icon size={size} />
+      </span>
+      <span className="min-w-0">
+        <span
+          className={`block font-body uppercase tracking-[0.16em] text-text-muted ${
+            compact ? 'text-[9px]' : 'text-[10px]'
+          }`}
+        >
+          {label}
+        </span>
+        <span
+          className={`mt-0.5 block font-display font-light italic leading-snug text-text ${
+            compact ? 'text-sm' : 'text-base'
+          }`}
+        >
+          {value}
+        </span>
+      </span>
+    </div>
+  );
 }
 
 export default function DeliveryEta({
@@ -15,25 +52,17 @@ export default function DeliveryEta({
   const eta = isBackorder ? BACKORDER_LABEL : deliveryRangeShort(offsetDays);
 
   return (
-    <p
-      className={`flex flex-wrap items-baseline gap-x-2 gap-y-1 text-text ${
-        compact ? 'font-body text-[11px] leading-snug' : 'font-body text-sm leading-snug'
-      }`}
-    >
-      <span className="inline-flex items-baseline gap-1.5">
-        <span aria-hidden>📦</span>
-        <span className="font-medium">
-          {isBackorder ? 'Bajo pedido' : `Se despacha hoy ${todayShort()}`}
-        </span>
-      </span>
-      <span className="text-text-muted" aria-hidden>
+    <div className={`flex flex-wrap items-start ${compact ? 'gap-x-3 gap-y-2' : 'gap-x-4 gap-y-2'}`}>
+      <EtaStep
+        Icon={PackageLineIcon}
+        label={isBackorder ? 'Despacho' : 'Se despacha'}
+        value={isBackorder ? 'Bajo pedido' : `Hoy ${todayShort()}`}
+        compact={compact}
+      />
+      <span className={`mt-4 font-body text-text-muted ${compact ? 'text-xs' : 'text-sm'}`} aria-hidden>
         →
       </span>
-      <span className="inline-flex items-baseline gap-1.5">
-        <span aria-hidden>🚚</span>
-        <span className="text-text-soft">Entrega estimada</span>
-        <span className="font-medium text-text">{eta}</span>
-      </span>
-    </p>
+      <EtaStep Icon={TruckLineIcon} label="Entrega estimada" value={eta} compact={compact} />
+    </div>
   );
 }
