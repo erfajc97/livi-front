@@ -90,6 +90,8 @@ export const GET: APIRoute = async () => {
     loc('/catalogo/combos', undefined, 'weekly', '0.8'),
     loc('/bajo-pedido', undefined, 'daily', '0.8'),
     loc('/decants', undefined, 'monthly', '0.8'),
+    loc('/faq', undefined, 'monthly', '0.5'),
+    loc('/cookies', undefined, 'yearly', '0.2'),
     loc('/blog', undefined, 'weekly', '0.6'),
     loc('/contacto', undefined, 'monthly', '0.4'),
     loc('/terminos', undefined, 'yearly', '0.2'),

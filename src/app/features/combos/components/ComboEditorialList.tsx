@@ -200,9 +200,9 @@ export default function ComboEditorialList({ combos, isLoading }: ComboEditorial
       {/* Encabezado editorial — compacto */}
       <header className="mx-auto max-w-3xl px-6 py-7 text-center md:py-10">
         <span className="eyebrow">— Selecciones de la casa</span>
-        <h1 className="mt-2.5 font-display text-3xl font-light leading-[1.1] tracking-[-0.02em] text-text md:text-5xl">
+        <h2 className="mt-2.5 font-display text-3xl font-light leading-[1.1] tracking-[-0.02em] text-text md:text-5xl">
           Cada combo, pensado para un momento.
-        </h1>
+        </h2>
       </header>
 
       {/* Filas alternadas */}

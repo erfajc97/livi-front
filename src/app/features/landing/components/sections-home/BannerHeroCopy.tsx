@@ -2,7 +2,14 @@
  * Copy y CTAs del banner. En desktop van sobre el slide 1 (onDark);
  * en móvil, debajo de la foto.
  */
-export default function BannerHeroCopy({ onDark = false }: { onDark?: boolean }) {
+export default function BannerHeroCopy({
+  onDark = false,
+  asHero = false,
+}: {
+  onDark?: boolean;
+  asHero?: boolean;
+}) {
+  const TitleTag = asHero ? 'h1' : 'p';
   return (
     <div className="max-w-[38rem]">
       <p
@@ -12,13 +19,13 @@ export default function BannerHeroCopy({ onDark = false }: { onDark?: boolean })
       >
         Perfumería · Ecuador
       </p>
-      <p
+      <TitleTag
         className={`mt-3 font-display text-[clamp(2rem,4.4vw,3.35rem)] font-light leading-[1.08] tracking-[-0.02em] ${
           onDark ? 'text-bg' : 'text-text'
         }`}
       >
         Perfumes originales y decants en Ecuador
-      </p>
+      </TitleTag>
       <p
         className={`mt-4 max-w-[46ch] font-body text-sm leading-[1.65] md:text-[15px] ${
           onDark ? 'text-bg/85' : 'text-text-soft'

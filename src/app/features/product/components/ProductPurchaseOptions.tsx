@@ -319,7 +319,7 @@ export default function ProductPurchaseOptions({
     const url =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://www.nondecants.com${productUrl(product)}`;
+        : `https://nondecants.com${productUrl(product)}`;
     const msg = `Hola, estoy interesado/a en el perfume ${product.name}: ${url}`;
     window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
   };

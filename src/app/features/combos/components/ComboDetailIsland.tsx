@@ -80,7 +80,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
     const url =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://www.nondecants.com/combo/${combo.id}`;
+        : `https://nondecants.com/combo/${combo.id}`;
     const productList = products.map((cp) => cp.product?.name ?? 'Producto').join(', ');
     const msg = `Hola, estoy interesado/a en el combo "${combo.name}" (${productList}): ${url}`;
     window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');

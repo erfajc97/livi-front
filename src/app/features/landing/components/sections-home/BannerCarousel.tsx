@@ -103,7 +103,7 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
 
       {/* Móvil: el copy no va sobre la foto, va como bloque aparte debajo. */}
       <div className="border-b border-border px-6 py-6 md:hidden">
-        <BannerHeroCopy />
+        <BannerHeroCopy asHero />
       </div>
 
       <CommitmentStrip />

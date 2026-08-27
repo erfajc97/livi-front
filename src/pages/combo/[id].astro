@@ -3,7 +3,8 @@ export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchComboById } from '@/app/tanstack-queries/combosQuery';
-import { absoluteImageUrl, comboSeoDescription } from '@/app/helpers/seoMeta';
+import { comboSeoDescription, SHARE_DESCRIPTION } from '@/app/helpers/seoMeta';
+import { comboShareImagePath } from '@/app/helpers/ogCard';
 import ComboDetailIsland from '@/app/features/combos/components/ComboDetailIsland';
 
 const { id } = Astro.params;
@@ -18,7 +19,8 @@ if (!combo) {
   title={`${combo.name} | NonDecants`}
   description={comboSeoDescription(combo)}
   shareTitle={combo.name}
-  ogImage={absoluteImageUrl(combo.imageUrl)}
+  ogDescription={SHARE_DESCRIPTION}
+  ogImage={comboShareImagePath(combo.id)}
   canonical={`/combo/${combo.id}`}
 >
   <div class="bg-bg min-h-screen">

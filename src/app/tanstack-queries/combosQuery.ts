@@ -3,7 +3,7 @@ import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import type { Combo } from '@/app/types/global.types';
 
-const fetchActiveCombos = async (): Promise<Combo[]> => {
+export const fetchActiveCombos = async (): Promise<Combo[]> => {
   const { data } = await axiosInstance.get(API_ENDPOINTS.COMBOS_ACTIVE);
   const responseData = data?.data ?? data;
   if (Array.isArray(responseData)) return responseData;

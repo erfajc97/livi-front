@@ -5,12 +5,14 @@ import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/productsQuery';
 import { productUrl } from '@/app/helpers/productUrl';
 import {
-  absoluteImageUrl,
   breadcrumbJsonLd,
+  productDisplayName,
   productJsonLd,
   productSeoDescription,
   productSeoTitle,
+  SHARE_DESCRIPTION,
 } from '@/app/helpers/seoMeta';
+import { productShareImagePath } from '@/app/helpers/ogCard';
 import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
 import ProductEditorial from '@/app/features/product/components/ProductEditorial.astro';
 import ExploreCategoriesCarousel from '@/app/features/product/components/ExploreCategoriesCarousel';
@@ -38,7 +40,6 @@ const relatedProducts = product.marcaId
       .filter((p) => p.id !== product.id)
   : [];
 
-const productImage = absoluteImageUrl(product.image || product.imageUrl || product.images?.[0]);
 const listingHref = product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes';
 const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
 ---
@@ -46,8 +47,9 @@ const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
 <PublicLayout
   title={productSeoTitle(product)}
   description={productSeoDescription(product)}
-  shareTitle={productSeoTitle(product)}
-  ogImage={productImage}
+  shareTitle={productDisplayName(product)}
+  ogDescription={SHARE_DESCRIPTION}
+  ogImage={productShareImagePath(product.id)}
   ogType="product"
   canonical={canonical}
   jsonLd={[

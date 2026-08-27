@@ -3,6 +3,11 @@ import type { Combo, Product } from '@/app/types/global.types';
 
 export const SITE_ORIGIN = 'https://nondecants.com';
 
+/** Copy de la tarjeta al compartir (WhatsApp, Linktree, Facebook). */
+export const SHARE_DESCRIPTION =
+  'Perfumes y decants sellados al mejor precio 100% originales.';
+export const SHARE_TITLE = `NonDecants — ${SHARE_DESCRIPTION.replace(/\.$/, '')}`;
+
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
   const normalized = path.startsWith('/') ? path : `/${path}`;

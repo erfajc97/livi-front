@@ -3,6 +3,8 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
+RUN apk add --no-cache libc6-compat
+
 # Copy package files
 COPY package*.json ./
 
@@ -20,6 +22,8 @@ RUN npm run build \
 FROM node:24-alpine
 
 WORKDIR /app
+
+RUN apk add --no-cache libc6-compat
 
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nextjs -u 1001 -G nodejs

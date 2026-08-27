@@ -1,0 +1,33 @@
+---
+import { productUrl } from '@/app/helpers/productUrl';
+import type { Product } from '@/app/types/global.types';
+
+interface Props {
+  products: Product[];
+  title?: string;
+}
+
+const { products, title = 'Índice de fragancias' } = Astro.props;
+---
+
+{products.length > 0 && (
+  <nav class="border-t border-border px-6 py-10 md:px-14 md:py-14" aria-label={title}>
+    <h2 class="font-display text-2xl font-light tracking-[-0.02em] text-text">{title}</h2>
+    <p class="mt-2 max-w-[60ch] font-body text-sm leading-relaxed text-text-soft">
+      Todas las referencias de esta selección, enlazadas para que puedas abrir cada ficha.
+    </p>
+    <ul class="mt-6 columns-1 gap-x-10 sm:columns-2 lg:columns-3">
+      {products.map((product) => (
+        <li class="break-inside-avoid border-b border-border/70 py-1.5">
+          <a
+            href={productUrl(product)}
+            class="font-body text-[13px] leading-snug text-text-soft transition-colors hover:text-text"
+          >
+            {product.marca?.name ? `${product.marca.name} · ` : ''}
+            {product.name}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}

@@ -1,0 +1,36 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+import LegalLayout from '@/app/features/landing/pages/legal/LegalLayout.astro';
+import { SITE_FAQ } from '@/app/features/landing/data/faqItems';
+import { breadcrumbJsonLd, faqPageJsonLd } from '@/app/helpers/seoMeta';
+---
+
+<PublicLayout
+  title="Preguntas frecuentes | NonDecants"
+  description="Decants, envíos en Ecuador, horarios de despacho, pagos y encargos. Respuestas claras de NonDecants."
+  canonical="/faq"
+  jsonLd={[
+    breadcrumbJsonLd([
+      { name: 'Inicio', href: '/' },
+      { name: 'Preguntas frecuentes', href: '/faq' },
+    ]),
+    faqPageJsonLd(SITE_FAQ),
+  ]}
+>
+  <LegalLayout
+    eyebrow="Ayuda"
+    title="Preguntas frecuentes"
+    intro="Cómo funcionan los decants, los envíos en Ecuador, el horario de despacho y los pagos. Si no está aquí, escríbenos por WhatsApp."
+  >
+    {SITE_FAQ.map((item) => (
+      <>
+        <h2>{item.question}</h2>
+        <p>{item.answer}</p>
+      </>
+    ))}
+    <p>
+      Más detalle sobre decants en <a href="/decants">cómo funcionan los decants</a>.
+      Condiciones de compra en los <a href="/terminos">términos</a>.
+    </p>
+  </LegalLayout>
+</PublicLayout>
