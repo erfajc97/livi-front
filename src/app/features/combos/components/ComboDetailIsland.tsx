@@ -163,7 +163,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
         {comboHasBajoPedido && (
           <div className="mt-5 border-l-2 border-accent bg-bg-alt px-4 py-3">
             <p className="font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
-              <span className="text-text-muted">Bajo pedido ·</span> Entrega
+              <span className="text-text-muted">Bajo pedido ·</span>
               <span className="ml-2 font-display text-lg italic normal-case tracking-normal text-text">13–17 días</span>
             </p>
           </div>

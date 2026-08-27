@@ -30,7 +30,7 @@ export default function CatalogBrandBackorder({
           </h2>
         </div>
         <span className="font-body text-[11px] uppercase tracking-[0.16em] text-text-muted">
-          Entrega 13–17 días
+          Plazo 13–17 días
         </span>
       </div>
       <ProductGrid products={products} isLoading={isLoading} isFetching={isFetching} />

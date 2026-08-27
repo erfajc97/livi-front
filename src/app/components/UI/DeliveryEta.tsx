@@ -1,39 +1,48 @@
 import type { ComponentType } from 'react';
 import PackageLineIcon from '@/assets/svg/PackageLineIcon';
 import TruckLineIcon from '@/assets/svg/TruckLineIcon';
-import { BACKORDER_LABEL, deliveryRangeShort, todayShort } from '@/app/helpers/deliveryWindow';
+import {
+  BACKORDER_LABEL,
+  DEFAULT_DISPATCH_CUTOFF_HOUR,
+  deliveryRangeShort,
+  dispatchDateShort,
+} from '@/app/helpers/deliveryWindow';
 
 interface DeliveryEtaProps {
   variant: 'immediate' | 'backorder';
   offsetDays?: number;
+  cutoffHour?: number;
   compact?: boolean;
 }
 
 interface EtaStepProps {
   Icon: ComponentType<{ size?: number; className?: string }>;
-  label: string;
+  motion: string;
+  label?: string;
   value: string;
   compact: boolean;
 }
 
-function EtaStep({ Icon, label, value, compact }: EtaStepProps) {
+function EtaStep({ Icon, motion, label, value, compact }: EtaStepProps) {
   const size = compact ? 16 : 20;
   return (
-    <div className="flex shrink-0 items-start gap-3">
-      <span className="mt-0.5 shrink-0 text-text-soft">
+    <div className="flex min-w-0 items-start gap-2 sm:gap-3">
+      <span className={`mt-0.5 inline-flex h-5 w-5 shrink-0 overflow-hidden text-text-soft sm:h-6 sm:w-6 ${motion}`}>
         <Icon size={size} />
       </span>
-      <span>
+      <span className="min-w-0">
+        {label && (
+          <span
+            className={`block font-body uppercase tracking-[0.16em] text-text-muted ${
+              compact ? 'text-[9px]' : 'text-[10px]'
+            }`}
+          >
+            {label}
+          </span>
+        )}
         <span
-          className={`block font-body uppercase tracking-[0.16em] text-text-muted ${
-            compact ? 'text-[9px]' : 'text-[10px]'
-          }`}
-        >
-          {label}
-        </span>
-        <span
-          className={`mt-0.5 block font-display font-light italic leading-snug text-text ${
-            compact ? 'text-sm' : 'text-base'
+          className={`block font-display font-light italic leading-snug text-text ${
+            compact ? 'text-sm' : 'mt-0.5 text-base'
           }`}
         >
           {value}
@@ -46,28 +55,39 @@ function EtaStep({ Icon, label, value, compact }: EtaStepProps) {
 export default function DeliveryEta({
   variant,
   offsetDays = 0,
+  cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
   compact = false,
 }: DeliveryEtaProps) {
   const isBackorder = variant === 'backorder';
-  const eta = isBackorder ? BACKORDER_LABEL : deliveryRangeShort(offsetDays);
+  const eta = isBackorder ? BACKORDER_LABEL : deliveryRangeShort(offsetDays, cutoffHour);
 
   return (
     <div
-      className={`flex w-full items-start justify-between ${compact ? 'gap-5' : 'gap-10'}`}
+      className={
+        compact
+          ? 'flex min-w-0 flex-col gap-1.5'
+          : 'grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-x-2 sm:gap-x-6'
+      }
     >
       <EtaStep
         Icon={PackageLineIcon}
-        label={isBackorder ? 'Despacho' : 'Se despacha'}
-        value={isBackorder ? 'Bajo pedido' : `Hoy ${todayShort()}`}
+        motion="commit-icon commit-icon--pack"
+        label={compact ? undefined : isBackorder ? 'Despacho' : 'Se despacha'}
+        value={isBackorder ? 'Bajo pedido' : dispatchDateShort(cutoffHour)}
         compact={compact}
       />
-      <span
-        className={`shrink-0 self-center px-2 font-body text-text-muted ${compact ? 'text-xs' : 'text-sm'}`}
-        aria-hidden
-      >
-        →
-      </span>
-      <EtaStep Icon={TruckLineIcon} label="Entrega estimada" value={eta} compact={compact} />
+      {!compact && (
+        <span className="self-center font-body text-sm text-text-muted" aria-hidden>
+          →
+        </span>
+      )}
+      <EtaStep
+        Icon={TruckLineIcon}
+        motion="commit-icon commit-icon--drive"
+        label={undefined}
+        value={eta}
+        compact={compact}
+      />
     </div>
   );
 }

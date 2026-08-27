@@ -25,6 +25,7 @@ export default function CartPage() {
     updateQty,
     hasHydrated,
     deliveryOffset,
+    cutoffHour,
   } = useCartPageHook();
 
   // Esqueleto mientras se hidrata el carrito desde localStorage: evita el
@@ -93,6 +94,7 @@ export default function CartPage() {
       row={row}
       group={group}
       deliveryOffset={deliveryOffset}
+      cutoffHour={cutoffHour}
       onSetTotal={updateQty}
       onRemove={removeItem}
     />
@@ -130,7 +132,7 @@ export default function CartPage() {
 
           {bajo.length > 0 && (
             <div>
-              <GroupHeader title="Bajo pedido" meta="Entrega 13–17 días" />
+              <GroupHeader title="Bajo pedido" meta="Plazo 13–17 días" />
               <div>{bajo.map((r) => renderRow(r, 'bajo'))}</div>
               <p className="mt-6 border-l-2 border-accent bg-bg-alt px-4 py-3 font-display text-sm italic text-text-soft">
                 Este perfume lo traemos exclusivamente para ti. Verificado por NonDecants antes de enviártelo.

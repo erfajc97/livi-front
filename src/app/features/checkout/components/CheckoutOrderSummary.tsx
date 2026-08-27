@@ -1,8 +1,8 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
-import { lineDeliveryLabel, orderDeliveryLabel } from '@/app/helpers/deliveryWindow';
-import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
+import { lineDeliveryLabel, orderDeliveryLabel, DEFAULT_DISPATCH_CUTOFF_HOUR } from '@/app/helpers/deliveryWindow';
+import { useDeliveryOffsetQuery, useDispatchCutoffQuery } from '@/app/tanstack-queries/settingsQuery';
 
 interface CheckoutOrderSummaryProps {
   items: CartItem[];
@@ -48,6 +48,7 @@ export default function CheckoutOrderSummary({
   const hasBajoPedido = items.some((item) => getSplit(splits, item).bajo > 0);
 
   const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
+  const { data: cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR } = useDispatchCutoffQuery();
 
   return (
     <div className="flex flex-col">
@@ -59,7 +60,7 @@ export default function CheckoutOrderSummary({
             <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
           <p className="text-xs leading-snug text-text-soft">
-            Tu pedido incluye productos <span className="text-text">bajo pedido</span>. Entrega estimada: 13–17 días tras confirmación del pago.
+            Tu pedido incluye productos <span className="text-text">bajo pedido</span>. Plazo: 13–17 días tras confirmación del pago.
           </p>
         </div>
       )}
@@ -113,7 +114,7 @@ export default function CheckoutOrderSummary({
                       getSplit(splits, item).bajo > 0 ? 'bg-accent' : 'bg-text-muted'
                     }`}
                   />
-                  {lineDeliveryLabel(getSplit(splits, item), deliveryOffset)}
+                  {lineDeliveryLabel(getSplit(splits, item), deliveryOffset, cutoffHour)}
                 </p>
               </div>
             </div>
@@ -123,7 +124,7 @@ export default function CheckoutOrderSummary({
         {/* Resumen global de tiempos de entrega */}
         {items.length > 0 && (
           <p className="border-t border-border pt-4 font-body text-[12px] leading-relaxed text-text-soft">
-            {orderDeliveryLabel(items.map((i) => getSplit(splits, i)), deliveryOffset)}
+            {orderDeliveryLabel(items.map((i) => getSplit(splits, i)), deliveryOffset, cutoffHour)}
           </p>
         )}
       </div>

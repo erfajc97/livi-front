@@ -3,9 +3,9 @@ import ShieldCheckLineIcon from '@/assets/svg/ShieldCheckLineIcon';
 import LockLineIcon from '@/assets/svg/LockLineIcon';
 
 const ITEMS = [
-  { Icon: TruckLineIcon, label: 'Envíos a Ecuador' },
-  { Icon: ShieldCheckLineIcon, label: 'Auténtico' },
-  { Icon: LockLineIcon, label: 'Pago seguro' },
+  { Icon: TruckLineIcon, label: 'Envíos a Ecuador', motion: 'commit-icon commit-icon--drive' },
+  { Icon: ShieldCheckLineIcon, label: 'Auténtico', motion: 'commit-icon commit-icon--seal' },
+  { Icon: LockLineIcon, label: 'Pago seguro', motion: 'commit-icon commit-icon--lock' },
 ] as const;
 
 interface TrustIconsProps {
@@ -15,9 +15,9 @@ interface TrustIconsProps {
 export default function TrustIcons({ size = 22 }: TrustIconsProps) {
   return (
     <ul className="grid grid-cols-3 gap-3" aria-label="Compra con confianza">
-      {ITEMS.map(({ Icon, label }) => (
+      {ITEMS.map(({ Icon, label, motion }) => (
         <li key={label} className="flex flex-col items-center gap-1.5 text-center">
-          <span className="text-text-soft">
+          <span className={`inline-flex h-7 w-7 items-center justify-center overflow-hidden text-text-soft ${motion}`}>
             <Icon size={size} />
           </span>
           <span className="font-body text-[10px] uppercase leading-tight tracking-[0.14em] text-text-muted">

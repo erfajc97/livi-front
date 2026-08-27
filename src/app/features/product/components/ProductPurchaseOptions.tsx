@@ -5,7 +5,8 @@ import TrustIcons from '@/app/components/UI/TrustIcons';
 import { productUrl } from '@/app/helpers/productUrl';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
-import { useDeliveryOffsetQuery } from '@/app/tanstack-queries/settingsQuery';
+import { DEFAULT_DISPATCH_CUTOFF_HOUR } from '@/app/helpers/deliveryWindow';
+import { useDeliveryOffsetQuery, useDispatchCutoffQuery } from '@/app/tanstack-queries/settingsQuery';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Product, ProductVariant } from '@/app/types/global.types';
 
@@ -90,6 +91,7 @@ export default function ProductPurchaseOptions({
 
   // Días extra de entrega configurados en el admin (setting opcional).
   const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
+  const { data: cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR } = useDispatchCutoffQuery();
 
   // Number(): los decimales llegan como string desde el backend; sin esto las
   // sumas de ml concatenan y la disponibilidad sale mal.
@@ -386,11 +388,11 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      <div className="border-y border-border bg-bg-alt/60 px-4 py-3.5 -mx-4">
-        <p className="eyebrow mb-1.5 text-text-muted">Entrega</p>
+      <div className="overflow-x-hidden border-y border-border bg-bg-alt/60 px-4 py-3.5 -mx-4">
         <DeliveryEta
           variant={selectedIsBajoPedido ? 'backorder' : 'immediate'}
           offsetDays={deliveryOffset}
+          cutoffHour={cutoffHour}
         />
         <div className="mt-3.5 border-t border-border/80 pt-3.5">
           <TrustIcons />
@@ -400,11 +402,8 @@ export default function ProductPurchaseOptions({
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           onClick={handleAddToCart}
-          /* Con un decant elegido el botón toma el marco dorado: la tarjeta
-             seleccionada se pinta en negro y el brillo pasa a la acción. */
-          className={`flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent ${
-            selectedDecant ? 'gold-frame' : ''
-          }`}
+          /* Marco dorado en loop en el CTA de añadir. */
+          className="gold-frame flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
         >
           Añadir — {formatCurrency(discountedPrice)}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>

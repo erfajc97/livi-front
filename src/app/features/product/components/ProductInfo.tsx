@@ -70,7 +70,7 @@ export default function ProductInfo({
         <div className="mt-7 border-l-2 border-accent bg-bg-alt px-5 py-5">
           <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Curado bajo pedido</span>
           <p className="mt-2.5 font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
-            Entrega estimada
+            Plazo
             <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
           </p>
           <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
@@ -124,7 +124,7 @@ export default function ProductInfo({
           type="button"
           onClick={onAddToCart}
           disabled={!current}
-          className="flex flex-1 items-center justify-between bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="gold-frame flex flex-1 items-center justify-between bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span>Añadir — {formatCurrency(price)}</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>

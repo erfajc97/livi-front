@@ -232,6 +232,23 @@ h1, h2, h3, h4, h5, h6 {
 .commit-icon--rise .ci-part-3 { animation-delay: 0.55s; }
 .commit-icon--rise .ci-part-4 { animation-delay: 0.75s; }
 
+/* Despacho (caja) y pago seguro (candado) — mismo dibujo en loop. */
+.commit-icon--pack .ci-part,
+.commit-icon--lock .ci-part {
+  stroke-dasharray: 1;
+  animation-name: commit-draw;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+}
+.commit-icon--pack .ci-part { animation-duration: 3.6s; }
+.commit-icon--pack .ci-part-1 { animation-delay: 0s; }
+.commit-icon--pack .ci-part-2 { animation-delay: 0.25s; }
+.commit-icon--pack .ci-part-3 { animation-delay: 0.45s; }
+.commit-icon--lock .ci-part { animation-duration: 3.5s; }
+.commit-icon--lock .ci-part-1 { animation-delay: 0s; }
+.commit-icon--lock .ci-part-2 { animation-delay: 0.4s; }
+
 /* Envíos — el camión entra rápido, se queda un momento y vuelve a pasar. */
 @keyframes commit-drive {
   0%   { opacity: 0; transform: translateX(-20px); }

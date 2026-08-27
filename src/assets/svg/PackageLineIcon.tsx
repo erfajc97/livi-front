@@ -18,9 +18,9 @@ export default function PackageLineIcon({ size = 30, className }: IconProps) {
       className={className}
       aria-hidden
     >
-      <path d="M4.5 8.25 12 4.5l7.5 3.75v9.5L12 21.5 4.5 17.75z" />
-      <path d="M12 4.5v17" />
-      <path d="M4.5 8.25 12 12l7.5-3.75" />
+      <path className="ci-part ci-part-1" pathLength={1} d="M4.5 8.25 12 4.5l7.5 3.75v9.5L12 21.5 4.5 17.75z" />
+      <path className="ci-part ci-part-2" pathLength={1} d="M12 4.5v17" />
+      <path className="ci-part ci-part-3" pathLength={1} d="M4.5 8.25 12 12l7.5-3.75" />
     </svg>
   );
 }

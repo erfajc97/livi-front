@@ -175,7 +175,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           type="button"
           onClick={handleQuickAdd}
-          className="absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-white transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
+          className="gold-frame absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-white transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
         >
           Añadir al carrito
         </button>

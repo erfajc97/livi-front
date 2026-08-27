@@ -1,17 +1,19 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import DeliveryEta from '@/app/components/UI/DeliveryEta';
+import { DEFAULT_DISPATCH_CUTOFF_HOUR } from '@/app/helpers/deliveryWindow';
 import type { CartRow } from '../hooks/useCartPageHook';
 
 interface CartLineProps {
   row: CartRow;
   group: 'immediate' | 'bajo';
   deliveryOffset?: number;
+  cutoffHour?: number;
   /** Fija la cantidad TOTAL del item (el split se recalcula solo). */
   onSetTotal: (variantId: string, total: number) => void;
   onRemove: (variantId: string) => void;
 }
 
-export default function CartLine({ row, group, deliveryOffset = 0, onSetTotal, onRemove }: CartLineProps) {
+export default function CartLine({ row, group, deliveryOffset = 0, cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR, onSetTotal, onRemove }: CartLineProps) {
   const { item, portionQty, total, split } = row;
   const isBajo = group === 'bajo';
   const isCombo = item.comboId != null;
@@ -60,10 +62,11 @@ export default function CartLine({ row, group, deliveryOffset = 0, onSetTotal, o
         </h3>
         <p className="mt-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft">{variantLabel}</p>
 
-        <div className="mt-2.5">
+        <div className="mt-2.5 min-w-0 overflow-hidden">
           <DeliveryEta
             variant={isBajo ? 'backorder' : 'immediate'}
             offsetDays={deliveryOffset}
+            cutoffHour={cutoffHour}
             compact
           />
         </div>
