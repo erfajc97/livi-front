@@ -66,7 +66,7 @@ export default function DeliveryEta({
       className={
         compact
           ? 'flex min-w-0 flex-col gap-1.5'
-          : 'grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-x-2 sm:gap-x-6'
+          : 'grid w-full min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-start gap-x-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-x-6'
       }
     >
       <EtaStep
@@ -81,13 +81,15 @@ export default function DeliveryEta({
           →
         </span>
       )}
-      <EtaStep
-        Icon={TruckLineIcon}
-        motion="commit-icon commit-icon--drive"
-        label={undefined}
-        value={eta}
-        compact={compact}
-      />
+      <div className="min-w-0 justify-self-end pl-2 sm:justify-self-auto sm:pl-0">
+        <EtaStep
+          Icon={TruckLineIcon}
+          motion="commit-icon commit-icon--drive"
+          label={undefined}
+          value={eta}
+          compact={compact}
+        />
+      </div>
     </div>
   );
 }
