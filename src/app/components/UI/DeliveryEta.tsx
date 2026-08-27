@@ -66,7 +66,7 @@ export default function DeliveryEta({
       className={
         compact
           ? 'flex min-w-0 flex-col gap-1.5'
-          : 'grid w-full min-w-0 grid-cols-[auto_auto_minmax(0,1fr)] items-start gap-x-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-x-6'
+          : 'grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-x-3 sm:gap-x-6'
       }
     >
       <EtaStep
@@ -77,11 +77,11 @@ export default function DeliveryEta({
         compact={compact}
       />
       {!compact && (
-        <span className="self-center font-body text-sm text-text-muted" aria-hidden>
+        <span className="justify-self-center self-center font-body text-sm text-text-muted" aria-hidden>
           →
         </span>
       )}
-      <div className="min-w-0 justify-self-end pl-2 sm:justify-self-auto sm:pl-0">
+      <div className="min-w-0 justify-self-end">
         <EtaStep
           Icon={TruckLineIcon}
           motion="commit-icon commit-icon--drive"
