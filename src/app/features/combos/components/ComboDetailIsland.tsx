@@ -20,10 +20,11 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
   const active = variants.find((v) => v.id === activeId) ?? combo;
 
   const products = active.comboProducts ?? [];
-  const discount = active.discount ?? 0;
-  const hasDiscount = discount > 0;
-  const actualPrice = hasDiscount ? active.finalPrice - discount : active.finalPrice;
-  const discountPercent = hasDiscount ? Math.round((discount / active.finalPrice) * 100) : 0;
+  const discount = Number(active.discount ?? 0);
+  const listPrice = Number(active.finalPrice);
+  const hasDiscount = discount > 0 && Number.isFinite(listPrice);
+  const actualPrice = hasDiscount ? listPrice - discount : listPrice;
+  const discountPercent = hasDiscount && listPrice > 0 ? Math.round((discount / listPrice) * 100) : 0;
 
   const comboInStock = products.every((cp) => {
     const prod = cp.product;
@@ -138,8 +139,9 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
             <span className="eyebrow">Elige tu versión</span>
             <div className="mt-2.5 flex flex-wrap gap-2">
               {variants.map((v, i) => {
-                const vDisc = v.discount ?? 0;
-                const vPrice = vDisc > 0 ? v.finalPrice - vDisc : v.finalPrice;
+                const vDisc = Number(v.discount ?? 0);
+                const vList = Number(v.finalPrice);
+                const vPrice = vDisc > 0 && Number.isFinite(vList) ? vList - vDisc : vList;
                 const isActive = v.id === activeId;
                 return (
                   <button
@@ -175,7 +177,7 @@ function ComboDetailContent({ combo }: ComboDetailIslandProps) {
         <div className="flex items-baseline gap-3">
           <span className="font-display text-2xl text-text">{formatCurrency(actualPrice)}</span>
           {hasDiscount && (
-            <span className="font-body text-sm text-text-muted line-through">{formatCurrency(active.finalPrice)}</span>
+            <span className="font-body text-sm text-text-muted line-through">{formatCurrency(listPrice)}</span>
           )}
           {discountPercent > 0 && (
             <span className="bg-accent px-1.5 py-px font-body text-[10px] font-medium tracking-wide text-bg">-{discountPercent}%</span>

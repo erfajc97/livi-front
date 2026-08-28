@@ -30,9 +30,10 @@ function ComboRow({ combo, index }: { combo: Combo; index: number }) {
   const addItem = useCartStore((s) => s.addItem);
   const products = combo.comboProducts ?? [];
 
-  const discount = combo.discount ?? 0;
-  const hasDiscount = discount > 0;
-  const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
+  const discount = Number(combo.discount ?? 0);
+  const listPrice = Number(combo.finalPrice);
+  const hasDiscount = discount > 0 && Number.isFinite(listPrice);
+  const actualPrice = hasDiscount ? listPrice - discount : listPrice;
   const originalSum = products.reduce((sum, cp) => {
     const price = Number(cp.productVariation?.price ?? cp.product?.price ?? 0);
     return sum + price * cp.quantity;

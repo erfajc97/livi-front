@@ -25,8 +25,10 @@ export function clipMeta(text: string, max = 155): string {
   return `${clean.slice(0, max - 1).replace(/\s+\S*$/, '')}…`;
 }
 
-export function formatUsd(amount: number): string {
-  return amount.toFixed(2).replace('.', ',');
+/** TypeORM `decimal` llega como string en JSON. Number() antes de toFixed. */
+export function formatUsd(amount: number | string): string {
+  const n = Number(amount);
+  return Number.isFinite(n) ? n.toFixed(2).replace('.', ',') : '0,00';
 }
 
 const GENDER_LABEL: Record<string, string> = {
@@ -220,7 +222,9 @@ export function productJsonLd(product: Product) {
 
 export function comboSeoDescription(combo: Combo): string {
   const base = combo.description?.trim() || `Combo ${combo.name} de perfumes originales en Ecuador.`;
-  return clipMeta(`${base} Desde $${formatUsd(combo.finalPrice)} · envío 24–72 h.`);
+  const price = Number(combo.finalPrice);
+  const priceBit = Number.isFinite(price) && price > 0 ? ` Desde $${formatUsd(price)}` : '';
+  return clipMeta(`${base}${priceBit} · envío 24–72 h.`);
 }
 
 export function articleJsonLd(post: {

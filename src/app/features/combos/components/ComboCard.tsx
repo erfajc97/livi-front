@@ -9,10 +9,11 @@ export default function ComboCard({ combo }: ComboCardProps) {
   const comboImage = combo.imageUrl;
   const products = combo.comboProducts ?? [];
 
-  const discount = combo.discount ?? 0;
-  const hasDiscount = discount > 0;
-  const actualPrice = hasDiscount ? combo.finalPrice - discount : combo.finalPrice;
-  const discountPercent = hasDiscount ? Math.round((discount / combo.finalPrice) * 100) : 0;
+  const discount = Number(combo.discount ?? 0);
+  const listPrice = Number(combo.finalPrice);
+  const hasDiscount = discount > 0 && Number.isFinite(listPrice);
+  const actualPrice = hasDiscount ? listPrice - discount : listPrice;
+  const discountPercent = hasDiscount && listPrice > 0 ? Math.round((discount / listPrice) * 100) : 0;
 
   const comboInStock = products.every((cp) => {
     const prod = cp.product;

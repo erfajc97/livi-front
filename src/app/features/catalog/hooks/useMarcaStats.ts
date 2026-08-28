@@ -8,20 +8,16 @@ function formatsOf(product: Product) {
   return product.variants ?? [];
 }
 
-/** Tiene al menos un formato que no es botella completa. */
-function hasDecantFormat(product: Product) {
-  return formatsOf(product).some((format) => !format.isFullBottle);
-}
-
 function minPriceOf(product: Product): number | null {
-  if (product.minFormatPrice != null && Number.isFinite(product.minFormatPrice)) {
-    return product.minFormatPrice;
+  if (product.minFormatPrice != null && Number.isFinite(Number(product.minFormatPrice))) {
+    return Number(product.minFormatPrice);
   }
   const prices = formatsOf(product)
     .map((format) => Number(format.price))
     .filter((price) => Number.isFinite(price) && price > 0);
   if (prices.length) return Math.min(...prices);
-  if (product.price != null && product.price > 0) return product.price;
+  const fallback = Number(product.price);
+  if (Number.isFinite(fallback) && fallback > 0) return fallback;
   return null;
 }
 
@@ -33,12 +29,14 @@ export function useMarcaStats(marcaId?: number) {
   });
 
   const products = query.data?.content ?? [];
+  const inStock = products.filter((product) => !product.bajoPedido);
+  const backorder = products.filter((product) => product.bajoPedido);
   const prices = products.map(minPriceOf).filter((price): price is number => price != null);
 
   return {
     total: query.data?.pagination?.total ?? products.length,
-    decants: products.filter(hasDecantFormat).length,
-    bajoPedido: products.filter((product) => product.bajoPedido).length,
+    decants: inStock.length,
+    bajoPedido: backorder.length,
     fromPrice: prices.length ? Math.min(...prices) : null,
     isLoading: enabled && query.isLoading,
   };

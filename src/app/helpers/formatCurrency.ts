@@ -1,8 +1,10 @@
-// Formatea un número como precio en USD
-export const formatCurrency = (amount: number): string => {
+// Formatea un número como precio en USD.
+// TypeORM `decimal` llega como string en JSON — Number() antes de formatear.
+export const formatCurrency = (amount: number | string): string => {
+  const n = Number(amount);
   return new Intl.NumberFormat('es-EC', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
-  }).format(amount);
+  }).format(Number.isFinite(n) ? n : 0);
 };

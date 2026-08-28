@@ -15,6 +15,9 @@ export interface UseCatalogHookProps {
 // (5 filas de 2). En ambos casos la última fila queda completa.
 const DESKTOP_LIMIT = 12;
 const MOBILE_LIMIT = 10;
+/** Vista marca: máximo 3 filas (4×3 desktop, 2×3 móvil) + «Ver más». */
+const BRAND_DESKTOP_LIMIT = 12;
+const BRAND_MOBILE_LIMIT = 6;
 const DESKTOP_QUERY = '(min-width: 768px)';
 
 const defaultFilters: CatalogFilters = {
@@ -160,6 +163,7 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
       ? DESKTOP_LIMIT
       : MOBILE_LIMIT,
   );
+  const [brandChunks, setBrandChunks] = useState(1);
 
   useEffect(() => {
     const mq = window.matchMedia(DESKTOP_QUERY);
@@ -179,9 +183,25 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
   // /catalogo/perfumes) SIEMPRE se respeta, incluso al navegar a una casa
   // (marca) o categoría. Así la sección "Bajo Pedido" muestra solo bajo
   // pedido y "Perfumes" solo stock, en cualquier nivel de navegación.
+  const isBrandView = filters.marcaId != null && slugsResolved;
+  const brandPageSize = limit === DESKTOP_LIMIT ? BRAND_DESKTOP_LIMIT : BRAND_MOBILE_LIMIT;
+
+  useEffect(() => {
+    setBrandChunks(1);
+  }, [
+    filters.marcaId,
+    filters.categoryId,
+    filters.gender,
+    filters.timeOfDay,
+    filters.concentration,
+    filters.projection,
+    debouncedSearch,
+    debouncedMaxPrice,
+  ]);
+
   const queryParams = {
-    page: filters.page,
-    limit,
+    page: isBrandView ? 1 : filters.page,
+    limit: isBrandView ? brandPageSize * brandChunks : limit,
     search: debouncedSearch || undefined,
     inStock: filters.inStock || undefined,
     bajoPedido,
@@ -198,6 +218,13 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
   };
 
   const { data, isLoading, isFetching } = useProductsQuery({ queryParams });
+
+  const products = data?.content ?? [];
+  const pagination = data?.pagination;
+  const hasMore = isBrandView && (pagination?.total ?? 0) > products.length;
+  const loadMore = useCallback(() => {
+    setBrandChunks((chunks) => chunks + 1);
+  }, []);
 
   const showBrandBackorder = bajoPedido === false && filters.marcaId != null && slugsResolved;
   const brandBackorderQuery = useProductsQuery({
@@ -284,12 +311,15 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
 
   return {
     filters,
-    products: data?.content ?? [],
-    pagination: data?.pagination,
+    products,
+    pagination,
     isLoading,
     isFetching,
     sortValue,
     hasActiveFilters,
+    isBrandView,
+    hasMore,
+    loadMore,
     showBrandBackorder,
     brandBackorderProducts: brandBackorderQuery.data?.content ?? [],
     brandBackorderTotal: brandBackorderQuery.data?.pagination?.total ?? 0,

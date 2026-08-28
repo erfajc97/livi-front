@@ -6,6 +6,7 @@ export interface NavMarca {
   id: string
   name: string
   slug: string
+  description: string
   imageUrl: string | null
   /** Portada vertical para teléfono. Si es null se usa `imageUrl`. */
   mobileImageUrl: string | null
@@ -41,6 +42,7 @@ function mapCategories(raw: any[]): NavCategory[] {
       id: String(s.id),
       name: s.name,
       slug: s.slug ?? s.name.toLowerCase(),
+      description: s.description ?? '',
       imageUrl: s.imageUrl ?? null,
       mobileImageUrl: s.mobileImageUrl ?? null,
       isActive: s.isActive !== false,

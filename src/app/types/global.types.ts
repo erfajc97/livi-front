@@ -95,7 +95,7 @@ export interface Banner {
   mobileImageUrl?: string;
   link?: string;
   buttonText?: string;
-  type?: 'hero' | 'category';
+  type?: 'hero' | 'category' | 'brand' | 'navbar' | 'catalog_perfumes' | 'catalog_bajo_pedido';
   isActive?: boolean;
   isVisible?: boolean;
   order?: number;

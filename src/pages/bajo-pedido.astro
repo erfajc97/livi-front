@@ -18,7 +18,7 @@ const indexed = await fetchProducts({ limit: 200, page: 1, bajoPedido: true });
 >
   <div class="bg-bg min-h-screen">
     <div class="border-t border-border"></div>
-    <Catalog client:load bajoPedido={true} bannerTitle="Bajo Pedido" bannerDescription="Perfumes exclusivos disponibles bajo pedido" />
+    <Catalog client:load bajoPedido={true} bannerSlot="catalog_bajo_pedido" bannerTitle="Bajo Pedido" bannerDescription="Perfumes exclusivos disponibles bajo pedido" />
     <CatalogProductIndex products={indexed.content} title="Referencias bajo pedido" />
   </div>
 </PublicLayout>

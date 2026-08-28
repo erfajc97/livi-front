@@ -28,9 +28,9 @@ const BANKS: BankInfo[] = [
     logo: <img src={BANK_LOGO_SRC.pichincha} alt="Banco Pichincha" className="h-4 w-auto object-contain md:h-5" />,
     rows: [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
-      ['Número de cuenta', '2206573833', true],
-      ['Titular', 'NonDecants'],
-      ['Cédula / RUC', '0924538271', true],
+      ['Número de cuenta', '2213099079', true],
+      ['Titular', 'Jean Philippe Wong'],
+      ['Cédula', '0951454917', true],
       ['Correo', 'nondecants@gmail.com'],
     ],
   },
