@@ -54,7 +54,7 @@ export function organizationJsonLd() {
     '@type': 'Organization',
     name: 'NonDecants',
     url: SITE_ORIGIN,
-    logo: absoluteUrl('/logonondecants.png'),
+    logo: absoluteUrl('/favicon.png'),
     sameAs: [
       'https://www.instagram.com/nondecants',
       'https://www.tiktok.com/@nondecants_',
@@ -248,7 +248,7 @@ export function articleJsonLd(post: {
     publisher: {
       '@type': 'Organization',
       name: 'NonDecants',
-      logo: { '@type': 'ImageObject', url: absoluteUrl('/logonondecants.png') },
+      logo: { '@type': 'ImageObject', url: absoluteUrl('/favicon.png') },
     },
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),
   };

@@ -162,7 +162,7 @@ export default function MobileMenu({ pathname, onClose }: MobileMenuProps) {
       {/* Fila de utilidades — aviso de envíos + logo de Servientrega (REQ-037) */}
       <div className="flex items-center gap-4 bg-bg-alt px-6 py-7">
         <span className="font-body text-sm tracking-[0.04em] text-text-muted">
-          Envíos a todo el Ecuador
+          Envíos por Servientrega
         </span>
         <img
           src="/servientrega.png"

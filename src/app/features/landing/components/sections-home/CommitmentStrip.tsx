@@ -16,7 +16,7 @@ const COMMITMENTS = [
   },
   {
     Icon: TruckLineIcon,
-    title: 'Envíos a\ntodo Ecuador',
+    title: 'Envíos por\nServientrega',
     text: 'Recíbelo entre 24 y 72 horas.',
     motion: 'commit-icon--drive',
   },

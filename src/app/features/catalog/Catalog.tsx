@@ -96,10 +96,6 @@ function CatalogContent({
   const resultCount =
     (pagination?.total ?? products.length) + (showBrandBackorder ? brandBackorderTotal : 0);
 
-  const marcas = Array.from(
-    new Map(categories.flatMap((c) => c.marcas).map((m) => [String(m.id), m])).values(),
-  );
-
   const activeChips: { key: string; label: string; onRemove: () => void }[] = [];
   if (filters.gender)
     activeChips.push({ key: 'gender', label: labelOf(CATALOG_GENDERS, filters.gender), onRemove: () => setGender('') });
@@ -228,11 +224,11 @@ function CatalogContent({
 
           <div className="sticky top-0 z-20 border-b border-border bg-bg/95 backdrop-blur-sm">
             <div className="flex flex-col gap-3 px-6 py-4 md:flex-row md:items-center md:justify-between md:px-14">
-              <div className="flex items-center gap-2 md:hidden">
+              <div className="flex min-w-0 flex-col gap-2 md:hidden">
                 <button
                   type="button"
                   onClick={() => setFiltersOpen(true)}
-                  className="inline-flex shrink-0 items-center gap-2 bg-text px-3.5 py-2.5 font-body text-[11px] uppercase tracking-[0.14em] text-bg transition-colors hover:bg-accent"
+                  className="inline-flex w-fit shrink-0 items-center gap-2 bg-text px-3.5 py-2.5 font-body text-[11px] uppercase tracking-[0.14em] text-bg transition-colors hover:bg-accent"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
@@ -244,7 +240,10 @@ function CatalogContent({
                   onGenderChange={setGender}
                   marcaId={filters.marcaId}
                   onMarcaChange={setMarcaId}
-                  marcas={marcas}
+                  categoryId={filters.categoryId}
+                  onCategoryChange={setCategoryId}
+                  categories={categories}
+                  showCategory={tipo !== 'combos'}
                 />
               </div>
 
@@ -255,7 +254,7 @@ function CatalogContent({
                     type="button"
                     onClick={chip.onRemove}
                     className={`items-center gap-1.5 border border-border px-3 py-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft transition-colors hover:border-accent hover:text-accent ${
-                      chip.key === 'gender' || chip.key === 'marca'
+                      chip.key === 'gender' || chip.key === 'marca' || chip.key === 'cat'
                         ? 'hidden md:inline-flex'
                         : 'inline-flex'
                     }`}

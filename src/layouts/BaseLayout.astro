@@ -99,9 +99,14 @@ const ogUpdated = new Date().toISOString();
     <meta name="twitter:image" content={ogImageUrl.href} />
     <meta name="twitter:image:alt" content={shareTitle} />
 
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- Google exige múltiplos de 48px. /favicon.ico es lo que piden Chrome y
+         los resultados de búsqueda si el <link> falla o está cacheado. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260828" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=20260828" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=20260828" />
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png?v=20260828" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260828" />
 
     <!-- Google Fonts · Atelier: Cormorant Garamond (display serif) + DM Sans (cuerpo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
