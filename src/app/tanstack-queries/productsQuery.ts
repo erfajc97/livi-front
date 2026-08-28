@@ -23,10 +23,21 @@ const extractMl = (v: any): number => {
   return 0;
 };
 
-/** Extract image URLs from backend image objects or plain strings */
+/** Extract image URLs in admin gallery order (1 = card, 2 = hover). */
 const extractImages = (images: any): string[] => {
   if (!images || !Array.isArray(images)) return [];
-  return images.map((img: any) => (typeof img === 'string' ? img : img.url)).filter(Boolean);
+  const urls = [...images]
+    .filter((img: any) => img && (typeof img === 'string' || (img.url && img.isActive !== false)))
+    .sort((a: any, b: any) => {
+      if (typeof a === 'string' || typeof b === 'string') return 0;
+      return (
+        Number(a.displayOrder ?? 0) - Number(b.displayOrder ?? 0) ||
+        Number(a.id ?? 0) - Number(b.id ?? 0)
+      );
+    })
+    .map((img: any) => (typeof img === 'string' ? img : img.url))
+    .filter(Boolean) as string[];
+  return [...new Set(urls)];
 };
 
 /** Maps backend product shape to frontend Product interface */

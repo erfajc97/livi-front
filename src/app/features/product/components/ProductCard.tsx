@@ -19,11 +19,13 @@ interface Format {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const [hovered, setHovered] = useState(false);
 
+  // Galería del admin: [0] principal (card), [1] hover. No se usa la foto
+  // del formato: pisaba ese orden y el hover mostraba cualquiera.
   const productImages = (product.images ?? [])
     .map((img: any) => (typeof img === 'string' ? img : img.url))
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((url, i, arr) => arr.indexOf(url) === i);
   const productImage = productImages[0] || product.image || product.imageUrl;
   const hoverImage = productImages[1];
 
@@ -66,10 +68,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const basePrice = selected?.price ?? product.minFormatPrice ?? product.price ?? 0;
   const finalPrice = applyDiscount(basePrice);
 
-  // Imagen visible: la del formato elegido si tiene foto propia; si no, la
-  // imagen del producto (con el cambio a la 2ª foto al hover de siempre).
-  const selectedImage = selected?.imageUrl;
-  const displayImage = selectedImage || (hovered && hoverImage ? hoverImage : productImage);
+  const displayImage = productImage || selected?.imageUrl;
 
   // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
   const chipFormats = formats.slice(0, 2);
@@ -81,7 +80,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   /** Item de carrito del formato elegido en la card. */
   const buildCartItem = (): CartItem | null => {
-    const image = selected?.imageUrl || productImage || '';
+    const image = productImage || selected?.imageUrl || '';
     const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
 
     const buildFull = (price: number): CartItem => ({
@@ -138,22 +137,30 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div
-      className="group/card flex h-full flex-col bg-white"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Imagen — tile blanco cuadrado; el cambio a la 2ª foto es inmediato.
-          `data-card-media` lo usa el carrusel para centrar sus flechas. */}
+    <div className="group/card flex h-full flex-col bg-white">
+      {/* Imagen — tile blanco cuadrado; 1ª de galería + 2ª al hover en desktop. */}
       <div data-card-media className="relative aspect-square overflow-hidden bg-white">
-        <a href={productUrl} className="block h-full w-full">
+        <a href={productUrl} className="relative block h-full w-full">
           {displayImage ? (
-            <img
-              src={displayImage}
-              alt={product.name}
-              loading="lazy"
-              className="h-full w-full object-contain p-3 sm:p-4"
-            />
+            <>
+              <img
+                data-gallery-role="principal"
+                src={displayImage}
+                alt={product.name}
+                loading="lazy"
+                className="h-full w-full object-contain p-3 sm:p-4"
+              />
+              {hoverImage && (
+                <img
+                  data-gallery-role="hover"
+                  src={hoverImage}
+                  alt=""
+                  aria-hidden
+                  loading="lazy"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-contain p-3 opacity-0 transition-opacity duration-200 sm:p-4 md:group-hover/card:opacity-100"
+                />
+              )}
+            </>
           ) : (
             <div className="flex h-full w-full items-center justify-center text-text-muted">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
