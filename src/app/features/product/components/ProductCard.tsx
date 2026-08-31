@@ -20,14 +20,13 @@ interface Format {
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  // Galería del admin: [0] principal (card), [1] hover. No se usa la foto
-  // del formato: pisaba ese orden y el hover mostraba cualquiera.
+  // Galería del producto: [0] principal, [1] hover. La foto del decant
+  // (formato) solo entra cuando el chip elegido no es el frasco.
   const productImages = (product.images ?? [])
     .map((img: any) => (typeof img === 'string' ? img : img.url))
     .filter(Boolean)
     .filter((url, i, arr) => arr.indexOf(url) === i);
   const productImage = productImages[0] || product.image || product.imageUrl;
-  const hoverImage = productImages[1];
 
   const variants = product.variants ?? [];
   // Formatos: preferir la lista compacta del backend; si no, derivar de las
@@ -68,7 +67,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const basePrice = selected?.price ?? product.minFormatPrice ?? product.price ?? 0;
   const finalPrice = applyDiscount(basePrice);
 
-  const displayImage = productImage || selected?.imageUrl;
+  const formatImage =
+    selected && !selected.isFullBottle ? selected.imageUrl : undefined;
+  const displayImage = formatImage || productImage;
+  const hoverImage = formatImage ? undefined : productImages[1];
 
   // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
   const chipFormats = formats.slice(0, 2);
@@ -80,7 +82,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   /** Item de carrito del formato elegido en la card. */
   const buildCartItem = (): CartItem | null => {
-    const image = productImage || selected?.imageUrl || '';
+    const image = displayImage || '';
     const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
 
     const buildFull = (price: number): CartItem => ({
