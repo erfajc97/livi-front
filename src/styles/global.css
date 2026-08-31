@@ -1,3 +1,4 @@
+@import "./fonts.css";
 @import "tailwindcss";
 
 @theme {
@@ -25,9 +26,9 @@
 
   /* ── Tipografía ────────────────────────────────── */
   /* Display serif editorial (Cormorant Garamond) + sans neutra (DM Sans). */
-  --font-heading: "Cormorant Garamond", "Cormorant", serif;
-  --font-display: "Cormorant Garamond", "Cormorant", serif;
-  --font-body:    "DM Sans", system-ui, sans-serif;
+  --font-heading: "Cormorant Garamond Variable", "Cormorant Garamond", serif;
+  --font-display: "Cormorant Garamond Variable", "Cormorant Garamond", serif;
+  --font-body:    "DM Sans Variable", "DM Sans", system-ui, sans-serif;
 
   /* ── Radios ────────────────────────────────────── */
   --radius-sm: 4px;

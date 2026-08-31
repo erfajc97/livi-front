@@ -15,6 +15,10 @@ export default defineConfig({
   output: 'hybrid',
   adapter: node({ mode: 'standalone' }),
   integrations: [react()],
+  // El CSS de página (~15 KiB) no sale como <link> bloqueante: va en el HTML.
+  build: {
+    inlineStylesheets: 'always',
+  },
   server: {
     port: 4321,
   },

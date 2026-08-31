@@ -30,12 +30,12 @@ export function useCarouselNav(emblaApi: EmblaCarouselType | undefined) {
       sync();
     };
     onReInit();
+    // No escuchar `scroll`: cada frame leía geometría y hacía setState,
+    // y Lighthouse lo marcaba como redistribución forzada.
     emblaApi.on('select', sync);
-    emblaApi.on('scroll', sync);
     emblaApi.on('reInit', onReInit);
     return () => {
       emblaApi.off('select', sync);
-      emblaApi.off('scroll', sync);
       emblaApi.off('reInit', onReInit);
     };
   }, [emblaApi, sync]);
@@ -92,10 +92,10 @@ export function useMediaCenterTop(
     const media = root.querySelector('[data-card-media]');
     if (!media) return;
 
-    const measure = () => setTop((media as HTMLElement).offsetHeight / 2);
-    measure();
-
-    const observer = new ResizeObserver(measure);
+    const observer = new ResizeObserver((entries) => {
+      const h = entries[0]?.contentRect.height;
+      if (h) setTop(h / 2);
+    });
     observer.observe(media);
     return () => observer.disconnect();
   }, [containerRef, contentKey]);

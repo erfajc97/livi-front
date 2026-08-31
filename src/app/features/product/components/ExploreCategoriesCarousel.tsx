@@ -95,6 +95,7 @@ export default function ExploreCategoriesCarousel({ products }: ExploreCategorie
         progress={progress}
         snapCount={snapCount}
         onSeek={seekRatio}
+        emblaApi={emblaApi}
         className="mt-5 md:mt-7"
       />
     </section>

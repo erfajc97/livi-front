@@ -123,6 +123,7 @@ export default function ProductCarouselSection({
               progress={progress}
               snapCount={snapCount}
               onSeek={seekRatio}
+              emblaApi={emblaApi}
               className="mt-5 md:mt-7"
             />
           </div>

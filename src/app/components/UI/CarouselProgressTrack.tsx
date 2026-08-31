@@ -1,13 +1,21 @@
-import type { MouseEvent } from 'react';
+import { useEffect, useRef, type MouseEvent } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 
 interface CarouselProgressTrackProps {
-  /** Progreso 0–1 del recorrido (scrollProgress de Embla). */
+  /** Progreso 0–1 del recorrido (scrollProgress de Embla). Fallback si no hay api. */
   progress: number;
   /** Nº de posiciones (snaps) del carrusel. */
   snapCount: number;
   /** Salta a la posición correspondiente a una proporción 0–1 del recorrido. */
   onSeek: (ratio: number) => void;
+  /** Si viene, el tramo se mueve en rAF sin setState (evita reflow en cada scroll). */
+  emblaApi?: EmblaCarouselType;
   className?: string;
+}
+
+function thumbTransform(progress: number, snapCount: number) {
+  const offsetPct = Math.min(1, Math.max(0, progress)) * (snapCount - 1) * 100;
+  return `translateX(${offsetPct}%) translateY(-50%)`;
 }
 
 /**
@@ -21,13 +29,41 @@ export default function CarouselProgressTrack({
   progress,
   snapCount,
   onSeek,
+  emblaApi,
   className = '',
 }: CarouselProgressTrackProps) {
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const snapCountRef = useRef(snapCount);
+  snapCountRef.current = snapCount;
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const apply = () => {
+      const el = thumbRef.current;
+      if (!el) return;
+      el.style.transform = thumbTransform(emblaApi.scrollProgress(), snapCountRef.current);
+    };
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        apply();
+      });
+    };
+    apply();
+    emblaApi.on('scroll', onScroll);
+    emblaApi.on('reInit', apply);
+    return () => {
+      emblaApi.off('scroll', onScroll);
+      emblaApi.off('reInit', apply);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [emblaApi]);
+
   if (snapCount <= 1) return null;
 
   const thumbPct = 100 / snapCount;
-  // translateX en % del propio tramo: de 0 a (snapCount - 1) veces su ancho.
-  const offsetPct = Math.min(1, Math.max(0, progress)) * (snapCount - 1) * 100;
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -51,8 +87,12 @@ export default function CarouselProgressTrack({
       <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-border" />
       {/* Tramo activo negro */}
       <div
+        ref={thumbRef}
         className="absolute left-0 top-1/2 h-[3px] rounded-full bg-text"
-        style={{ width: `${thumbPct}%`, transform: `translateX(${offsetPct}%) translateY(-50%)` }}
+        style={{
+          width: `${thumbPct}%`,
+          transform: thumbTransform(progress, snapCount),
+        }}
       />
     </div>
   );
