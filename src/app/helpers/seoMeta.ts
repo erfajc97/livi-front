@@ -138,15 +138,26 @@ export function productSeoTitle(product: Product): string {
 }
 
 export function productSeoDescription(product: Product): string {
-  const source = product.description || product.detailDescription || '';
-  const firstSentence = (source.split(/[.!?]/)[0] || '').trim() || productDisplayName(product);
+  const name = productDisplayName(product);
+  const raw = (product.description || product.detailDescription || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  // El bloque editorial "El proceso" está quemado en todas las PDP; si alguien
+  // lo pegó en la descripción del producto, no debe salir en Google/WhatsApp.
+  const body =
+    raw && !/^el proceso\b/i.test(raw) && !/cada decant se extrae/i.test(raw)
+      ? raw
+      : '';
   const bits = [
     product.concentration ? CONCENTRATION_LABEL[product.concentration] : '',
     product.gender ? GENDER_LABEL[product.gender] : '',
   ].filter(Boolean);
   const min = minOfferPrice(product);
-  const priceBit = min != null ? `decant desde $${formatUsd(min)}` : 'decant o frasco sellado';
-  return clipMeta(`${firstSentence}. ${bits.join(', ')}${bits.length ? ' ➜ ' : ''}${priceBit} · original en Ecuador.`);
+  const priceBit = min != null ? `desde $${formatUsd(min)}` : 'decant o frasco sellado';
+  if (body) return clipMeta(`${name}. ${body}`);
+  return clipMeta(
+    `${name} original en Ecuador. ${bits.join(', ')}${bits.length ? '. ' : ''}${priceBit}.`,
+  );
 }
 
 export function productJsonLd(product: Product) {

@@ -144,7 +144,6 @@ export default function CatalogBanner({
       </picture>
       <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
       <div className="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
-        <span className="eyebrow text-white/80">Selección curada</span>
         <h1 className="font-display text-4xl font-light italic leading-none text-white sm:text-5xl md:text-6xl">
           {title}
         </h1>

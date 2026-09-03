@@ -69,7 +69,7 @@ export default function CartPage() {
         </svg>
         <h1 className="font-display text-4xl font-light text-text">Tu carrito está vacío</h1>
         <p className="max-w-sm font-body text-sm text-text-soft">
-          Explora el catálogo y descubre fragancias en stock o curadas bajo pedido.
+          Explora el catálogo y descubre fragancias en stock o bajo pedido.
         </p>
         <a
           href="/catalogo/perfumes"
@@ -110,9 +110,9 @@ export default function CartPage() {
         </h1>
         <p className="mt-4 max-w-xl font-body text-sm text-text-soft">
           {mixed ? (
-            <>Tu carrito combina referencias <span className="text-text">en stock</span> y referencias <span className="italic">curadas bajo pedido</span>.</>
+            <>Tu carrito combina referencias <span className="text-text">en stock</span> y referencias <span className="italic">bajo pedido</span>.</>
           ) : bajo.length > 0 ? (
-            <>Todas tus referencias son <span className="italic">curadas bajo pedido</span>.</>
+            <>Todas tus referencias son <span className="italic">bajo pedido</span>.</>
           ) : (
             <>Todas tus referencias están <span className="text-text">en stock</span>, listas para envío.</>
           )}

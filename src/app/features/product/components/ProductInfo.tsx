@@ -65,16 +65,16 @@ export default function ProductInfo({
         <p className="mt-5 max-w-md font-body text-sm leading-relaxed text-text-soft">{product.description}</p>
       )}
 
-      {/* Caja "curado bajo pedido" — SOLO productos bajo pedido */}
+      {/* Caja bajo pedido — SOLO productos bajo pedido */}
       {isBajo && (
         <div className="mt-7 border-l-2 border-accent bg-bg-alt px-5 py-5">
-          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Curado bajo pedido</span>
+          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">— Bajo pedido</span>
           <p className="mt-2.5 font-body text-[11px] uppercase tracking-[0.18em] text-text-soft">
             Plazo
             <span className="ml-2 font-display text-xl italic normal-case tracking-normal text-text">13–17 días</span>
           </p>
           <p className="mt-3 max-w-sm font-display text-sm italic leading-relaxed text-text-soft">
-            Curado especialmente para ti. Verificado por NonDecants antes de llegar a tus manos.
+            Pedido especialmente para ti. Verificado por NonDecants antes de llegar a tus manos.
           </p>
         </div>
       )}
@@ -138,7 +138,7 @@ export default function ProductInfo({
       <div className="mt-9 space-y-5 border-t border-border pt-7">
         <TrustRow label="Autenticidad">Verificado por NonDecants</TrustRow>
         <TrustRow label="Entrega">
-          {isBajo ? 'Curado bajo pedido · 13–17 días' : 'Servientrega 24–72h · todo el Ecuador'}
+          {isBajo ? 'Bajo pedido · 13–17 días' : 'Servientrega 24–72h · todo el Ecuador'}
         </TrustRow>
         <TrustRow label="Pago">Tarjeta · Transferencia · PayPhone</TrustRow>
       </div>

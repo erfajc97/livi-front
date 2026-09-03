@@ -6,11 +6,9 @@ import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/products
 import { productUrl } from '@/app/helpers/productUrl';
 import {
   breadcrumbJsonLd,
-  productDisplayName,
   productJsonLd,
   productSeoDescription,
   productSeoTitle,
-  SHARE_DESCRIPTION,
 } from '@/app/helpers/seoMeta';
 import { productShareImagePath } from '@/app/helpers/ogCard';
 import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
@@ -47,8 +45,8 @@ const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
 <PublicLayout
   title={productSeoTitle(product)}
   description={productSeoDescription(product)}
-  shareTitle={productDisplayName(product)}
-  ogDescription={SHARE_DESCRIPTION}
+  shareTitle={productSeoTitle(product)}
+  ogDescription={productSeoDescription(product)}
   ogImage={productShareImagePath(product.id)}
   ogType="product"
   canonical={canonical}
