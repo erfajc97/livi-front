@@ -87,6 +87,39 @@ export function websiteJsonLd() {
   };
 }
 
+/** Imágenes del home para que Google pueda armar miniaturas en la SERP. */
+export function homepageBannersJsonLd(
+  banners: Array<{ title?: string; subtitle?: string; imageUrl?: string; image?: string }>,
+) {
+  const images = banners
+    .map((banner) => ({
+      url: absoluteImageUrl(banner.imageUrl || banner.image),
+      name: (banner.title || 'NonDecants').trim(),
+      description: (banner.subtitle || banner.title || 'Perfumes originales en Ecuador').trim(),
+    }))
+    .filter((item): item is { url: string; name: string; description: string } => Boolean(item.url));
+
+  if (!images.length) return undefined;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Banners NonDecants',
+    numberOfItems: images.length,
+    itemListElement: images.map((image, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'ImageObject',
+        contentUrl: image.url,
+        url: image.url,
+        name: image.name,
+        description: image.description,
+      },
+    })),
+  };
+}
+
 export function breadcrumbJsonLd(items: { name: string; href: string }[]) {
   return {
     '@context': 'https://schema.org',

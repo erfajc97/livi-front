@@ -52,7 +52,11 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
                   )}
                   <img
                     src={banner.imageUrl ?? banner.image ?? ''}
-                    alt={banner.title || 'Banner NönDecants'}
+                    alt={
+                      banner.title?.trim() ||
+                      banner.subtitle?.trim() ||
+                      'Perfumes originales y decants NonDecants'
+                    }
                     className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
                     fetchPriority={index === 0 ? 'high' : undefined}
                   />

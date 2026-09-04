@@ -5,7 +5,7 @@ import { MOCK_ENABLED } from '@/app/lib/mock';
 import { MOCK_BANNERS } from '@/app/features/landing/data';
 import type { Banner } from '@/app/types/global.types';
 
-const fetchBanners = async (): Promise<Banner[]> => {
+export const fetchVisibleBanners = async (): Promise<Banner[]> => {
   if (MOCK_ENABLED) return MOCK_BANNERS;
   try {
     const { data } = await axiosInstance.get(`${API_ENDPOINTS.BANNERS}/visible`);
@@ -16,12 +16,13 @@ const fetchBanners = async (): Promise<Banner[]> => {
   }
 };
 
-export const useBannersQuery = (enabled = true) =>
+export const useBannersQuery = (enabled = true, initialData?: Banner[]) =>
   useQuery<Banner[]>({
     queryKey: ['banners'],
-    queryFn: fetchBanners,
+    queryFn: fetchVisibleBanners,
     enabled,
     staleTime: 1000 * 60 * 10,
+    initialData,
   });
 
 export type CatalogBannerSlot = 'catalog_perfumes' | 'catalog_bajo_pedido';

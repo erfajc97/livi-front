@@ -5,19 +5,63 @@ import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { blogService } from '@/app/features/blog/services/blogService';
 import { productUrl } from '@/app/helpers/productUrl';
-import { SITE_ORIGIN } from '@/app/helpers/seoMeta';
+import { absoluteImageUrl, SITE_ORIGIN } from '@/app/helpers/seoMeta';
 import { mapProduct } from '@/app/tanstack-queries/productsQuery';
 
-function loc(path: string, lastmod?: string, changefreq = 'weekly', priority = '0.7') {
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function loc(
+  path: string,
+  lastmod?: string,
+  changefreq = 'weekly',
+  priority = '0.7',
+  images: Array<{ url: string; title?: string }> = [],
+) {
   const last = lastmod
     ? `<lastmod>${new Date(lastmod).toISOString()}</lastmod>`
     : '';
+  const imageTags = images
+    .filter((image) => image.url)
+    .map((image) => {
+      const title = image.title
+        ? `\n      <image:title>${escapeXml(image.title)}</image:title>`
+        : '';
+      return `    <image:image>
+      <image:loc>${escapeXml(image.url)}</image:loc>${title}
+    </image:image>`;
+    })
+    .join('\n');
   return `  <url>
     <loc>${SITE_ORIGIN}${path.startsWith('/') ? path : `/${path}`}</loc>
     ${last}
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
+${imageTags}
   </url>`;
+}
+
+async function homeUrl(): Promise<string> {
+  try {
+    const { data } = await axiosInstance.get(`${API_ENDPOINTS.BANNERS}/visible`, {
+      timeout: 8_000,
+    });
+    const rows = Array.isArray(data) ? data : Array.isArray(data?.data) ? data.data : [];
+    const images = rows
+      .map((banner: { title?: string; imageUrl?: string; image?: string }) => ({
+        url: absoluteImageUrl(banner.imageUrl || banner.image) ?? '',
+        title: banner.title,
+      }))
+      .filter((image: { url: string }) => image.url);
+    return loc('/', undefined, 'daily', '1.0', images);
+  } catch {
+    return loc('/', undefined, 'daily', '1.0');
+  }
 }
 
 async function productUrls(): Promise<string[]> {
@@ -41,7 +85,16 @@ async function productUrls(): Promise<string[]> {
         const product = mapProduct(raw);
         if (!product.id) continue;
         const lastmod = product.createdAt || undefined;
-        urls.push(loc(productUrl(product), lastmod, 'weekly', '0.8'));
+        const image = absoluteImageUrl(product.image || product.imageUrl);
+        urls.push(
+          loc(
+            productUrl(product),
+            lastmod,
+            'weekly',
+            '0.8',
+            image ? [{ url: image, title: product.name }] : [],
+          ),
+        );
       }
       const totalPages = Number(payload?.totalPages ?? page);
       if (page >= totalPages) break;
@@ -77,14 +130,15 @@ async function blogUrls(): Promise<string[]> {
 }
 
 export const GET: APIRoute = async () => {
-  const [products, combos, posts] = await Promise.all([
+  const [home, products, combos, posts] = await Promise.all([
+    homeUrl(),
     productUrls(),
     comboUrls(),
     blogUrls(),
   ]);
 
   const staticPages = [
-    loc('/', undefined, 'daily', '1.0'),
+    home,
     loc('/catalogo', undefined, 'daily', '0.9'),
     loc('/catalogo/perfumes', undefined, 'daily', '0.9'),
     loc('/catalogo/combos', undefined, 'weekly', '0.8'),
@@ -99,7 +153,8 @@ export const GET: APIRoute = async () => {
   ];
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${[...staticPages, ...products, ...combos, ...posts].join('\n')}
 </urlset>
 `;
