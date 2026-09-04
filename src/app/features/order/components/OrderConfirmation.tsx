@@ -1,6 +1,7 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import OrderStatusBadge from './OrderStatusBadge';
 import OrderTracking from './OrderTracking';
+import GoogleReviewOptIn from './GoogleReviewOptIn';
 import type { Order } from '@/app/types/global.types';
 
 interface OrderConfirmationProps {
@@ -22,6 +23,11 @@ const DELIVERY_LABELS: Record<string, string> = {
 export default function OrderConfirmation({ order }: OrderConfirmationProps) {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
+      <GoogleReviewOptIn
+        orderId={order.id}
+        email={order.customerEmail}
+        deliveryMethod={order.deliveryMethod}
+      />
       {/* Header */}
       <div className="text-center">
         <div className="w-16 h-16 rounded-full bg-[--color-success]/20 border border-[--color-success]/40 flex items-center justify-center mx-auto mb-4">

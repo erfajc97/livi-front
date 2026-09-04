@@ -95,6 +95,23 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
+    <!-- Valoraciones de Google Customer Reviews: badge INLINE, no el globo flotante. -->
+    <div class="mb-8 flex flex-col gap-5 border border-border bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 md:mb-10">
+      <div class="max-w-md">
+        <span class="eyebrow">Valoraciones</span>
+        <p class="mt-2 font-display text-xl font-light italic leading-snug text-text">
+          Clientes verificados por Google
+        </p>
+        <p class="mt-2 font-body text-[13px] leading-relaxed text-text-soft">
+          Opiniones reales de compradores en Ecuador. El sello lo emite Google, no nosotros.
+        </p>
+      </div>
+      <div
+        id="google-customer-reviews-badge"
+        class="flex min-h-16 min-w-[180px] items-center justify-start sm:justify-end"
+      ></div>
+    </div>
+
     <!-- Medios de pago: bloque propio bajo las columnas. En la barra legal
          competían con los enlaces y quedaban apretados contra el borde. -->
     <div class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2.5 md:gap-x-4 md:gap-y-3">
@@ -122,3 +139,33 @@ const year = new Date().getFullYear();
     </div>
   </div>
 </footer>
+
+<script is:inline src="https://apis.google.com/js/platform.js?onload=renderGoogleReviewBadge" async defer></script>
+<script is:inline id="merchantWidgetScript" src="https://www.gstatic.com/shopping/merchant/merchantwidget.js" defer></script>
+<script is:inline>
+  window.renderGoogleReviewBadge = function () {
+    var el = document.getElementById('google-customer-reviews-badge');
+    if (!el || !window.gapi) return;
+    window.gapi.load('ratingbadge', function () {
+      window.gapi.ratingbadge.render(el, {
+        merchant_id: 5847763007,
+        position: 'INLINE',
+      });
+    });
+  };
+
+  (function () {
+    var tag = document.getElementById('merchantWidgetScript');
+    if (!tag) return;
+    tag.addEventListener('load', function () {
+      if (!window.merchantwidget) return;
+      window.merchantwidget.start({
+        merchant_id: 5847763007,
+        position: 'LEFT_BOTTOM',
+        region: 'EC',
+        bottomMargin: 24,
+        mobileBottomMargin: 88,
+      });
+    });
+  })();
+</script>

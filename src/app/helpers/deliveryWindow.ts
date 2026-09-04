@@ -86,7 +86,21 @@ export function deliveryRangeShort(
   return `${dateShort(addDaysFromToday(1 + start + offsetDays))} – ${dateShort(addDaysFromToday(2 + start + offsetDays))}`;
 }
 
-/** Días que tarda una importación bajo pedido. */
+/** Fecha ISO (YYYY-MM-DD) que Google pide en el opt-in de reseñas. */
+export function estimatedDeliveryIso(
+  deliveryMethod?: string,
+  hasBackorder = false,
+  cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
+): string {
+  let days = 4;
+  if (hasBackorder) days = 17;
+  else if (deliveryMethod === 'RETIRO') days = 1;
+  else if (deliveryMethod === 'SERVIENTREGA_GYE') days = 3;
+  else if (deliveryMethod === 'SERVIENTREGA_NACIONAL') days = 7;
+  const date = addDaysFromToday(days + dispatchDayOffset(cutoffHour));
+  return date.toISOString().slice(0, 10);
+}
+
 export const BACKORDER_LABEL = '13–17 días';
 
 interface Split {

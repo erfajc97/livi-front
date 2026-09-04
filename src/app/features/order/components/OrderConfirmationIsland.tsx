@@ -4,6 +4,7 @@ import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
+import GoogleReviewOptIn from './GoogleReviewOptIn';
 
 type Status = 'loading' | 'paid' | 'failed' | 'transfer';
 
@@ -117,6 +118,10 @@ function OrderConfirmationContent() {
 
   return (
     <div className="flex flex-col items-center text-center py-12 gap-6">
+      <GoogleReviewOptIn
+        orderId={order?.id || order?.orderNumber}
+        email={order?.customerEmail}
+      />
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success-muted text-success">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="20 6 9 17 4 12" />
