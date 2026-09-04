@@ -5,6 +5,7 @@ import ProductRankingSection from '../../components/sections-home/ProductRanking
 import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
 import HowItWorksSection from '../../components/sections-home/HowItWorksSection';
 import ExploreCategoriesSection from '../../components/sections-home/ExploreCategoriesSection';
+import GoogleReviewsSection from '../../components/sections-home/GoogleReviewsSection';
 
 function HomeContent() {
   const { sections, sectionsLoading } = useHomeHook();
@@ -20,6 +21,7 @@ function HomeContent() {
         <ProductRankingSection title="" products={[]} isLoading num="02" />
         <ExploreCategoriesSection />
         <BlogCarousel />
+        <GoogleReviewsSection />
       </div>
     );
   }
@@ -57,8 +59,9 @@ function HomeContent() {
       <ExploreCategoriesSection />
 
       {/* El blog cierra después del ranking: cuenta la casa cuando el visitante
-          ya vio los productos que se venden */}
+          ya vio los productos que se venden. Las valoraciones van justo después. */}
       <BlogCarousel />
+      <GoogleReviewsSection />
 
       {rest.map((section, index) => (
         <ProductCarouselSection
