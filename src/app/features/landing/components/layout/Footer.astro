@@ -95,25 +95,6 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <!-- Badge INLINE de Google: las estrellas las pinta su iframe, no nosotros. -->
-    <div
-      id="google-reviews-block"
-      class="mb-8 flex flex-col gap-4 border border-border bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7 md:mb-10"
-    >
-      <div class="max-w-md">
-        <span class="eyebrow">Valoraciones</span>
-        <p class="mt-2 font-display text-xl font-light italic leading-snug text-text">
-          Clientes verificados por Google
-        </p>
-        <p class="mt-1 font-body text-[13px] leading-relaxed text-text-soft">
-          El sello y las estrellas los emite Google. Si aún no hay rating, el recuadro se oculta.
-        </p>
-      </div>
-      <div id="google-customer-reviews-badge" class="flex min-h-[52px] min-w-[180px] items-center sm:justify-end">
-        <g:ratingbadge merchant_id="5847763007"></g:ratingbadge>
-      </div>
-    </div>
-
     <!-- Medios de pago: bloque propio bajo las columnas. En la barra legal
          competían con los enlaces y quedaban apretados contra el borde. -->
     <div class="mb-6 flex flex-wrap items-center gap-x-3 gap-y-2.5 md:gap-x-4 md:gap-y-3">
@@ -142,62 +123,25 @@ const year = new Date().getFullYear();
   </div>
 </footer>
 
+<!-- BEGIN MerchantWidget Code — snippet oficial de Merchant Center -->
+<script is:inline id="merchantWidgetScript" src="https://www.gstatic.com/shopping/merchant/merchantwidget.js" defer></script>
 <script is:inline>
-  (function () {
-    var MERCHANT_ID = 5847763007;
-
-    function hideEmptyBlock() {
-      var badge = document.getElementById('google-customer-reviews-badge');
-      var block = document.getElementById('google-reviews-block');
-      if (!badge || !block) return;
-      var painted = badge.querySelector('iframe') || badge.getBoundingClientRect().height >= 40;
-      if (!painted) block.setAttribute('hidden', '');
+  function startNondecantsMerchantWidget() {
+    if (!window.merchantwidget) return;
+    merchantwidget.start({
+      merchant_id: 5847763007,
+      position: 'LEFT_BOTTOM',
+      bottomMargin: 24,
+      mobileBottomMargin: 88,
+    });
+  }
+  var merchantWidgetScript = document.getElementById('merchantWidgetScript');
+  if (merchantWidgetScript) {
+    if (window.merchantwidget) {
+      startNondecantsMerchantWidget();
+    } else {
+      merchantWidgetScript.addEventListener('load', startNondecantsMerchantWidget);
     }
-
-    window.renderGoogleReviewBadge = function () {
-      var el = document.getElementById('google-customer-reviews-badge');
-      if (!el || !window.gapi) return;
-      window.gapi.load('ratingbadge', function () {
-        window.gapi.ratingbadge.render(el, {
-          merchant_id: MERCHANT_ID,
-          position: 'INLINE',
-        });
-        window.setTimeout(hideEmptyBlock, 4000);
-      });
-    };
-
-    function startMerchantWidget() {
-      if (!window.merchantwidget) return;
-      window.merchantwidget.start({
-        merchant_id: MERCHANT_ID,
-        position: 'LEFT_BOTTOM',
-        bottomMargin: 24,
-        mobileBottomMargin: 88,
-      });
-    }
-
-    function addScript(src, id, onLoad) {
-      if (id && document.getElementById(id)) {
-        if (onLoad) onLoad();
-        return;
-      }
-      var s = document.createElement('script');
-      if (id) s.id = id;
-      s.src = src;
-      s.async = true;
-      s.defer = true;
-      if (onLoad) s.addEventListener('load', onLoad);
-      document.body.appendChild(s);
-    }
-
-    addScript(
-      'https://apis.google.com/js/platform.js?onload=renderGoogleReviewBadge',
-      'google-platform-js',
-    );
-    addScript(
-      'https://www.gstatic.com/shopping/merchant/merchantwidget.js',
-      'merchantWidgetScript',
-      startMerchantWidget,
-    );
-  })();
+  }
 </script>
+<!-- END MerchantWidget Code -->
