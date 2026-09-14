@@ -1,0 +1,32 @@
+# Render Blueprint — LIVI Web (tienda Astro, SSR híbrido con adapter Node)
+# https://render.com/docs/blueprint-spec
+#
+# Uso: Render → New → Blueprint → repo livi-front.
+# OJO: NO es un sitio estático — usa output:'hybrid' + @astrojs/node
+# (páginas de producto/checkout se renderizan en servidor). Por eso se
+# despliega como web service Node con el servidor standalone de Astro.
+#
+# VITE_API_BASE_URL debe apuntar al servicio livi-api desplegado
+# (https://livi-api.onrender.com/api) o al dominio propio (https://api.livi.ec/api).
+#
+# Dominio: cuando compren el dominio → Settings → Custom Domain (ej. livi.ec / www.livi.ec)
+# y actualizar `site:` en astro.config.mjs.
+
+services:
+  - type: web
+    name: livi-web
+    runtime: node
+    plan: free # el plan free "duerme" tras inactividad; subir a starter en prod
+    buildCommand: npm install && npm run build
+    # Servidor standalone del adapter @astrojs/node
+    startCommand: node ./dist/server/entry.mjs
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: HOST
+        value: 0.0.0.0 # Render enruta tráfico externo; sin esto solo escucha localhost
+      # PORT lo inyecta Render automáticamente y Astro lo respeta
+      - key: VITE_API_BASE_URL
+        sync: false # https://livi-api.onrender.com/api (TODO dominio propio)
+      - key: VITE_SECRET_KEY
+        sync: false # clave para cifrado local del cliente (secureStorage)
