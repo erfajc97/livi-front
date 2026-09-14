@@ -55,7 +55,7 @@ export default function BannerCarousel({ banners, isLoading = false }: BannerCar
                     alt={
                       banner.title?.trim() ||
                       banner.subtitle?.trim() ||
-                      'Perfumes originales y decants NonDecants'
+                      'Pañaleras y mochilas de cuero LIVI'
                     }
                     className="absolute inset-0 h-full w-full object-cover object-[center_35%] md:object-center"
                     fetchPriority={index === 0 ? 'high' : undefined}

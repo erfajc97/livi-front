@@ -2,33 +2,43 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Colores de marca · Dirección ATELIER ───────── */
-  /* Marfil suave + tinta cálida + bronce. Editorial, galería, luz. */
-  --color-bg:              #F6F3EE;   /* marfil suave */
-  --color-bg-alt:          #EFEAE2;   /* beige cálido (paneles / barras) */
-  --color-surface:         #FFFFFF;
-  --color-surface-raised:  #FBFAF7;   /* surfaceTint */
-  --color-accent:          #8A7A66;   /* bronce apagado */
-  --color-accent-hover:    #6F6152;   /* bronce más oscuro (sobre fondo claro) */
-  --color-text:            #1C1A17;   /* negro cálido (ink) */
-  --color-text-soft:       #5C544B;   /* cuerpo */
-  --color-text-muted:      #8A8278;   /* metadata */
-  --color-border:          #E4DED4;   /* hairlines */
-  --color-border-soft:     #EEE9DF;
-  --color-border-accent:   #8A7A66;
+  /* ── Colores de marca · LIVI ────────────────────── */
+  /* Paleta oficial (PDF identidad · pág. Paleta):
+     protagonistas Butter · Burgundy · Sage · Dusty Blue;
+     soporte Espresso · Negro · Beige.
+     Decisión de diseño (feedback cliente): el blanco es la base de la
+     tienda —más elegante—; el butter queda como acento puntual
+     (announcement, badges, caballito) y no como fondo de página. */
+  --color-bg:              #FFFFFF;   /* blanco — base de la tienda */
+  --color-bg-alt:          #F4F1EC;   /* marfil-gris (tiles de foto / paneles) */
+  --color-surface:         #FFFFFF;   /* tarjetas */
+  --color-surface-raised:  #FCFBF8;   /* surface elevada */
+  --color-butter:          #F5EFC6;   /* butter — acento puntual */
+  --color-accent:          #4D0E12;   /* burgundy LIVI — protagonista */
+  --color-accent-hover:    #6B1A20;   /* burgundy más vivo */
+  --color-sage:            #9EAA8F;   /* sage — protagonista (bloques editoriales) */
+  --color-dusty:           #A5BCD6;   /* dusty blue — protagonista */
+  --color-negro:           #12100E;   /* negro — soporte */
+  --color-text:            #231815;   /* espresso (ink) */
+  --color-text-soft:       #4A3F38;   /* cuerpo */
+  --color-text-muted:      #7A6E64;   /* metadata */
+  --color-border:          #E5E0D7;   /* hairlines */
+  --color-border-soft:     #EDE9E0;
+  --color-border-accent:   #4D0E12;
   --color-error:           #B23B3B;
   --color-error-muted:     #B23B3B22;
-  --color-success:         #5A6B4E;
-  --color-success-muted:   #5A6B4E22;
+  --color-success:         #65754F;   /* sage oscuro */
+  --color-success-muted:   #9EAA8F44;
   --color-warning:         #B07A1E;
   --color-warning-muted:   #B07A1E22;
-  --color-info:            #3E6E99;
+  --color-info:            #5F7E9E;   /* dusty blue oscuro */
 
   /* ── Tipografía ────────────────────────────────── */
-  /* Display serif editorial (Cormorant Garamond) + sans neutra (DM Sans). */
-  --font-heading: "Cormorant Garamond Variable", "Cormorant Garamond", serif;
-  --font-display: "Cormorant Garamond Variable", "Cormorant Garamond", serif;
-  --font-body:    "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  /* Display serif editorial (Adelon → fallback Cormorant Garamond) + Jost. */
+  --font-heading: "Adelon", "Cormorant Garamond Variable", "Cormorant Garamond", serif;
+  --font-display: "Adelon", "Cormorant Garamond Variable", "Cormorant Garamond", serif;
+  --font-body:    "Jost", "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace;
 
   /* ── Radios ────────────────────────────────────── */
   --radius-sm: 4px;
@@ -121,8 +131,8 @@ h1, h2, h3, h4, h5, h6 {
   animation: delivery-shimmer 3.4s linear infinite;
 }
 @keyframes delivery-dot-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(138, 122, 102, 0.45); }
-  50% { opacity: 0.75; transform: scale(0.8); box-shadow: 0 0 0 6px rgba(138, 122, 102, 0); }
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(77, 14, 18, 0.45); }
+  50% { opacity: 0.75; transform: scale(0.8); box-shadow: 0 0 0 6px rgba(77, 14, 18, 0); }
 }
 .delivery-dot {
   animation: delivery-dot-pulse 1.8s ease-in-out infinite;
@@ -135,9 +145,21 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 100% 0, 100% 100%, 0 100%, 0 0; }
 }
 
-/* ── Marco dorado que recorre el borde de izquierda a derecha. Marca la opción
-      del frasco completo en la ficha, el botón de añadir cuando hay un decant
-      elegido y los botones que llevan al pago: el brillo solo pinta el borde
+/* ── Carrito drawer: entra desde la derecha en 260 ms (ref. PDF carrito) ── */
+@keyframes cart-drawer-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+.cart-drawer-panel {
+  animation: cart-drawer-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cart-drawer-panel { animation: none; }
+}
+
+/* ── Marco dorado que recorre el borde de izquierda a derecha. Marca el color
+      elegido en la ficha de producto, el botón de añadir al carrito y los
+      botones que llevan al pago: el brillo solo pinta el borde
       (máscara), no el interior.
 
       Con `background-size` mayor que la caja, el porcentaje de
@@ -194,7 +216,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ── "Nuestro compromiso": cada ícono repite su gesto en loop (REQ-061).
-      Escudo y frascos se dibujan por partes —el trazo aparece como si alguien
+      Escudo y mochilas se dibujan por partes —el trazo aparece como si alguien
       lo estuviera trazando—, el camión entra rápido y el mundo gira mientras la
       lupa se acerca. ─────────────────────────────────────────────────────── */
 .commit-icon {
@@ -226,7 +248,7 @@ h1, h2, h3, h4, h5, h6 {
 .commit-icon--seal .ci-part-1 { animation-delay: 0s; }
 .commit-icon--seal .ci-part-2 { animation-delay: 0.5s; }
 
-/* Catálogo — primero el marco y después los frascos, uno por uno. */
+/* Catálogo — primero el marco y después las piezas, una por una. */
 .commit-icon--rise .ci-part { animation-duration: 3.8s; }
 .commit-icon--rise .ci-part-1 { animation-delay: 0s; }
 .commit-icon--rise .ci-part-2 { animation-delay: 0.35s; }

@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js';
 
-const SECRET_KEY = import.meta.env.VITE_SECRET_KEY || 'nondecants-default-key';
+const SECRET_KEY = import.meta.env.VITE_SECRET_KEY || 'livi-default-key';
 
 const isClient = typeof localStorage !== 'undefined';
 

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { API_ENDPOINTS } from '@/app/api/endpoints'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://stgapi.nondecants.com/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:4101/api' : 'https://api.livi.ec/api')
 
 export interface BlogPost {
   id: number | string

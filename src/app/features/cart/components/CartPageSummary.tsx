@@ -44,21 +44,31 @@ export default function CartPageSummary({
           </div>
         </div>
 
-        <div className="mt-6 flex items-end justify-between border-t border-border pt-5">
-          <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text">Total</span>
+        <div className="mt-6 flex items-center gap-2.5 border-t border-border pt-5">
+          <span className="inline-block h-3.5 w-3.5 shrink-0 bg-accent" aria-hidden="true" />
+          <span className="font-body text-xs text-text-soft">Envoltura de regalo LIVI incluida</span>
+        </div>
+
+        <div className="mt-4 flex items-end justify-between border-t border-border pt-5">
+          <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text">Subtotal</span>
           <span className="font-display text-3xl font-light text-text">{formatCurrency(total)}</span>
         </div>
-        <p className="mt-2 font-display text-sm italic text-text-muted">
-          Envío e impuestos finales se confirman en el pago.
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+          Envío calculado en el checkout
         </p>
 
-        {/* CTA — marco dorado en loop: es el paso que queremos que se siga */}
+        {/* CTA — burgundy, el paso que queremos que se siga (ref. PDF carrito) */}
         <a
           href="/checkout"
-          className="gold-frame mt-6 flex w-full items-center justify-between gap-2 bg-text px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          className="gold-frame mt-6 flex w-full items-center justify-center gap-2 bg-accent px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent-hover"
         >
-          <span>Pagar — {formatCurrency(total)}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
+          Finalizar compra
+        </a>
+        <a
+          href="/catalogo"
+          className="mt-3 block text-center font-body text-xs italic text-text-muted transition-colors hover:text-text"
+        >
+          o seguir viendo la colección
         </a>
 
         <div className="mt-6">

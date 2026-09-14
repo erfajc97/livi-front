@@ -39,23 +39,20 @@ function ProductDetailContent({ productId }: ProductDetailProps) {
   }
 
   const images = (product.images?.length ? product.images : [product.image].filter(Boolean)) as string[];
-  const isBajo = !!product.bajoPedido;
 
   return (
     <div className="mx-auto max-w-[1500px] px-6 pb-40 md:px-14 md:pb-24">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 py-6 font-body text-[11px] tracking-[0.04em] text-text-muted">
-        <a href="/" className="transition-colors hover:text-text">Inicio</a>
-        <span>·</span>
-        <a href={isBajo ? '/bajo-pedido' : '/catalogo/perfumes'} className="transition-colors hover:text-text">
-          {isBajo ? 'Bajo Pedido' : 'Perfumes'}
+      {/* Breadcrumb — mono editorial (ref. PDF ficha) */}
+      <nav className="flex items-center gap-3 py-6 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">
+        <a href="/catalogo" className="transition-colors hover:text-text">
+          Tienda
         </a>
-        <span>·</span>
+        <span>/</span>
         <span className="text-text">{product.name}</span>
       </nav>
 
       <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[1.05fr_1fr] md:gap-20">
-        <ProductImages images={images} name={product.name} bajoPedido={isBajo} />
+        <ProductImages images={images} name={product.name} />
         <ProductInfo
           product={product}
           selectedVariant={selectedVariant}

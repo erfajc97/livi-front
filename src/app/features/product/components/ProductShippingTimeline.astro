@@ -1,7 +1,7 @@
 ---
 // Shipping timeline — compact design, dates computed client-side
 // Fetch delivery_days_offset from settings API at build/SSR time
-const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://stgapi.nondecants.com/api'
+const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4101/api'
 let deliveryOffset = 0
 try {
   const res = await fetch(`${apiBase}/settings/delivery_days_offset`)

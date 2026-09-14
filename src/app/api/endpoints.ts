@@ -1,5 +1,5 @@
-// Fuente única de verdad para todos los endpoints de la API NonDecants
-// Backend: http://localhost:3030/api
+// Fuente única de verdad para todos los endpoints de la API LIVI
+// Backend: http://localhost:4101/api
 export const API_ENDPOINTS = {
   // ── Auth ────────────────────────────────────────
   LOGIN:                      '/auth/login',               // POST - public
@@ -22,7 +22,7 @@ export const API_ENDPOINTS = {
   // ── Banners ─────────────────────────────────────
   BANNERS:                    '/banners',
   BANNERS_VISIBLE:            '/banners/visible',
-  BANNERS_BY_TYPE:            '/banners/by-type',      // ?type=hero|category|brand|navbar|catalog_perfumes|catalog_bajo_pedido
+  BANNERS_BY_TYPE:            '/banners/by-type',      // ?type=hero|category|brand|navbar|catalog_perfumes
   BANNERS_BY_CATEGORY:        '/banners/category',     // + /:categoryId
   BANNERS_BY_MARCA:           '/banners/marca',        // + /:marcaId
 
@@ -50,8 +50,6 @@ export const API_ENDPOINTS = {
   // ── Products ────────────────────────────────────
   PRODUCTS:                   '/products',             // GET all (public), POST create (admin)
   PRODUCT:                    '/products',             // + /:id GET/PATCH/DELETE
-  PRODUCTS_WITH_DECANTS:      '/products/with-decants', // GET all with decants (public)
-  PRODUCT_DECANTS:            '/products',             // + /:id/decants GET (public)
   PRODUCT_VARIATIONS:         '/product-variations',   // GET/POST
 
   // ── Product Options (admin) ─────────────────────
@@ -78,10 +76,6 @@ export const API_ENDPOINTS = {
   // ── Payments (Payphone) ──────────────────────────
   CREATE_TRANSACTION:         '/payments/create-transaction',    // POST (auth)
   VERIFY_PAYMENT:             '/payments/verify',                // GET (public, redirect callback)
-
-  // ── Combos ───────────────────────────────────────
-  COMBOS:                     '/combos',               // GET all (admin)
-  COMBOS_ACTIVE:              '/combos/active',         // GET active (public)
 
   // ── Newsletter ────────────────────────────────────
   NEWSLETTER_SUBSCRIBE:         '/newsletter/subscribe', // POST - public

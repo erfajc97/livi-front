@@ -50,24 +50,29 @@ export default function NavbarSearch() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="p-0.5 transition-colors hover:text-accent" aria-label="Buscar">
-        <SearchIcon />
+      <button
+        onClick={() => setOpen(true)}
+        className="hidden font-mono text-[11px] uppercase tracking-[0.18em] transition-colors hover:text-accent md:block"
+        aria-label="Buscar"
+      >
+        Buscar
       </button>
 
       {open && (
         <div className="fixed inset-0 z-[60] bg-black/40" onClick={close}>
           <div className="w-full border-b border-border bg-bg" onClick={(e) => e.stopPropagation()}>
-            <div className="mx-auto max-w-3xl px-6 py-5 md:px-8">
-              {/* Input */}
-              <div className="flex items-center gap-3 border-b border-border pb-3 text-text">
+            <div className="mx-auto max-w-3xl px-6 py-6 md:px-8 md:py-8">
+              {/* Input — título serif + línea fina (ref. PDF búsqueda D) */}
+              <div className="flex items-center gap-4 border-b border-text pb-3 text-text">
                 <SearchIcon className="h-5 w-5 text-text-muted" />
                 <input
                   ref={inputRef}
                   type="search"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Buscar perfume o casa…"
-                  className="flex-1 bg-transparent font-body text-base text-text placeholder:text-text-muted focus:outline-none"
+                  placeholder="Buscar"
+                  aria-label="Buscar"
+                  className="flex-1 bg-transparent font-heading text-2xl font-normal text-text placeholder:text-text-muted focus:outline-none md:text-3xl"
                 />
                 <button onClick={close} aria-label="Cerrar" className="p-1 text-text-muted transition-colors hover:text-text">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
@@ -77,13 +82,28 @@ export default function NavbarSearch() {
               {/* Resultados */}
               <div className="mt-2 max-h-[62vh] overflow-y-auto">
                 {!active ? (
-                  <p className="px-1 py-6 font-body text-sm text-text-muted">Escribe al menos 2 letras para buscar.</p>
+                  <div className="px-1 py-6">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">Sugerencias</p>
+                    <div className="mt-3 flex flex-col">
+                      {['Tote espresso', 'Mochila negra', 'Pañaleras', 'Accesorios'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setQ(s)}
+                          className="border-b border-border/60 py-3 text-left font-body text-sm font-medium text-text transition-colors hover:text-accent"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ) : isFetching && results.length === 0 ? (
                   <p className="px-1 py-6 font-body text-sm text-text-muted">Buscando…</p>
                 ) : results.length === 0 ? (
                   <p className="px-1 py-6 font-body text-sm text-text-muted">Sin resultados para “{debounced}”.</p>
                 ) : (
                   <>
+                    <p className="px-1 pt-5 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">Sugerencias</p>
                     {results.map((p) => (
                       <a
                         key={p.id}
@@ -99,14 +119,14 @@ export default function NavbarSearch() {
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-display text-base text-text">{p.name}</p>
                           <p className="font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">
-                            {p.bajoPedido ? 'Bajo pedido' : 'En stock'}
+                            {'En stock'}
                           </p>
                         </div>
                         <span className="shrink-0 font-body text-sm text-text-soft">Desde {formatCurrency(minPriceOf(p))}</span>
                       </a>
                     ))}
                     <a
-                      href={`/catalogo/perfumes?search=${encodeURIComponent(debounced)}`}
+                      href={`/catalogo?search=${encodeURIComponent(debounced)}`}
                       onClick={close}
                       className="block px-1 py-4 font-body text-[11px] uppercase tracking-[0.18em] text-accent transition-colors hover:text-text"
                     >

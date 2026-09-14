@@ -22,21 +22,27 @@ export type PaymentMethod = 'PAYPHONE' | 'TRANSFERENCIA' | 'EFECTIVO';
 
 export type DeliveryMethod = 'RETIRO' | 'ENTREGA_PERSONAL' | 'RETIRO_PIWU' | 'SERVIENTREGA_GYE' | 'SERVIENTREGA_NACIONAL';
 
-// ── Enums de producto ────────────────────────────────────
-export type Gender = 'HOMBRE' | 'MUJER' | 'UNISEX';
-export type TimeOfDay = 'DIA' | 'NOCHE';
-export type Concentration = 'EAU_DE_PARFUM' | 'EAU_DE_TOILETTE' | 'EAU_DE_TOILETTE_INTENSE' | 'EAU_DE_COLOGNE' | 'BODY_MIST' | 'ELIXIR' | 'PARFUM' | 'EXTRAIT_DE_PARFUM';
-export type Projection = 'DISCRETA' | 'MODERADA' | 'ALTA';
-
 // ── Modelos de API ──────────────────────────────────────
+export interface ProductImage {
+  id: number | string;
+  url: string;
+  alt?: string;
+  displayOrder?: number;
+}
+
 export interface ProductVariant {
   id: string;
-  ml: number;
+  /** Nombre de la variante (color): "Negro", "Espresso"… */
+  name?: string;
+  /** Talla de la variante (combo color×talla): "Midi", "Maxi"… — opcional. */
+  size?: string;
   price: number;
-  mlSize: number;
-  isFullBottle: boolean;
+  sku?: string;
+  /** Color del swatch en hex (lo define el admin; fallback al mapa por nombre). */
+  colorHex?: string;
+  /** Unidades disponibles: el stock vive a nivel producto. */
   availableQuantity: number;
-  images?: string[];
+  images?: ProductImage[];
 }
 
 export interface Product {
@@ -45,44 +51,34 @@ export interface Product {
   description: string;
   image?: string;
   imageUrl?: string;
-  images?: string[];
+  images?: ProductImage[];
   variants: ProductVariant[];
-  /** Nº de formatos comprables (frasco + decants), del backend. */
+  /** Nº de variantes comprables (colores), del backend. */
   variationsCount?: number;
-  /** Precio del formato más barato / más caro (del backend). */
+  /** Precio de la variante más barata / más cara (del backend). */
   minFormatPrice?: number;
   maxFormatPrice?: number;
-  /** Lista compacta de formatos (frasco + decants) para las cards. */
-  formats?: { id: string; ml: number; price: number; isFullBottle: boolean; imageUrl?: string }[];
-  totalMl: number;
-  openBottleMlRemaining: number;
-  availableMl: number;
+  /** Lista compacta de variantes (colores) para las cards. */
+  formats?: { id: string; name?: string; size?: string; price: number; imageUrl?: string; colorHex?: string }[];
   isActive: boolean;
-  bajoPedido?: boolean;
-  gender?: Gender;
-  timeOfDay?: TimeOfDay;
-  concentration?: Concentration;
-  projection?: Projection;
   discount?: number;
   detailDescription?: string;
   benefits?: string[];
+  /** Usos comunes (acordeón "Usos comunes" de la ficha). */
+  commonUses?: string[];
+  /** IDs de productos "Combina con" (Pairs With). */
+  pairsWith?: number[];
+  /** Tallas disponibles (selector "Talla" de la ficha). */
+  sizes?: string[];
+  /** Posts de Instagram de la ficha: enlace + imagen de la card. */
+  instagramPosts?: { url: string; image: string }[];
   stock?: number;
   price?: number;
   categoryId?: number;
   marcaId?: number;
-  /** Casa del perfume: la ficha la muestra sobre el título y enlaza a su catálogo. */
+  /** Marca: la ficha la muestra sobre el título y enlaza a su catálogo. */
   marca?: { id: number; name: string; slug?: string };
   createdAt: string;
-  // ── PDP editorial ──
-  scentProfileTitle?: string;
-  scentSections?: { title: string; notes: { name: string; color: string }[]; description: string }[];
-  mood?: string[];
-  occasion?: string[];
-  longevity?: number;
-  projectionScore?: number;
-  signatureTitle?: string;
-  signatureDescription?: string;
-  signatureImageUrl?: string;
 }
 
 export interface Banner {
@@ -95,7 +91,7 @@ export interface Banner {
   mobileImageUrl?: string;
   link?: string;
   buttonText?: string;
-  type?: 'hero' | 'category' | 'brand' | 'navbar' | 'catalog_perfumes' | 'catalog_bajo_pedido';
+  type?: 'hero' | 'category' | 'brand' | 'navbar' | 'catalog_perfumes';
   isActive?: boolean;
   isVisible?: boolean;
   order?: number;
@@ -124,7 +120,7 @@ export interface OrderItem {
   productId: string;
   variantId: string;
   name: string;
-  ml: number;
+  variationName?: string;
   price: number;
   quantity: number;
 }
@@ -181,13 +177,8 @@ export interface ProductQueryParams {
   search?: string;
   inStock?: boolean;
   isActive?: boolean;
-  bajoPedido?: boolean;
   categoryId?: number;
   marcaId?: number;
-  gender?: Gender;
-  timeOfDay?: TimeOfDay;
-  concentration?: Concentration;
-  projection?: Projection;
   hasDiscount?: boolean;
   minPrice?: number;
   maxPrice?: number;

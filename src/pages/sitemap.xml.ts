@@ -105,19 +105,6 @@ async function productUrls(): Promise<string[]> {
   return urls;
 }
 
-async function comboUrls(): Promise<string[]> {
-  try {
-    const { data } = await axiosInstance.get(API_ENDPOINTS.COMBOS_ACTIVE, { timeout: 8_000 });
-    const payload = data?.data ?? data;
-    const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
-    return rows
-      .filter((combo: { id?: number }) => combo?.id != null)
-      .map((combo: { id: number }) => loc(`/combo/${combo.id}`, undefined, 'weekly', '0.6'));
-  } catch {
-    return [];
-  }
-}
-
 async function blogUrls(): Promise<string[]> {
   try {
     const posts = await blogService.fetchPublishedPosts();
@@ -130,20 +117,17 @@ async function blogUrls(): Promise<string[]> {
 }
 
 export const GET: APIRoute = async () => {
-  const [home, products, combos, posts] = await Promise.all([
+  const [home, products, posts] = await Promise.all([
     homeUrl(),
     productUrls(),
-    comboUrls(),
     blogUrls(),
   ]);
 
   const staticPages = [
     home,
     loc('/catalogo', undefined, 'daily', '0.9'),
-    loc('/catalogo/perfumes', undefined, 'daily', '0.9'),
-    loc('/catalogo/combos', undefined, 'weekly', '0.8'),
-    loc('/bajo-pedido', undefined, 'daily', '0.8'),
-    loc('/decants', undefined, 'monthly', '0.8'),
+    loc('/nuestra-historia', undefined, 'monthly', '0.6'),
+    loc('/el-taller', undefined, 'monthly', '0.6'),
     loc('/faq', undefined, 'monthly', '0.5'),
     loc('/cookies', undefined, 'yearly', '0.2'),
     loc('/blog', undefined, 'weekly', '0.6'),
@@ -155,7 +139,7 @@ export const GET: APIRoute = async () => {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${[...staticPages, ...products, ...combos, ...posts].join('\n')}
+${[...staticPages, ...products, ...posts].join('\n')}
 </urlset>
 `;
 

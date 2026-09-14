@@ -1,32 +1,31 @@
-import logoSvg from '@/assets/logo.svg';
-
 export default function PaymentConfirmation() {
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10">
-      {/* Banner inside card */}
-      <div className="relative rounded-2xl overflow-hidden">
-        <img
-          src="/confirmation-banner.png"
-          alt=""
-          className="w-full h-[240px] sm:h-[300px] object-cover"
-        />
-        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-3 px-6 text-center">
-          <img src={logoSvg.src} alt="NönDecants" className="h-14 sm:h-20" />
-          <p className="text-white text-base sm:text-xl font-heading font-bold">
-            ¡Gracias por hacer tu pedido con nosotros!
-          </p>
+    <div className="rounded-none border border-border bg-surface p-6 shadow-xl sm:p-10">
+      {/* Banner burgundy con wordmark reversado + caballito (ref. PDF identidad) */}
+      <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden bg-accent px-6 py-12 text-center sm:py-16">
+        <img src="/logo-livi-reversed.svg" alt="LIVI Ecuador" className="h-14 w-auto sm:h-16" />
+        <div className="flex items-center justify-center gap-4" aria-hidden="true">
+          <span className="h-px w-12 bg-[#F5EFC6]/40" />
+          <img src="/caballito-butter.png" alt="" className="h-[26px] w-8 object-contain" />
+          <span className="h-px w-12 bg-[#F5EFC6]/40" />
         </div>
+        <p className="font-heading text-lg font-normal text-[#F5EFC6] sm:text-2xl">
+          ¡Gracias por hacer tu pedido con nosotros!
+        </p>
       </div>
 
       {/* Check + Message */}
-      <div className="flex flex-col items-center text-center pt-8 pb-4 gap-5">
-        <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <div className="flex flex-col items-center gap-5 pb-4 pt-8 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5EFC6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </div>
-        <p className="text-black font-heading text-lg sm:text-2xl font-bold leading-snug max-w-md">
-          Estaremos trabajando para suministrarte tú pedido lo más rapido posible.
+        <p className="max-w-md font-heading text-lg font-normal leading-snug text-text sm:text-2xl">
+          Estaremos trabajando para entregarte tu pedido lo más rápido posible.
+        </p>
+        <p className="font-body text-sm text-text-soft">
+          Tu pieza sale del taller con empaque de regalo incluido.
         </p>
       </div>
     </div>

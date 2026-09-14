@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { colorHex } from '@/app/helpers/colorHex';
 import { productUrl as productUrlHelper } from '@/app/helpers/productUrl';
 import { useCartStore, type CartItem } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
@@ -11,17 +12,17 @@ interface ProductCardProps {
 
 interface Format {
   id: string;
-  ml: number;
+  name?: string;
   price: number;
-  isFullBottle: boolean;
   imageUrl?: string;
+  colorHex?: string;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
 
-  // Galería del producto: [0] principal, [1] hover. La foto del decant
-  // (formato) solo entra cuando el chip elegido no es el frasco.
+  // Galería del producto: [0] principal, [1] hover. La foto del color elegido
+  // (formato) entra cuando el chip seleccionado trae imagen propia.
   const productImages = (product.images ?? [])
     .map((img: any) => (typeof img === 'string' ? img : img.url))
     .filter(Boolean)
@@ -29,119 +30,87 @@ export default function ProductCard({ product }: ProductCardProps) {
   const productImage = productImages[0] || product.image || product.imageUrl;
 
   const variants = product.variants ?? [];
-  // Formatos: preferir la lista compacta del backend; si no, derivar de las
-  // variantes cargadas (mock / detalle). Orden: botella completa primero y
-  // luego decants por ml ascendente — el frasco arranca seleccionado.
+  // Formatos (colores): preferir la lista compacta del backend; si no, derivar
+  // de las variantes cargadas (mock / detalle).
   const formats: Format[] = (product.formats && product.formats.length
     ? product.formats
     : variants.map((v) => ({
-        id: v.id,
-        ml: v.ml,
-        price: v.price,
-        isFullBottle: v.isFullBottle,
-        imageUrl: v.images?.[0],
+        id: String(v.id),
+        name: v.name,
+        price: Number(v.price),
+        imageUrl: v.images?.[0]?.url,
+        colorHex: v.colorHex,
       }))
   )
-    .filter((f) => f.ml > 0 || f.price > 0)
-    .slice()
-    .sort((a, b) => {
-      if (a.isFullBottle !== b.isFullBottle) return a.isFullBottle ? -1 : 1;
-      return a.ml - b.ml;
-    });
+    .filter((f) => f.price > 0)
+    .slice();
 
   // Formato elegido desde la propia card: cambia el precio sin salir de aquí.
   const [selectedId, setSelectedId] = useState<string | null>(formats[0]?.id ?? null);
   const selected = formats.find((f) => f.id === selectedId) ?? formats[0] ?? null;
 
-  const sealedStock = Number(product.stock ?? 0);
-  const openMl = Number(product.openBottleMlRemaining ?? 0);
-  const totalMl = Number(product.totalMl ?? 0);
-  const availableMl = openMl + sealedStock * totalMl;
-  const hasStock = sealedStock > 0 || availableMl > 0;
+  const stock = Number(product.stock ?? 0);
+  const hasStock = stock > 0;
 
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
   const applyDiscount = (n: number) => (hasDiscount ? n * (1 - discount / 100) : n);
 
-  // Precio del formato seleccionado (antes se mostraba el rango del producto).
-  const basePrice = selected?.price ?? product.minFormatPrice ?? product.price ?? 0;
+  // Precio del color seleccionado (antes se mostraba el rango del producto).
+  const basePrice = Number(selected?.price ?? product.minFormatPrice ?? product.price ?? 0);
   const finalPrice = applyDiscount(basePrice);
 
-  const formatImage =
-    selected && !selected.isFullBottle ? selected.imageUrl : undefined;
+  const formatImage = selected?.imageUrl;
   const displayImage = formatImage || productImage;
   const hoverImage = formatImage ? undefined : productImages[1];
 
-  // Máximo 2 formatos como chips; el "+" solo aparece si hay más de 2.
-  const chipFormats = formats.slice(0, 2);
-  const hasMoreFormats = formats.length > 2;
+  // Máximo 4 dots de color; el "+n" indica cuántos más hay (ref. minabaie).
+  const dotFormats = formats.slice(0, 4);
+  const extraFormats = formats.length - dotFormats.length;
 
   const productUrl = productUrlHelper(product);
-  // El "+" abre el detalle ya posicionado en el formato elegido aquí.
+  // El "+" abre el detalle ya posicionado en el color elegido aquí.
   const detailUrl = selected ? `${productUrl}?variant=${selected.id}` : productUrl;
 
-  /** Item de carrito del formato elegido en la card. */
+  /** Item de carrito del color elegido en la card. */
   const buildCartItem = (): CartItem | null => {
-    const image = displayImage || '';
-    const fullIsBackorder = !!product.bajoPedido || sealedStock <= 0;
-
-    const buildFull = (price: number): CartItem => ({
+    if (!selected || basePrice <= 0) return null;
+    return {
       productId: product.id,
-      variantId: `full-${product.id}`,
+      variantId: String(selected.id),
       name: product.name,
-      image,
-      ml: totalMl,
-      price: applyDiscount(price),
+      variationName: selected.name,
+      image: displayImage || '',
+      price: finalPrice,
       quantity: 1,
-      bajoPedido: fullIsBackorder,
-      // El frasco no tiene tope: el excedente se desglosa como bajo pedido.
-      maxQty: undefined,
-      stockAvailable: fullIsBackorder ? undefined : sealedStock,
-      availableMl,
-    });
-
-    // Se intenta el formato elegido y, si no se puede preparar, los siguientes.
-    const ordered = selected ? [selected, ...formats.filter((f) => f.id !== selected.id)] : formats;
-
-    for (const f of ordered) {
-      if (f.price <= 0) continue;
-      if (f.isFullBottle) return buildFull(f.price);
-      // Decant: topado por los ml disponibles del producto.
-      const maxQty = f.ml > 0 ? Math.floor(availableMl / f.ml) : 0;
-      if (maxQty < 1) continue;
-      return {
-        productId: product.id,
-        variantId: f.id,
-        name: product.name,
-        image,
-        ml: f.ml,
-        price: applyDiscount(f.price),
-        quantity: 1,
-        bajoPedido: false,
-        maxQty,
-        availableMl,
-      };
-    }
-
-    // Sin decants preparables: queda el frasco (siempre comprable si hay precio).
-    const price = product.price ?? basePrice;
-    return price > 0 ? buildFull(price) : null;
+      maxQty: hasStock ? stock : undefined,
+      stockAvailable: stock,
+    };
   };
 
   const handleQuickAdd = () => {
+    if (!hasStock) {
+      window.location.href = productUrl;
+      return;
+    }
     const item = buildCartItem();
     if (!item) {
       window.location.href = productUrl;
       return;
     }
     addItem(item);
-    sonnerResponse(`${product.name} · ${item.ml} ml añadido al carrito.`, 'success');
+    sonnerResponse(
+      `${product.name}${item.variationName ? ` · ${item.variationName}` : ''} añadido al carrito.`,
+      'success',
+    );
   };
 
   return (
-    <div className="group/card flex h-full flex-col bg-white">
-      {/* Imagen — tile blanco cuadrado; 1ª de galería + 2ª al hover en desktop. */}
-      <div data-card-media className="relative aspect-square overflow-hidden bg-white">
+    /* Card estilo minabaie: sin contenedor blanco — la foto respira sobre un
+       tile beige y la info va suelta debajo, con dots de color. */
+    <div className="group/card flex h-full flex-col">
+      {/* Imagen — tile beige 4:5; 1ª de galería + 2ª al hover en desktop. */}
+      <div data-card-media className="relative aspect-[4/5] overflow-hidden bg-bg-alt">
         <a href={productUrl} className="relative block h-full w-full">
           {displayImage ? (
             <>
@@ -150,7 +119,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 src={displayImage}
                 alt={product.name}
                 loading="lazy"
-                className="h-full w-full object-contain p-3 sm:p-4"
+                className="h-full w-full object-cover transition-transform duration-500 md:group-hover/card:scale-[1.03]"
               />
               {hoverImage && (
                 <img
@@ -159,7 +128,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                   alt=""
                   aria-hidden
                   loading="lazy"
-                  className="pointer-events-none absolute inset-0 h-full w-full object-contain p-3 opacity-0 transition-opacity duration-200 sm:p-4 md:group-hover/card:opacity-100"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 md:group-hover/card:opacity-100"
                 />
               )}
             </>
@@ -178,31 +147,29 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
         )}
 
-        {/* Añadir al carrito — siempre visible en móvil, al hover en desktop.
-            Negro con texto blanco; al pasar el cursor por encima se invierte
-            (beige con texto negro) sin dejar franja. */}
+        {/* Añadir al carrito — siempre visible en móvil, al hover en desktop. */}
         <button
           type="button"
           onClick={handleQuickAdd}
-          className="gold-frame absolute inset-x-0 bottom-0 z-10 bg-text py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-white transition-[background-color,color,opacity,transform] duration-150 hover:bg-bg hover:text-text sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
+          className="absolute inset-x-0 bottom-0 z-10 bg-accent py-2.5 font-body text-[10px] uppercase tracking-[0.18em] text-bg transition-[background-color,opacity,transform] duration-150 hover:bg-accent-hover sm:translate-y-full sm:opacity-0 sm:group-hover/card:translate-y-0 sm:group-hover/card:opacity-100"
         >
           Añadir al carrito
         </button>
       </div>
 
-      {/* Info */}
-      <div className="flex flex-1 flex-col gap-1 px-3 pb-3 pt-2.5">
+      {/* Info suelta — sin caja */}
+      <div className="flex flex-1 flex-col gap-1 pb-1 pt-3">
         <a href={productUrl}>
           {/* Altura mínima de 2 líneas: los nombres largos ya no desalinean
-              los chips de formato entre cards vecinas */}
-          <h3 className="line-clamp-2 min-h-[2.75em] font-display text-[15px] font-normal leading-snug tracking-[-0.005em] text-text transition-colors group-hover/card:text-accent">
+              los dots de color entre cards vecinas */}
+          <h3 className="line-clamp-2 min-h-[2.6em] font-body text-[13px] font-normal leading-snug tracking-[0.01em] text-text transition-colors group-hover/card:text-accent">
             {product.name}
           </h3>
         </a>
 
-        {/* Precio del formato elegido + estado */}
-        <div className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
-          <span className="font-body text-[11px] tracking-[0.02em] text-text">
+        {/* Precio del color elegido + estado */}
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="font-body text-[12px] tracking-[0.02em] text-text">
             {hasDiscount && (
               <span className="mr-1.5 text-text-muted line-through">{formatCurrency(basePrice)}</span>
             )}
@@ -210,46 +177,41 @@ export default function ProductCard({ product }: ProductCardProps) {
           </span>
           <span
             className={`shrink-0 font-body text-[9px] uppercase tracking-[0.16em] ${
-              product.bajoPedido ? 'text-accent' : hasStock ? 'text-text-muted' : 'text-error'
+              hasStock ? 'text-text-muted' : 'text-error'
             }`}
           >
-            {product.bajoPedido ? 'Bajo pedido' : hasStock ? 'En stock' : 'Sin stock'}
+            {hasStock ? 'En stock' : 'Sin stock'}
           </span>
         </div>
 
-        {/* Chips de formato (máx 2): seleccionan y actualizan el precio aquí
-            mismo. El "+" (solo con más de 2 formatos) abre el detalle.
-            `mt-auto` los fija al pie de la card para que queden alineados
-            entre cards de la misma fila. */}
-        {chipFormats.length > 0 && (
-          <div className="mt-auto flex flex-nowrap items-center gap-1.5 pt-0.5">
-            {chipFormats.map((f) => {
+        {/* Dots de color (máx 4 + "+n"): seleccionan y actualizan el precio
+            aquí mismo. `mt-auto` los fija al pie para alinear entre cards. */}
+        {dotFormats.length > 0 && (
+          <div className="mt-auto flex flex-nowrap items-center gap-2 pt-1.5">
+            {dotFormats.map((f) => {
               const isSelected = selected?.id === f.id;
               return (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => setSelectedId(f.id)}
+                  aria-label={`Color ${f.name ?? 'único'}`}
                   aria-pressed={isSelected}
-                  className={`border px-2.5 py-1 font-body text-[10px] uppercase tracking-[0.08em] transition-colors ${
-                    isSelected
-                      ? 'border-text bg-text text-bg'
-                      : 'border-border text-text-soft hover:border-text hover:text-text'
+                  title={f.name ?? 'Color'}
+                  className={`h-3.5 w-3.5 rounded-full transition-transform hover:scale-110 ${
+                    isSelected ? 'ring-1 ring-text ring-offset-2 ring-offset-bg' : ''
                   }`}
-                >
-                  {f.ml} ml
-                </button>
+                  style={{ backgroundColor: f.colorHex ?? colorHex(f.name) }}
+                />
               );
             })}
-            {hasMoreFormats && (
+            {extraFormats > 0 && (
               <a
                 href={detailUrl}
-                aria-label="Ver todos los formatos"
-                className="flex h-6 w-6 items-center justify-center rounded-full border border-border text-text-soft transition-colors hover:border-text hover:text-text"
+                aria-label="Ver todos los colores"
+                className="font-body text-[10px] tracking-[0.06em] text-text-muted transition-colors hover:text-text"
               >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
+                +{extraFormats}
               </a>
             )}
           </div>

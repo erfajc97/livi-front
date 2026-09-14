@@ -1,7 +1,8 @@
 import { useCartPageHook, type CartRow } from '../hooks/useCartPageHook';
 import CartLine from './CartLine';
 import CartPageSummary from './CartPageSummary';
-import CartRecommendations from './CartRecommendations';
+// LIVI no usa la publicidad del carrito por ahora (se conserva el componente):
+// import CartRecommendations from './CartRecommendations';
 
 function GroupHeader({ title, meta }: { title: string; meta: string }) {
   return (
@@ -69,24 +70,20 @@ export default function CartPage() {
         </svg>
         <h1 className="font-display text-4xl font-light text-text">Tu carrito está vacío</h1>
         <p className="max-w-sm font-body text-sm text-text-soft">
-          Explora el catálogo y descubre fragancias en stock o bajo pedido.
+          Explora la tienda y descubre nuestras pañaleras y mochilas de cuero.
         </p>
         <a
-          href="/catalogo/perfumes"
+          href="/catalogo"
           className="mt-2 inline-flex items-center gap-2 bg-text px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
         >
           Explorar catálogo
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
         </a>
 
-        <div className="w-full text-left">
-          <CartRecommendations />
-        </div>
+        {/* LIVI no usa la publicidad del carrito por ahora (componente conservado). */}
       </section>
     );
   }
-
-  const mixed = immediate.length > 0 && bajo.length > 0;
 
   const renderRow = (row: CartRow, group: 'immediate' | 'bajo') => (
     <CartLine
@@ -109,36 +106,18 @@ export default function CartPage() {
           Carrito <span className="italic text-text-soft">({itemCount})</span>
         </h1>
         <p className="mt-4 max-w-xl font-body text-sm text-text-soft">
-          {mixed ? (
-            <>Tu carrito combina referencias <span className="text-text">en stock</span> y referencias <span className="italic">bajo pedido</span>.</>
-          ) : bajo.length > 0 ? (
-            <>Todas tus referencias son <span className="italic">bajo pedido</span>.</>
-          ) : (
-            <>Todas tus referencias están <span className="text-text">en stock</span>, listas para envío.</>
-          )}
+          Todas tus referencias están <span className="text-text">en stock</span>, listas para envío.
         </p>
       </header>
 
       {/* ── Cuerpo: items (izq) + resumen (der) ── */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.55fr_1fr] lg:gap-16 xl:gap-24">
-        {/* Items agrupados */}
+        {/* Items */}
         <div>
-          {immediate.length > 0 && (
-            <div className="mb-8 md:mb-14">
-              <GroupHeader title="Envío inmediato" meta="Servientrega · 24–72 h" />
-              <div>{immediate.map((r) => renderRow(r, 'immediate'))}</div>
-            </div>
-          )}
-
-          {bajo.length > 0 && (
-            <div>
-              <GroupHeader title="Bajo pedido" meta="Plazo 13–17 días" />
-              <div>{bajo.map((r) => renderRow(r, 'bajo'))}</div>
-              <p className="mt-6 border-l-2 border-accent bg-bg-alt px-4 py-3 font-display text-sm italic text-text-soft">
-                Este perfume lo traemos exclusivamente para ti. Verificado por NonDecants antes de enviártelo.
-              </p>
-            </div>
-          )}
+          <div className="mb-8 md:mb-14">
+            <GroupHeader title="Envío inmediato" meta="Servientrega · 24–72 h" />
+            <div>{immediate.map((r) => renderRow(r, 'immediate'))}</div>
+          </div>
         </div>
 
         {/* Resumen sticky */}
@@ -154,8 +133,8 @@ export default function CartPage() {
         </aside>
       </div>
 
-      {/* Publicidad de productos — se administra desde el admin */}
-      <CartRecommendations />
+      {/* Publicidad del carrito desactivada para LIVI (se conserva el componente):
+      <CartRecommendations /> */}
     </section>
   );
 }

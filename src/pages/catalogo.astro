@@ -11,14 +11,14 @@ const indexed = await fetchProducts({ limit: 200, page: 1 });
 ---
 
 <PublicLayout
-  title="Catálogo de perfumes originales en Ecuador | NonDecants"
-  description="Explora perfumes árabes, nicho y de diseñador 100 % originales. Decants y frascos sellados. Envío a todo Ecuador."
+  title="Tienda — Pañaleras y mochilas de cuero | LIVI"
+  description="Explora pañaleras, mochilas y accesorios de cuero premium LIVI. Hechos a mano en Ecuador. Envío a todo el país."
   canonical="/catalogo"
   robots={robots}
 >
   <div class="bg-bg min-h-screen">
     <div class="border-t border-border"></div>
-    <Catalog client:load bannerTitle="Catálogo" bannerDescription="Explora toda nuestra colección de perfumes" />
+    <Catalog client:load bannerTitle="Tienda" bannerDescription="Explora toda la colección LIVI" />
     <CatalogProductIndex products={indexed.content} />
   </div>
 </PublicLayout>

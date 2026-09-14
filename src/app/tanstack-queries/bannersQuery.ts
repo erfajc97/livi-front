@@ -25,7 +25,7 @@ export const useBannersQuery = (enabled = true, initialData?: Banner[]) =>
     initialData,
   });
 
-export type CatalogBannerSlot = 'catalog_perfumes' | 'catalog_bajo_pedido';
+export type CatalogBannerSlot = 'catalog_perfumes';
 
 const fetchBannersByType = async (type: string): Promise<Banner[]> => {
   try {
@@ -39,7 +39,7 @@ const fetchBannersByType = async (type: string): Promise<Banner[]> => {
   }
 };
 
-/** Primer banner visible de la página Perfumes o Bajo pedido. */
+/** Primer banner visible de la página Tienda. */
 export const useCatalogPageBanner = (slot?: CatalogBannerSlot, enabled = true) =>
   useQuery<Banner | null>({
     queryKey: ['banners', 'by-type', slot],

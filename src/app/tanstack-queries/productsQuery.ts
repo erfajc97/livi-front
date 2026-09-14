@@ -6,23 +6,6 @@ import { MOCK_PRODUCTS } from '@/app/features/landing/data';
 import { parseProductId } from '@/app/helpers/productUrl';
 import type { Product, ProductQueryParams, PaginatedResponse } from '@/app/types/global.types';
 
-/** Extract ml value from variation — tries measureValue, ml, name, or optionValues */
-const extractMl = (v: any): number => {
-  if (v.measureValue) return Number(v.measureValue);
-  if (v.ml) return Number(v.ml);
-  // Try parsing from name like "100ml"
-  const nameMatch = (v.name ?? '').match(/(\d+)\s*ml/i);
-  if (nameMatch) return Number(nameMatch[1]);
-  // Try parsing from optionValues
-  if (v.optionValues?.length) {
-    for (const ov of v.optionValues) {
-      const m = (ov.value ?? ov.displayName ?? '').match(/(\d+)\s*ml/i);
-      if (m) return Number(m[1]);
-    }
-  }
-  return 0;
-};
-
 /** Extract image URLs in admin gallery order (1 = card, 2 = hover). */
 const extractImages = (images: any): string[] => {
   if (!images || !Array.isArray(images)) return [];
@@ -51,32 +34,52 @@ export const mapProduct = (raw: any): Product => {
     images: imageList.length > 0 ? imageList : [raw.imageUrl].filter(Boolean),
     variants: (raw.variations ?? raw.variants ?? []).map((v: any) => ({
       id: String(v.id),
-      ml: Number(v.mlSize ?? extractMl(v)),
+      name: v.name ?? undefined,
       price: Number(v.price ?? 0),
-      mlSize: Number(v.mlSize ?? extractMl(v)),
-      isFullBottle: v.isFullBottle ?? false,
+      sku: v.sku ?? undefined,
+      colorHex: v.colorHex ?? undefined,
+      size: v.size ?? undefined,
       availableQuantity: Number(v.availableQuantity ?? 0),
-      images: extractImages(v.images),
+      images: extractImages(v.images).map((url, i) => ({ id: i, url })),
     })),
     variationsCount: raw.variationsCount ?? (raw.variations ?? raw.variants ?? []).length,
-    // El backend serializa los decimales como string ("100.00"): sin Number()
-    // las sumas de ml se concatenan ("96.00" + 200 → "96.00200") y la regla de
-    // stock frasco/decant deja de funcionar.
-    totalMl: Number(raw.totalMl ?? 100),
-    openBottleMlRemaining: Number(raw.openBottleMlRemaining ?? 0),
-    availableMl: Number(raw.availableMl ?? 0),
     isActive: raw.isActive ?? true,
-    bajoPedido: raw.bajoPedido ?? false,
-    gender: raw.gender ?? undefined,
-    timeOfDay: raw.timeOfDay ?? undefined,
-    concentration: raw.concentration ?? undefined,
-    projection: raw.projection ?? undefined,
     discount: raw.discount ? Number(raw.discount) : undefined,
     detailDescription: raw.detailDescription ?? undefined,
     benefits: (() => {
       if (!raw.benefits) return undefined;
       try { const parsed = JSON.parse(raw.benefits); return Array.isArray(parsed) ? parsed : undefined; }
       catch { return undefined; }
+    })(),
+    commonUses: (() => {
+      if (!raw.commonUses) return undefined;
+      try { const parsed = JSON.parse(raw.commonUses); return Array.isArray(parsed) ? parsed : undefined; }
+      catch { return undefined; }
+    })(),
+    pairsWith: (() => {
+      if (!raw.pairsWith) return undefined;
+      try {
+        const parsed = JSON.parse(raw.pairsWith);
+        return Array.isArray(parsed) ? parsed.map(Number).filter((n: number) => !Number.isNaN(n)) : undefined;
+      } catch { return undefined; }
+    })(),
+    sizes: (() => {
+      if (!raw.sizes) return undefined;
+      try {
+        const parsed = JSON.parse(raw.sizes);
+        return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : undefined;
+      } catch { return undefined; }
+    })(),
+    instagramPosts: (() => {
+      if (!raw.instagramPosts) return undefined;
+      try {
+        const parsed = JSON.parse(raw.instagramPosts);
+        return Array.isArray(parsed)
+          ? parsed
+              .filter((p: any) => p && p.url)
+              .map((p: any) => ({ url: String(p.url), image: String(p.image ?? '') }))
+          : undefined;
+      } catch { return undefined; }
     })(),
     stock: raw.stock != null ? Number(raw.stock) : undefined,
     price: raw.price ? Number(raw.price) : undefined,
@@ -85,10 +88,11 @@ export const mapProduct = (raw: any): Product => {
     formats: Array.isArray(raw.formats)
       ? raw.formats.map((f: any) => ({
           id: String(f.id),
-          ml: Number(f.ml),
+          name: f.name ?? undefined,
           price: Number(f.price),
-          isFullBottle: !!f.isFullBottle,
           imageUrl: f.imageUrl ?? undefined,
+          colorHex: f.colorHex ?? undefined,
+          size: f.size ?? undefined,
         }))
       : undefined,
     categoryId: raw.categoryId != null ? Number(raw.categoryId) : (raw.marca?.categoryId != null ? Number(raw.marca.categoryId) : undefined),
@@ -101,16 +105,6 @@ export const mapProduct = (raw: any): Product => {
         }
       : undefined,
     createdAt: raw.createdAt ?? '',
-    // ── PDP editorial ──
-    scentProfileTitle: raw.scentProfileTitle ?? undefined,
-    scentSections: Array.isArray(raw.scentSections) ? raw.scentSections : undefined,
-    mood: Array.isArray(raw.mood) ? raw.mood : undefined,
-    occasion: Array.isArray(raw.occasion) ? raw.occasion : undefined,
-    longevity: raw.longevity != null ? Number(raw.longevity) : undefined,
-    projectionScore: raw.projectionScore != null ? Number(raw.projectionScore) : undefined,
-    signatureTitle: raw.signatureTitle ?? undefined,
-    signatureDescription: raw.signatureDescription ?? undefined,
-    signatureImageUrl: raw.signatureImageUrl ?? undefined,
   };
 };
 
@@ -119,8 +113,7 @@ const applyMockFilters = (params: ProductQueryParams): PaginatedResponse<Product
   if (params.search) filtered = filtered.filter(p =>
     p.name.toLowerCase().includes(params.search!.toLowerCase())
   );
-  if (params.inStock) filtered = filtered.filter(p => p.variants.some(v => v.availableQuantity > 0));
-  if (params.bajoPedido !== undefined) filtered = filtered.filter(p => p.bajoPedido === (String(params.bajoPedido) === 'true'));
+  if (params.inStock) filtered = filtered.filter(p => (p.stock ?? 0) > 0);
   if (params.hasDiscount) filtered = filtered.filter(p => (p.discount ?? 0) > 0);
   if (params.minPrice !== undefined) {
     filtered = filtered.filter(p => (p.price ?? 0) >= params.minPrice!);
@@ -128,7 +121,6 @@ const applyMockFilters = (params: ProductQueryParams): PaginatedResponse<Product
   if (params.maxPrice !== undefined) {
     filtered = filtered.filter(p => (p.price ?? 0) <= params.maxPrice!);
   }
-  if (params.gender) filtered = filtered.filter(p => p.gender === params.gender);
   if (params.sortBy === 'createdAt') {
     filtered.sort((a, b) =>
       params.sortOrder === 'ASC'

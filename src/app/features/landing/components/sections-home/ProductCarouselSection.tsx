@@ -49,10 +49,12 @@ export default function ProductCarouselSection({
   const arrowTop = useMediaCenterTop(viewportRef, isLoading ? 0 : products.length);
 
   return (
-    <section className="bg-bg px-4 pb-10 pt-10 md:pb-14 md:pt-20">
-      <div className="mx-auto max-w-7xl">
+    /* Ancho completo como minabaie: sin contenedor max-w, solo el padding
+       lateral editorial del sitio. */
+    <section className="bg-bg px-6 pb-10 pt-10 md:px-14 md:pb-14 md:pt-20">
+      <div>
         {/* Header de sección — título en Cormorant Garamond (REQ-028) · Ver todo */}
-        <div className="mb-5 flex items-baseline justify-between px-2 sm:px-12 md:mb-9">
+        <div className="mb-5 flex items-baseline justify-between md:mb-9">
           {isLoading ? (
             <div className="h-8 w-52 animate-pulse rounded-sm bg-bg-alt md:h-10 md:w-72" />
           ) : (
@@ -70,7 +72,7 @@ export default function ProductCarouselSection({
 
         {isLoading ? (
           /* Mismo ancho por slide que el carrusel cargado: nada salta. */
-          <div className="px-3 sm:px-12">
+          <div>
             <div className="flex">
               {Array.from({ length: 4 }, (_, i) => (
                 <div key={i} className="shrink-0 basis-1/2 px-2.5 md:basis-1/3 md:px-3 lg:basis-1/4">
@@ -87,7 +89,7 @@ export default function ProductCarouselSection({
           /* El padding va FUERA del viewport: con overflow-hidden el recorte
              ocurre en el borde del padding y se colaba un trozo de la card
              siguiente. Así entran exactamente 4 (2 en móvil, 3 en tablet). */
-          <div className="relative px-3 sm:px-12" ref={viewportRef}>
+          <div className="relative" ref={viewportRef}>
             {/* Flechas montadas sobre las esquinas de la primera/última card,
                 centradas con la imagen */}
             <CarouselArrow
@@ -95,7 +97,7 @@ export default function ProductCarouselSection({
               onClick={scrollPrev}
               disabled={!canPrev}
               top={arrowTop}
-              className="absolute left-3 top-[34%] -translate-y-1/2 sm:left-12"
+              className="absolute left-0 top-[34%] -translate-y-1/2"
             />
 
             {/* Contenedor del carrusel */}
@@ -114,7 +116,7 @@ export default function ProductCarouselSection({
               onClick={scrollNext}
               disabled={!canNext}
               top={arrowTop}
-              className="absolute right-3 top-[34%] -translate-y-1/2 sm:right-12"
+              className="absolute right-0 top-[34%] -translate-y-1/2"
             />
 
             {/* Barra continua (REQ-026): un solo riel gris con el tramo activo

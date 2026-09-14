@@ -2,11 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useProductsQuery } from '@/app/tanstack-queries/productsQuery';
 import { useRawCategoriesQuery } from '@/app/tanstack-queries/categoriesQuery';
 import type { CatalogFilters } from '../types';
-import type { Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
 
 export interface UseCatalogHookProps {
-  tipo?: 'perfumes' | 'combos';
-  bajoPedido?: boolean;
   initialCategoryId?: number;
   initialMarcaId?: number;
 }
@@ -23,17 +20,13 @@ const DESKTOP_QUERY = '(min-width: 768px)';
 const defaultFilters: CatalogFilters = {
   search: '',
   inStock: false,
-  gender: '',
-  timeOfDay: '',
-  concentration: '',
-  projection: '',
   page: 1,
   sortBy: 'createdAt',
   order: 'desc',
 };
 
 /**
- * REQ-058 — URLs legibles con slugs: `?categoria=arabes&marca=giorgio-armani`.
+ * URLs legibles con slugs: `?categoria=panaleras&marca=livi`.
  * Se ACEPTAN los formatos viejo (`category=3&marca=3`, IDs numéricos) y nuevo
  * (`categoria=<slug>&marca=<slug>`); la API sigue recibiendo IDs — el slug se
  * resuelve a id en front con las categorías/marcas ya cargadas, y la URL se
@@ -63,7 +56,7 @@ function getUrlParams() {
   };
 }
 
-export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMarcaId }: UseCatalogHookProps = {}) {
+export function useCatalogHook({ initialCategoryId, initialMarcaId }: UseCatalogHookProps = {}) {
   const urlParams = getUrlParams();
   const catId = initialCategoryId ?? urlParams.categoryId;
   const subId = initialMarcaId ?? urlParams.marcaId;
@@ -179,10 +172,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     return () => mq.removeEventListener('change', sync);
   }, []);
 
-  // El flag de la página (bajoPedido={true} en /bajo-pedido, ={false} en
-  // /catalogo/perfumes) SIEMPRE se respeta, incluso al navegar a una casa
-  // (marca) o categoría. Así la sección "Bajo Pedido" muestra solo bajo
-  // pedido y "Perfumes" solo stock, en cualquier nivel de navegación.
   const isBrandView = filters.marcaId != null && slugsResolved;
   const brandPageSize = limit === DESKTOP_LIMIT ? BRAND_DESKTOP_LIMIT : BRAND_MOBILE_LIMIT;
 
@@ -191,10 +180,6 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
   }, [
     filters.marcaId,
     filters.categoryId,
-    filters.gender,
-    filters.timeOfDay,
-    filters.concentration,
-    filters.projection,
     debouncedSearch,
     debouncedMaxPrice,
   ]);
@@ -204,13 +189,8 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     limit: isBrandView ? brandPageSize * brandChunks : limit,
     search: debouncedSearch || undefined,
     inStock: filters.inStock || undefined,
-    bajoPedido,
     categoryId: filters.categoryId,
     marcaId: filters.marcaId,
-    gender: filters.gender || undefined,
-    timeOfDay: filters.timeOfDay || undefined,
-    concentration: filters.concentration || undefined,
-    projection: filters.projection || undefined,
     minPrice: filters.minPrice,
     maxPrice: debouncedMaxPrice,
     sortBy: filters.sortBy,
@@ -226,41 +206,12 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     setBrandChunks((chunks) => chunks + 1);
   }, []);
 
-  const showBrandBackorder = bajoPedido === false && filters.marcaId != null && slugsResolved;
-  const brandBackorderQuery = useProductsQuery({
-    queryParams: {
-      page: 1,
-      limit: DESKTOP_LIMIT,
-      marcaId: filters.marcaId,
-      bajoPedido: true,
-      sortBy: 'createdAt',
-      sortOrder: 'DESC',
-    },
-    enabled: showBrandBackorder,
-  });
-
   const setSearch = useCallback((search: string) => {
     setFilters((f) => ({ ...f, search, page: 1 }));
   }, []);
 
   const setInStock = useCallback((inStock: boolean) => {
     setFilters((f) => ({ ...f, inStock, page: 1 }));
-  }, []);
-
-  const setGender = useCallback((gender: Gender | '') => {
-    setFilters((f) => ({ ...f, gender, page: 1 }));
-  }, []);
-
-  const setTimeOfDay = useCallback((timeOfDay: TimeOfDay | '') => {
-    setFilters((f) => ({ ...f, timeOfDay, page: 1 }));
-  }, []);
-
-  const setConcentration = useCallback((concentration: Concentration | '') => {
-    setFilters((f) => ({ ...f, concentration, page: 1 }));
-  }, []);
-
-  const setProjection = useCallback((projection: Projection | '') => {
-    setFilters((f) => ({ ...f, projection, page: 1 }));
   }, []);
 
   const setPriceRange = useCallback((minPrice?: number, maxPrice?: number) => {
@@ -303,8 +254,7 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
   }, [initialCategoryId, initialMarcaId]);
 
   const hasActiveFilters = !!(
-    filters.search || filters.gender ||
-    filters.timeOfDay || filters.concentration || filters.projection ||
+    filters.search ||
     filters.minPrice || filters.maxPrice ||
     (filters.categoryId && filters.categoryId !== catId)
   );
@@ -320,20 +270,8 @@ export function useCatalogHook({ tipo, bajoPedido, initialCategoryId, initialMar
     isBrandView,
     hasMore,
     loadMore,
-    showBrandBackorder,
-    brandBackorderProducts: brandBackorderQuery.data?.content ?? [],
-    brandBackorderTotal: brandBackorderQuery.data?.pagination?.total ?? 0,
-    brandBackorderLoading: brandBackorderQuery.isLoading,
-    brandBackorderFetching: brandBackorderQuery.isFetching,
-    selectedMarca: filters.marcaId != null
-      ? rawCategories.flatMap((c) => c.marcas).find((m) => Number(m.id) === filters.marcaId)
-      : undefined,
     setSearch,
     setInStock,
-    setGender,
-    setTimeOfDay,
-    setConcentration,
-    setProjection,
     setPriceRange,
     setCategoryId,
     setMarcaId,

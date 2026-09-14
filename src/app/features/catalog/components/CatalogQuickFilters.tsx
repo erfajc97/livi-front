@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { CATALOG_GENDERS } from '../data';
-import type { Gender } from '@/app/types/global.types';
 import {
   sortCategoriesByHierarchy,
   type NavCategory,
@@ -8,8 +6,6 @@ import {
 } from '@/app/tanstack-queries/categoriesQuery';
 
 interface CatalogQuickFiltersProps {
-  gender: Gender | '';
-  onGenderChange: (v: Gender | '') => void;
   marcaId?: number;
   onMarcaChange: (v?: number) => void;
   categoryId?: number;
@@ -18,7 +14,7 @@ interface CatalogQuickFiltersProps {
   showCategory?: boolean;
 }
 
-type OpenMenu = 'category' | 'marca' | 'gender' | null;
+type OpenMenu = 'category' | 'marca' | null;
 
 function Chevron({ open }: { open: boolean }) {
   return (
@@ -36,8 +32,6 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 export default function CatalogQuickFilters({
-  gender,
-  onGenderChange,
   marcaId,
   onMarcaChange,
   categoryId,
@@ -69,7 +63,6 @@ export default function CatalogQuickFilters({
     new Map(marcaSource.map((m) => [String(m.id), m])).values(),
   );
 
-  const genderLabel = CATALOG_GENDERS.find((g) => g.value === gender)?.label ?? 'Género';
   const marcaLabel = marcas.find((m) => Number(m.id) === marcaId)?.name ?? 'Marca';
   const categoryLabel =
     sortedCategories.find((c) => Number(c.id) === categoryId)?.name ?? 'Categoría';
@@ -91,7 +84,7 @@ export default function CatalogQuickFilters({
   return (
     <div
       ref={rootRef}
-      className={`relative grid min-w-0 gap-1.5 ${showCategory ? 'grid-cols-3' : 'grid-cols-2'}`}
+      className={`relative grid min-w-0 gap-1.5 ${showCategory ? 'grid-cols-2' : 'grid-cols-1'}`}
     >
       {showCategory && (
         <button
@@ -113,16 +106,6 @@ export default function CatalogQuickFilters({
       >
         <span className="min-w-0 truncate">{marcaLabel}</span>
         <Chevron open={open === 'marca'} />
-      </button>
-
-      <button
-        type="button"
-        aria-expanded={open === 'gender'}
-        onClick={() => setOpen((v) => (v === 'gender' ? null : 'gender'))}
-        className={btn(Boolean(gender), 'gender')}
-      >
-        <span className="min-w-0 truncate">{genderLabel}</span>
-        <Chevron open={open === 'gender'} />
       </button>
 
       {open === 'category' && (
@@ -172,27 +155,6 @@ export default function CatalogQuickFilters({
               );
             })
           )}
-        </div>
-      )}
-
-      {open === 'gender' && (
-        <div className={menuPanel}>
-          {CATALOG_GENDERS.map((opt) => {
-            const active = gender === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  onGenderChange(active ? '' : (opt.value as Gender));
-                  setOpen(null);
-                }}
-                className={menuItem(active)}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
         </div>
       )}
     </div>

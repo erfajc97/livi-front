@@ -31,7 +31,7 @@ const BANKS: BankInfo[] = [
       ['Número de cuenta', '2213099079', true],
       ['Titular', 'Jean Philippe Wong'],
       ['Cédula', '0951454917', true],
-      ['Correo', 'nondecants@gmail.com'],
+      ['Correo', 'contacto@livi.ec'],
     ],
   },
   {
@@ -43,7 +43,7 @@ const BANKS: BankInfo[] = [
       ['Número de cuenta', '20009323889', true],
       ['Titular', 'Wong Diaz Jean Philippe'],
       ['RUC / Identificación', '0951454917', true],
-      ['Correo', 'nondecants@gmail.com'],
+      ['Correo', 'contacto@livi.ec'],
       ['Celular', '0992305463', true],
     ],
   },
@@ -55,7 +55,7 @@ const BANKS: BankInfo[] = [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
       ['Número de cuenta', '0060453629', true],
       ['CI', '0951454917', true],
-      ['Correo', 'nondecants@gmail.com'],
+      ['Correo', 'contacto@livi.ec'],
       ['Celular', '0992305463', true],
     ],
   },
@@ -180,7 +180,7 @@ export default function TransferBankInfoStep({ total, isPending, termsAccepted, 
         type="button"
         onClick={() => receiptFile && termsAccepted && onConfirm(receiptFile)}
         disabled={!receiptFile || !termsAccepted || isPending}
-        className={`mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`mt-2 w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 ${
           receiptFile && termsAccepted && !isPending ? 'gold-frame' : ''
         }`}
       >

@@ -3,12 +3,11 @@ import { useCartStore } from '@/app/store/cart/cartStore';
 import { useAuthStore } from '@/app/store/auth/authStore';
 
 export const NAV_LINKS = [
-  { href: '/',                   label: 'Inicio',             exact: true,  dropdown: false,      dropdownId: '' },
-  { href: '/catalogo/perfumes',  label: 'Perfumes',           exact: true,  dropdown: true,       dropdownId: 'perfumes' },
-  { href: '/catalogo/combos',    label: 'Combos',             exact: true,  dropdown: false,      dropdownId: '' },
-  { href: '/bajo-pedido',        label: 'Bajo pedido',        exact: true,  dropdown: true,       dropdownId: 'bajoPedido' },
-  { href: '/blog',               label: 'Blog',               exact: true,  dropdown: false,      dropdownId: '' },
-  { href: '/rastrear',           label: 'Rastrear tu pedido', exact: true,  dropdown: false,      dropdownId: '' },
+  { href: '/catalogo',         label: 'Tienda',           exact: true,  dropdown: false, dropdownId: '' },
+  { href: '/nuestra-historia', label: 'Nuestra Historia', exact: true,  dropdown: false, dropdownId: '' },
+  { href: '/el-taller',        label: 'El Taller',        exact: true,  dropdown: false, dropdownId: '' },
+  { href: '/blog',             label: 'Blog',             exact: true,  dropdown: false, dropdownId: '' },
+  { href: '/rastrear',         label: 'Rastrear pedido',  exact: true,  dropdown: false, dropdownId: '' },
 ];
 
 export function isLinkActive(href: string, currentUrl: string, exact: boolean) {
@@ -37,6 +36,11 @@ export function useNavbarHook() {
   const [activeCategory, setActiveCategory] = useState(0);
   const [pathname, setPathname] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
+  // Los stores leen localStorage al importarse: su valor ya difiere del SSR en
+  // el primer render del cliente y rompe la hidratación ("Expected server
+  // HTML…"). Todo lo que depende de auth/carrito se renderiza solo tras montar.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -135,9 +139,10 @@ export function useNavbarHook() {
   };
 
   return {
-    itemCount,
+    itemCount: mounted ? itemCount : 0,
     setDrawerOpen,
-    isAuthenticated,
+    isAuthenticated: mounted && isAuthenticated,
+    mounted,
     authOpen,
     setAuthOpen,
     mobileOpen,

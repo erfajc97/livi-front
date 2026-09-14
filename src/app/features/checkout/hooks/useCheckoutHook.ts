@@ -4,7 +4,6 @@ import { useAuthStore } from '@/app/store/auth/authStore';
 import { useDeliveryMethodsHook } from './useDeliveryMethodsHook';
 import { useAddressesQuery } from '@/app/tanstack-queries/addressesQuery';
 import { calcPayphoneSurcharge } from '@/app/helpers/calcPayphoneSurcharge';
-import { splitCartStock, getSplit } from '@/app/helpers/cartStockSplit';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
@@ -12,7 +11,7 @@ import { normalizeCustomerField, validateContact } from '../validators';
 import { isPickupMethod, PICKUP_METHODS, type DeliveryMode } from '../components/DeliverySection';
 import type { CustomerFormData, PaymentMethod, DeliveryMethod } from '../types';
 
-const PREFS_KEY = 'nondecants-checkout-prefs';
+const PREFS_KEY = 'livi-checkout-prefs';
 
 interface CheckoutPrefs {
   phone?: string;
@@ -66,15 +65,6 @@ interface OrderItemPayload {
   productVariationId?: number | string;
   quantity: number;
   priceOverride?: number;
-}
-
-export interface BackorderLine {
-  name: string;
-  ml?: number;
-  /** Unidades que salen de stock inmediato. */
-  inStock: number;
-  /** Unidades que entran bajo pedido (13–17 días). */
-  bajo: number;
 }
 
 export function useCheckoutHook() {
@@ -160,10 +150,7 @@ export function useCheckoutHook() {
   const items    = useCartStore((s) => s.items);
   const subtotal = useCartStore((s) => s.total());
 
-  // Subtotal only for non-combo items (coupons don't apply to combos)
-  const productSubtotal = items
-    .filter((i) => i.comboId == null)
-    .reduce((acc, i) => acc + i.price * i.quantity, 0);
+  const productSubtotal = subtotal;
 
   const { methods: deliveryOptions, isLoading: deliveryLoading } = useDeliveryMethodsHook(customer.city);
 
@@ -189,22 +176,6 @@ export function useCheckoutHook() {
   const total = afterDiscount + deliveryCost + payphoneSurcharge;
 
   const clearCart = useCartStore((s) => s.clearCart);
-
-  // Desglose bajo pedido: incluye items 100% bajo pedido, frascos con stock
-  // PARCIAL y decants cuyo ml ya está comprometido por los frascos del mismo
-  // producto que van en el carrito (13–17 días). Se usa para el modal de
-  // confirmación con detalle por producto.
-  const splits = splitCartStock(items);
-  const backorderItems: BackorderLine[] = items
-    .map((i) => {
-      const s = getSplit(splits, i);
-      return { name: i.name, ml: i.ml, inStock: s.inStock, bajo: s.bajo };
-    })
-    .filter((b) => b.bajo > 0);
-  const hasBajoPedido = backorderItems.length > 0;
-  const [bajoConfirm, setBajoConfirm] = useState<
-    null | { kind: 'submit' } | { kind: 'transfer'; file: File }
-  >(null);
 
   const handleCustomerChange = (field: keyof CustomerFormData, value: string) => {
     const next = normalizeCustomerField(field, value);
@@ -311,34 +282,16 @@ export function useCheckoutHook() {
         }).catch(() => {}); // fire and forget
       }
 
-      // Expand combo items into individual products for the backend
-      const orderItems = items.flatMap((item): OrderItemPayload | OrderItemPayload[] => {
-        if (item.comboProducts && item.comboProducts.length > 0) {
-          // Distribute combo price proportionally across items
-          const comboPrice = item.price; // This is the combo's actual price (finalPrice - discount)
-          const numProducts = item.comboProducts.length;
-          const pricePerItem = Math.round((comboPrice / numProducts) * 100) / 100;
-          // Last item gets the remainder to avoid rounding errors
-          const lastItemPrice = Math.round((comboPrice - pricePerItem * (numProducts - 1)) * 100) / 100;
+      // Cada línea del carrito es una variante (color) del producto.
+      const orderItems: OrderItemPayload[] = items.map((item) => ({
+        productVariationId: parseInt(item.variantId, 10),
+        quantity: item.quantity,
+      }));
 
-          return item.comboProducts.map((cp: any, idx: number) => {
-            const override = idx === numProducts - 1 ? lastItemPrice : pricePerItem;
-            if (cp.productVariationId) {
-              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity, priceOverride: override };
-            }
-            if (cp.productId) {
-              return { productId: cp.productId, quantity: cp.quantity * item.quantity, priceOverride: override };
-            }
-            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity, priceOverride: override };
-          });
-        }
-        // Regular item
-        const isFullBottle = item.variantId.startsWith('full-');
-        if (isFullBottle) {
-          return { productId: parseInt(item.productId, 10), quantity: item.quantity };
-        }
-        return { productVariationId: parseInt(item.variantId, 10), quantity: item.quantity };
-      });
+      const sizesNote = items
+        .filter((i) => i.size)
+        .map((i) => `${i.name}${i.variationName ? ` ${i.variationName}` : ''} — Talla ${i.size} ×${i.quantity}`)
+        .join(' | ');
 
       const payload = {
         items: orderItems,
@@ -353,6 +306,7 @@ export function useCheckoutHook() {
         couponCode: couponApplied ? couponCode : undefined,
         couponDiscount: couponApplied ? couponDiscount : undefined,
         notes: [
+          sizesNote && `Tallas: ${sizesNote}`,
           customer.cedula && `Cédula: ${customer.cedula}`,
           customer.reference && `Ref: ${customer.reference}`,
           customer.province && `Provincia: ${customer.province}`,
@@ -405,31 +359,16 @@ export function useCheckoutHook() {
         }).catch(() => {});
       }
 
-      // Build order items (same logic as handleSubmit)
-      const orderItems = items.flatMap((item): OrderItemPayload | OrderItemPayload[] => {
-        if (item.comboProducts && item.comboProducts.length > 0) {
-          const comboPrice = item.price;
-          const numProducts = item.comboProducts.length;
-          const pricePerItem = Math.round((comboPrice / numProducts) * 100) / 100;
-          const lastItemPrice = Math.round((comboPrice - pricePerItem * (numProducts - 1)) * 100) / 100;
+      // Cada línea del carrito es una variante (color) del producto.
+      const orderItems: OrderItemPayload[] = items.map((item) => ({
+        productVariationId: parseInt(item.variantId, 10),
+        quantity: item.quantity,
+      }));
 
-          return item.comboProducts.map((cp: any, idx: number) => {
-            const override = idx === numProducts - 1 ? lastItemPrice : pricePerItem;
-            if (cp.productVariationId) {
-              return { productVariationId: cp.productVariationId, quantity: cp.quantity * item.quantity, priceOverride: override };
-            }
-            if (cp.productId) {
-              return { productId: cp.productId, quantity: cp.quantity * item.quantity, priceOverride: override };
-            }
-            return { productId: parseInt(item.productId, 10), quantity: cp.quantity * item.quantity, priceOverride: override };
-          });
-        }
-        const isFullBottle = item.variantId.startsWith('full-');
-        if (isFullBottle) {
-          return { productId: parseInt(item.productId, 10), quantity: item.quantity };
-        }
-        return { productVariationId: parseInt(item.variantId, 10), quantity: item.quantity };
-      });
+      const sizesNote = items
+        .filter((i) => i.size)
+        .map((i) => `${i.name}${i.variationName ? ` ${i.variationName}` : ''} — Talla ${i.size} ×${i.quantity}`)
+        .join(' | ');
 
       const payload = {
         items: orderItems,
@@ -444,6 +383,7 @@ export function useCheckoutHook() {
         couponCode: couponApplied ? couponCode : undefined,
         couponDiscount: couponApplied ? couponDiscount : undefined,
         notes: [
+          sizesNote && `Tallas: ${sizesNote}`,
           customer.cedula && `Cédula: ${customer.cedula}`,
           customer.reference && `Ref: ${customer.reference}`,
           customer.province && `Provincia: ${customer.province}`,
@@ -478,7 +418,6 @@ export function useCheckoutHook() {
     }
   };
 
-  // Gate de confirmación: si hay bajo pedido, pedir confirmación antes de enviar
   const requestSubmit = () => {
     if (!paymentMethod) {
       sonnerResponse('Selecciona un método de pago.', 'error');
@@ -486,10 +425,6 @@ export function useCheckoutHook() {
     }
     if (!termsAccepted) {
       sonnerResponse('Debes aceptar los términos y condiciones.', 'error');
-      return;
-    }
-    if (hasBajoPedido) {
-      setBajoConfirm({ kind: 'submit' });
       return;
     }
     handleSubmit();
@@ -500,22 +435,8 @@ export function useCheckoutHook() {
       sonnerResponse('Debes aceptar los términos y condiciones.', 'error');
       return;
     }
-    if (hasBajoPedido) {
-      setBajoConfirm({ kind: 'transfer', file });
-      return;
-    }
     handleTransferSubmit(file);
   };
-
-  const confirmBajoPedido = () => {
-    const pending = bajoConfirm;
-    setBajoConfirm(null);
-    if (!pending) return;
-    if (pending.kind === 'submit') handleSubmit();
-    else handleTransferSubmit(pending.file);
-  };
-
-  const cancelBajoPedido = () => setBajoConfirm(null);
 
   return {
     step,
@@ -559,11 +480,5 @@ export function useCheckoutHook() {
     handleSelectAddress,
     handleSubmit: requestSubmit,
     handleTransferSubmit: requestTransferSubmit,
-    // Confirmación bajo pedido
-    hasBajoPedido,
-    backorderItems,
-    bajoConfirmOpen: bajoConfirm != null,
-    confirmBajoPedido,
-    cancelBajoPedido,
   };
 }

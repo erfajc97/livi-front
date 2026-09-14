@@ -1,8 +1,8 @@
 import sharp from 'sharp';
 import { absoluteImageUrl, SITE_ORIGIN } from '@/app/helpers/seoMeta';
 
-/** Marfil del tema — el lienzo de la tarjeta al compartir en WhatsApp. */
-const CARD_BG = { r: 246, g: 243, b: 238 };
+/** Butter del tema LIVI — el lienzo de la tarjeta al compartir en WhatsApp. */
+const CARD_BG = { r: 245, g: 239, b: 198 };
 const CARD_W = 1200;
 const CARD_H = 630;
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -12,19 +12,15 @@ function isAllowedImageHost(hostname: string): boolean {
   return (
     host === 'localhost' ||
     host === '127.0.0.1' ||
-    host === 'nondecants.com' ||
-    host === 'www.nondecants.com' ||
-    host.endsWith('.nondecants.com') ||
+    host === 'livi.ec' ||
+    host === 'www.livi.ec' ||
+    host.endsWith('.livi.ec') ||
     host.endsWith('.amazonaws.com')
   );
 }
 
 export function productShareImagePath(id: string | number): string {
   return `${SITE_ORIGIN}/og/producto/${id}`;
-}
-
-export function comboShareImagePath(id: string | number): string {
-  return `${SITE_ORIGIN}/og/combo/${id}`;
 }
 
 export async function renderShareJpeg(rawUrl?: string | null): Promise<Buffer | null> {

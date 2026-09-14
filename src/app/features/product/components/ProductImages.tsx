@@ -3,10 +3,9 @@ import { useRef, useState } from 'react';
 interface ProductImagesProps {
   images: string[];
   name: string;
-  bajoPedido?: boolean;
 }
 
-export default function ProductImages({ images, name, bajoPedido }: ProductImagesProps) {
+export default function ProductImages({ images, name }: ProductImagesProps) {
   const [active, setActive] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const list = images.length > 0 ? images : [];
@@ -54,12 +53,6 @@ export default function ProductImages({ images, name, bajoPedido }: ProductImage
             draggable={false}
           />
         </div>
-        {bajoPedido && (
-          <span className="absolute left-5 top-5 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text">
-            <span className="h-[5px] w-[5px] rounded-full bg-accent" />
-            Bajo Pedido
-          </span>
-        )}
 
         {/* Puntos del carrusel — solo mobile */}
         {list.length > 1 && (

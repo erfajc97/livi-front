@@ -24,8 +24,8 @@ interface Props {
 }
 
 const {
-  title = 'NonDecants — Perfumes sellados, decants y nondecants',
-  description = 'Compra perfumes sellados, decants y nondecants en Ecuador. Envíos a todo el país vía Servientrega.',
+  title = 'LIVI — Pañaleras y mochilas de cuero premium',
+  description = 'Compra pañaleras, mochilas y accesorios de cuero artesanal en Ecuador. Envíos a todo el país vía Servientrega.',
   shareTitle: shareTitleProp,
   ogDescription: ogDescriptionProp,
   ogImage = '/og-image.jpg',
@@ -36,8 +36,9 @@ const {
 } = Astro.props;
 
 // WhatsApp y varias apps renderizan la diéresis con una tipografía que no la
-// trae y sale un caracter roto, así que la tarjeta al compartir dice
-// "NonDecants" en texto plano. En la página el nombre sigue con ö.
+// trae y sale un caracter roto, así que la tarjeta al compartir va en texto
+// plano. (Heredado de la marca anterior; LIVI no usa diéresis, pero se deja
+// por seguridad.)
 const plainBrand = (text: string) => text.replace(/ö/g, 'o').replace(/Ö/g, 'O');
 const isHome = Astro.url.pathname === '/' || Astro.url.pathname === '';
 const shareTitle = plainBrand(
@@ -75,7 +76,7 @@ const ogUpdated = new Date().toISOString();
 
     <!-- Vista previa al compartir (WhatsApp, Linktree, Facebook, Telegram) -->
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content="NonDecants" />
+    <meta property="og:site_name" content="LIVI" />
     <meta property="og:locale" content="es_EC" />
     <meta property="og:title" content={shareTitle} />
     <meta property="og:description" content={ogDescription} />
@@ -104,15 +105,22 @@ const ogUpdated = new Date().toISOString();
     <!-- Google exige múltiplos de 48px. /favicon.ico es lo que piden Chrome y
          los resultados de búsqueda si el <link> falla o está cacheado. -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260828" />
-    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=20260828" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=20260828" />
-    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png?v=20260828" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260828" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=20260912" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=20260912" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png?v=20260912" />
+    <link rel="icon" type="image/png" sizes="256x256" href="/favicon.png?v=20260912" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260912" />
 
     <!-- Fuentes autohospedadas: sin CSS externo que bloquee el primer paint. -->
     <link rel="preload" href={dmSansLatin} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={cormorantItalic} as="font" type="font/woff2" crossorigin />
+    <!-- Jost (cuerpo) e IBM Plex Mono (labels técnicos) — Google Fonts. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Jost:ital,wght@0,300..700;1,300..700&display=swap"
+      rel="stylesheet"
+    />
     {jsonLdPayload.map((block) => (
       <script type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}

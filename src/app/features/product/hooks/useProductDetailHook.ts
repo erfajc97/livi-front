@@ -13,21 +13,24 @@ export function useProductDetailHook(productId: string) {
 
   const handleAddToCart = () => {
     if (!product || !selectedVariant) {
-      sonnerResponse('Selecciona un tamaño primero.', 'error');
+      sonnerResponse('Selecciona un color primero.', 'error');
       return;
     }
-    if (selectedVariant.availableQuantity < quantity) {
+    const stock = Number(product.stock ?? 0);
+    if (stock < quantity) {
       sonnerResponse('No hay suficiente stock disponible.', 'error');
       return;
     }
     addItem({
       productId: product.id,
-      variantId: selectedVariant.id,
+      variantId: String(selectedVariant.id),
       name:      product.name,
-      image:     selectedVariant.images?.[0] || product.image || '',
-      ml:        selectedVariant.ml,
-      price:     selectedVariant.price,
+      variationName: selectedVariant.name,
+      image:     selectedVariant.images?.[0]?.url ?? product.image ?? '',
+      price:     Number(selectedVariant.price),
       quantity,
+      maxQty:    stock > 0 ? stock : undefined,
+      stockAvailable: stock,
     });
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
     window.location.href = '/carrito';

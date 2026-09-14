@@ -82,7 +82,7 @@ export default function CartRecommendations() {
           <h2 className="font-display text-2xl font-light italic leading-none text-text md:text-3xl">{title}</h2>
         </div>
         <a
-          href="/catalogo/perfumes"
+          href="/catalogo"
           className="hidden border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.18em] text-text transition-colors hover:border-accent hover:text-accent sm:inline-block"
         >
           Ver todo

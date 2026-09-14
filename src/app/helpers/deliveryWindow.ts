@@ -89,50 +89,28 @@ export function deliveryRangeShort(
 /** Fecha ISO (YYYY-MM-DD) que Google pide en el opt-in de reseñas. */
 export function estimatedDeliveryIso(
   deliveryMethod?: string,
-  hasBackorder = false,
   cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
 ): string {
   let days = 4;
-  if (hasBackorder) days = 17;
-  else if (deliveryMethod === 'RETIRO') days = 1;
+  if (deliveryMethod === 'RETIRO') days = 1;
   else if (deliveryMethod === 'SERVIENTREGA_GYE') days = 3;
   else if (deliveryMethod === 'SERVIENTREGA_NACIONAL') days = 7;
   const date = addDaysFromToday(days + dispatchDayOffset(cutoffHour));
   return date.toISOString().slice(0, 10);
 }
 
-export const BACKORDER_LABEL = '13–17 días';
-
-interface Split {
-  inStock: number;
-  bajo: number;
-}
-
 /** Etiqueta por línea del pedido: cuándo llega ese producto. */
 export function lineDeliveryLabel(
-  split: Split,
   offsetDays = 0,
   cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
 ): string {
-  const window = deliveryWindow(offsetDays, cutoffHour);
-  if (split.bajo === 0) return `Lo recibes entre el ${window}`;
-  if (split.inStock === 0) return `Bajo pedido · lo recibes en ${BACKORDER_LABEL}`;
-  return `${split.inStock} entre el ${window} · ${split.bajo} en ${BACKORDER_LABEL}`;
+  return `Lo recibes entre el ${deliveryWindow(offsetDays, cutoffHour)}`;
 }
 
 /** Resumen del pedido completo, debajo del desglose de productos. */
 export function orderDeliveryLabel(
-  splits: Split[],
   offsetDays = 0,
   cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
 ): string {
-  const window = deliveryWindow(offsetDays, cutoffHour);
-  const hasImmediate = splits.some((s) => s.inStock > 0);
-  const hasBackorder = splits.some((s) => s.bajo > 0);
-
-  if (hasImmediate && hasBackorder) {
-    return `Recibirás parte de tu pedido entre el ${window} y el resto en ${BACKORDER_LABEL}.`;
-  }
-  if (hasBackorder) return `Recibirás tu pedido en ${BACKORDER_LABEL}.`;
-  return `Recibirás tu pedido entre el ${window}.`;
+  return `Recibirás tu pedido entre el ${deliveryWindow(offsetDays, cutoffHour)}.`;
 }

@@ -1,0 +1,192 @@
+import { useState } from 'react';
+import {
+  useNormalCategoriesQuery,
+  sortCategoriesByHierarchy,
+} from '@/app/tanstack-queries/categoriesQuery';
+import { useNavbarAdQuery } from '@/app/tanstack-queries/navbarAdQuery';
+
+const PER_PAGE = 3; // máximo de categorías visibles a la vez
+const BASE_PATH = '/catalogo';
+
+interface MegaMenuProps {
+  onClose: () => void;
+  dropdownRef: React.Ref<HTMLDivElement>;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}
+
+const FEATURE_FALLBACK = '/banner-catalog.png';
+
+/**
+ * Mega menú editorial de la Tienda (dirección LIVI · estilo editorial).
+ * Despliega las categorías reales del backend, cada una con sus marcas.
+ * "Ver todo {categoría}" lleva a la página de catálogo filtrada por
+ * esa categoría (banner con su imagen + todos los productos de sus marcas).
+ */
+export default function ShopMegaMenu({
+  onClose,
+  dropdownRef,
+  onMouseEnter,
+  onMouseLeave,
+}: MegaMenuProps) {
+  const { data: categories = [], isLoading } = useNormalCategoriesQuery();
+
+  const cats = sortCategoriesByHierarchy(categories.filter((c) => c.name.toLowerCase() !== 'all'));
+
+  // Paginación de categorías — máximo PER_PAGE por vista, flechas para el resto.
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(cats.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageCats = cats.slice(safePage * PER_PAGE, safePage * PER_PAGE + PER_PAGE);
+  const feature = pageCats[0] ?? cats[0];
+
+  // Panel "Destacado": prioriza la publicidad de navbar gestionada en el admin
+  // (banner type='navbar'). Si no hay, cae al destacado de categoría.
+  const { data: navAd } = useNavbarAdQuery();
+  const panel = navAd
+    ? {
+        href: navAd.link || BASE_PATH,
+        img: navAd.imageUrl || navAd.image || FEATURE_FALLBACK,
+        title: navAd.title,
+        description: navAd.subtitle,
+      }
+    : feature
+      ? {
+          href: `${BASE_PATH}?category=${feature.id}`,
+          img: feature.imageUrl || FEATURE_FALLBACK,
+          title: feature.name,
+          description: feature.description,
+        }
+      : null;
+
+  return (
+    <div
+      ref={dropdownRef}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className="absolute left-0 right-0 top-full z-50 hidden border-y border-border bg-bg text-text shadow-2xl md:block"
+    >
+      <div className="mx-auto grid max-w-[1600px] grid-cols-[1fr_360px] gap-16 px-14 pb-10 pt-10">
+        {/* Columnas de categorías → marcas (paginadas, máx 3) */}
+        <div>
+          {totalPages > 1 && (
+            <div className="mb-8 flex items-center justify-end gap-4 text-text">
+              <span className="font-body text-[11px] tabular-nums tracking-wide text-text-muted">
+                {safePage + 1} / {totalPages}
+              </span>
+              <button
+                type="button"
+                aria-label="Categorías anteriores"
+                disabled={safePage === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M15 6l-6 6 6 6" /></svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Siguientes categorías"
+                disabled={safePage >= totalPages - 1}
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:border-border disabled:hover:text-text"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M9 6l6 6-6 6" /></svg>
+              </button>
+            </div>
+          )}
+
+          <div className="grid grid-cols-3 gap-x-12 gap-y-12">
+          {isLoading ? (
+            <p className="text-sm text-text-muted">Cargando categorías…</p>
+          ) : cats.length === 0 ? (
+            <p className="text-sm text-text-muted">No hay categorías disponibles</p>
+          ) : (
+            pageCats.map((cat) => (
+              <div key={cat.id}>
+                {/* La CATEGORÍA manda en la jerarquía: display grande.
+                    Las marcas quedan por debajo, en cuerpo pequeño. */}
+                <a
+                  href={`${BASE_PATH}?category=${cat.id}`}
+                  onClick={onClose}
+                  className="group block"
+                >
+                  <span className="block font-display text-[28px] font-light italic leading-none tracking-[-0.01em] text-text transition-colors group-hover:text-accent group-hover:underline underline-offset-[6px] decoration-accent/70">
+                    {cat.name}
+                  </span>
+                </a>
+
+                <div className="mt-6 flex flex-col gap-2.5">
+                  {cat.marcas.slice(0, 6).map((sub) => (
+                    <a
+                      key={sub.id}
+                      href={`${BASE_PATH}?category=${cat.id}&marca=${sub.id}`}
+                      onClick={onClose}
+                      className="group block transition-transform duration-200 hover:translate-x-1"
+                    >
+                      <span className="block font-body text-[13px] leading-tight tracking-[0.01em] text-text-soft transition-colors group-hover:text-accent group-hover:underline underline-offset-4 decoration-accent/70">
+                        {sub.name}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+
+                {/* → página de catálogo filtrada por la categoría */}
+                <a
+                  href={`${BASE_PATH}?category=${cat.id}`}
+                  onClick={onClose}
+                  className="mt-6 inline-block border-b border-border pb-1 font-display text-base font-medium italic leading-none text-text transition-colors hover:text-accent"
+                >
+                  Ver todo →
+                </a>
+              </div>
+            ))
+          )}
+          </div>
+
+          {/* CTA principal — esquina inferior izquierda del panel */}
+          <a
+            href={BASE_PATH}
+            onClick={onClose}
+            className="group mt-16 inline-flex items-center gap-3 border-b-2 border-text pb-1.5 font-body text-sm uppercase tracking-[0.16em] text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Ver la tienda completa
+            <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+        </div>
+
+        {/* Panel editorial — publicidad de navbar (admin) o categoría destacada */}
+        {panel && (
+          <a
+            href={panel.href}
+            onClick={onClose}
+            className="relative block min-h-[340px] overflow-hidden text-white"
+          >
+            <img
+              src={panel.img}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover brightness-[0.82]"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/65" />
+            <span className="eyebrow absolute left-6 top-6 text-white/80">Destacado</span>
+            <div className="absolute inset-x-6 bottom-6">
+              <div className="font-display text-3xl font-normal leading-tight text-white">
+                {panel.title}
+              </div>
+              {panel.description && (
+                <p className="mt-2 max-w-[260px] text-sm leading-relaxed text-white/85">
+                  {panel.description}
+                </p>
+              )}
+              <span className="eyebrow mt-5 inline-block border-b border-white/60 pb-1 text-white">
+                Descubrir →
+              </span>
+            </div>
+          </a>
+        )}
+      </div>
+
+    </div>
+  );
+}

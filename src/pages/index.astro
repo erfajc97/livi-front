@@ -2,7 +2,7 @@
 export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
-import BannerCarouselIsland from '@/app/features/landing/components/sections-home/BannerCarouselIsland';
+import HeroSection from '@/app/features/landing/components/sections-home/HeroSection.astro';
 import Home from '@/app/features/landing/pages/home/Home';
 import {
   absoluteImageUrl,
@@ -16,12 +16,14 @@ const firstBannerImage = absoluteImageUrl(banners[0]?.imageUrl || banners[0]?.im
 ---
 
 <PublicLayout
-  title="Perfumes originales y decants en Ecuador | NonDecants"
-  description="Perfumes árabes, nicho y de diseñador 100 % originales. Pruébalos en decant. Envío nacional 24–72 h."
+  title="Pañaleras y mochilas de cuero premium en Ecuador | LIVI"
+  description="Pañaleras y mochilas de cuero genuino, hechas a mano en Ecuador. For modern parenthood. Envío nacional 24–72 h."
   ogImage={firstBannerImage ?? '/og-image.jpg'}
   jsonLd={[websiteJsonLd(), homepageBannersJsonLd(banners)]}
 >
-  <h1 class="sr-only">Perfumes originales y decants en Ecuador</h1>
-  <BannerCarouselIsland initialBanners={banners} client:load />
+  <h1 class="sr-only">Pañaleras y mochilas de cuero premium en Ecuador</h1>
+  {/* Hero editorial LIVI (ref. PDF pág. 14). Los banners del admin quedan
+      disponibles, pero el home usa este panel fijo de marca. */}
+  <HeroSection />
   <Home client:load />
 </PublicLayout>

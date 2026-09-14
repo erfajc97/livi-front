@@ -4,35 +4,43 @@ import ProductCarouselSection from '../../components/sections-home/ProductCarous
 import ProductRankingSection from '../../components/sections-home/ProductRankingSection';
 import BlogCarousel from '@/app/features/blog/components/BlogCarousel';
 import HowItWorksSection from '../../components/sections-home/HowItWorksSection';
-import ExploreCategoriesSection from '../../components/sections-home/ExploreCategoriesSection';
-import GoogleReviewsSection from '../../components/sections-home/GoogleReviewsSection';
+import EditorialBand from '../../components/sections-home/EditorialBand';
+import StoryTallerSection from '../../components/sections-home/StoryTallerSection';
+import NewsletterSection from '../../components/sections-home/NewsletterSection';
+import InstagramSection from '../../components/sections-home/InstagramSection';
+// Valoraciones: se comentan de momento; quizá más adelante se haga bien.
+// import GoogleReviewsSection from '../../components/sections-home/GoogleReviewsSection';
+// "Explora por categoría" tampoco va en el home: las secciones de producto
+// (Más vendidos, etc.) se pintan desde el admin (Landing Sections).
+// import ExploreCategoriesSection from '../../components/sections-home/ExploreCategoriesSection';
 
+/**
+ * Orden del home según la arquitectura del PDF de dirección creativa:
+ * hero (en index.astro) → producto héroe (sección del admin) → editorial →
+ * historia · taller → tres pasos → más secciones del admin → blog → newsletter.
+ */
 function HomeContent() {
   const { sections, sectionsLoading } = useHomeHook();
 
   // Mientras cargan las secciones se pintan los esqueletos con la forma final
-  // del home: 1 carrusel + carrusel del blog + pasos + ranking. Sin esto la
-  // página quedaba en blanco y todo saltaba al llegar la data.
+  // del home. Sin esto la página quedaba en blanco y todo saltaba al llegar
+  // la data.
   if (sectionsLoading) {
     return (
       <div className="bg-bg">
         <ProductCarouselSection title="" products={[]} isLoading num="01" />
-        <HowItWorksSection />
-        <ProductRankingSection title="" products={[]} isLoading num="02" />
-        <ExploreCategoriesSection />
-        <BlogCarousel />
-        <GoogleReviewsSection />
+        <EditorialBand />
+        <StoryTallerSection />
       </div>
     );
   }
 
-  // Orden fijo de secciones por posición (no por order<=1):
-  // 1ª sección → carrusel · carrusel del blog · 2ª sección → ranking · resto → carrusel
   const sorted = [...sections].sort((a, b) => a.order - b.order);
   const [first, second, ...rest] = sorted;
 
   return (
     <div className="bg-bg">
+      {/* 01 · Producto héroe — primera sección administrable (p. ej. Más vendidos) */}
       {first && (
         <ProductCarouselSection
           key={first.id}
@@ -43,9 +51,16 @@ function HomeContent() {
         />
       )}
 
-      {/* "Tres pasos hacia tu fragancia" va ANTES del ranking */}
+      {/* 02 · Editorial — firma de producto + caballito */}
+      <EditorialBand />
+
+      {/* 03 · Historia · Taller — páginas de marca */}
+      <StoryTallerSection />
+
+      {/* 04 · Tres pasos — cómo funciona la compra */}
       <HowItWorksSection />
 
+      {/* 05 · Ranking — segunda sección administrable */}
       {second && (
         <ProductRankingSection
           key={second.id}
@@ -56,13 +71,7 @@ function HomeContent() {
         />
       )}
 
-      <ExploreCategoriesSection />
-
-      {/* El blog cierra después del ranking: cuenta la casa cuando el visitante
-          ya vio los productos que se venden. Las valoraciones van justo después. */}
-      <BlogCarousel />
-      <GoogleReviewsSection />
-
+      {/* Secciones extra del admin (3ª en adelante) */}
       {rest.map((section, index) => (
         <ProductCarouselSection
           key={section.id}
@@ -74,6 +83,18 @@ function HomeContent() {
         />
       ))}
 
+      {/* El blog cierra la parte editorial */}
+      <BlogCarousel />
+
+      {/* Valoraciones — comentadas de momento:
+      <GoogleReviewsSection />
+      */}
+
+      {/* Instagram — comunidad (fotos curadas + link al perfil) */}
+      <InstagramSection />
+
+      {/* Newsletter — cierre transversal del home */}
+      <NewsletterSection />
     </div>
   );
 }

@@ -87,7 +87,7 @@ export default function CheckoutForm({
 
   return (
     <form className="flex flex-col gap-6" onSubmit={onFormSubmit}>
-      {step !== 3 && <CheckoutStepTabs step={step} setStep={setStep} />}
+      {step !== 3 && <CheckoutStepTabs step={step} setStep={setStep} canGoToStep2={canContinue} />}
 
       {step === 1 && (
         <>
@@ -119,7 +119,7 @@ export default function CheckoutForm({
             <button
               type="submit"
               disabled={!canContinue}
-              className={`w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40 ${
+              className={`w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40 ${
                 canContinue ? 'gold-frame' : ''
               }`}
             >
@@ -141,7 +141,7 @@ export default function CheckoutForm({
           <button
             type="submit"
             disabled={isPending || !paymentMethod || !termsAccepted}
-            className={`mt-2 w-full bg-text py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`mt-2 w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 ${
               !isPending && paymentMethod && termsAccepted ? 'gold-frame' : ''
             }`}
           >

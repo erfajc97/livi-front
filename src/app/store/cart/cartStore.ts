@@ -1,34 +1,21 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-export interface ComboProduct {
-  productId?: number;
-  productVariationId?: number;
-  quantity: number;
-}
-
 export interface CartItem {
   productId: string;
   variantId: string;
   name: string;
+  /** Nombre de la variante (color): "Negro", "Espresso"… */
+  variationName?: string;
+  /** Talla elegida (productos con tallas). */
+  size?: string;
   image: string;
-  ml: number;
   price: number;
   quantity: number;
-  comboId?: number;
-  comboProducts?: ComboProduct[];
-  bajoPedido?: boolean;
-  /** Máximo de unidades que se pueden pedir (stock). undefined = sin límite
-   *  (ej. frasco completo bajo pedido). Los decants SIEMPRE traen este tope. */
+  /** Máximo de unidades que se pueden pedir (stock). undefined = sin límite. */
   maxQty?: number;
-  /** Unidades realmente en stock (frasco sellado). Si la cantidad pedida supera
-   *  este número, el excedente pasa a "bajo pedido" en el desglose del carrito.
-   *  undefined = no aplica split (decant topado, o producto 100% bajo pedido). */
+  /** Unidades realmente en stock. */
   stockAvailable?: number;
-  /** ml físicos disponibles del producto (frasco abierto + frascos sellados).
-   *  Frascos y decants del mismo producto comparten este pool: los frascos que
-   *  se venden lo consumen y los decants sobrantes pasan a bajo pedido. */
-  availableMl?: number;
 }
 
 const clampQty = (qty: number, max?: number) =>
@@ -107,7 +94,7 @@ export const useCartStore = create<CartState>()(
       setHasHydrated: (hydrated) => set({ _hasHydrated: hydrated }),
     }),
     {
-      name: 'nondecants-cart',
+      name: 'livi-cart',
       storage: typeof window !== 'undefined' ? createJSONStorage(() => localStorage) : undefined,
       // Solo persistir items (no el estado del drawer)
       partialize: (state) => ({ items: state.items }),

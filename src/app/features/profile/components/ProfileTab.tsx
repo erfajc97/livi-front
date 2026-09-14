@@ -40,6 +40,9 @@ export default function ProfileTab() {
   const [pwdForm, setPwdForm] = useState({ current: '', next: '', confirm: '' });
   const [isChangingPwd, setIsChangingPwd] = useState(false);
   const loaded = useRef(false);
+  // Correo que vino del backend: el cambio se detecta contra este valor,
+  // no contra el store (que arranca vacío al recargar la página).
+  const originalEmail = useRef(user?.email ?? '');
 
   useEffect(() => {
     if (loaded.current) return;
@@ -48,6 +51,7 @@ export default function ProfileTab() {
       const u = data?.data ?? data;
       setIsGoogleUser(u.authProvider === 'google');
       setEmail(u.email ?? '');
+      originalEmail.current = u.email ?? '';
       setForm({
         firstName: u.firstName ?? '',
         lastName: u.lastName ?? '',
@@ -59,6 +63,38 @@ export default function ProfileTab() {
         reference: u.reference ?? '',
         preferredDeliveryMethod: u.preferredDeliveryMethod ?? '',
       });
+      // El store arranca sin usuario (no se persiste): poblarlo siempre para
+      // que el header muestre el nombre y el checkout tenga los datos.
+      setUser({
+        id: String(u.id),
+        name: `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim(),
+        firstName: u.firstName,
+        lastName: u.lastName,
+        email: u.email ?? user?.email ?? '',
+        role: (user?.role ?? 'CLIENT') as 'ADMIN' | 'CLIENT',
+        isEmailVerified: u.isEmailVerified ?? user?.isEmailVerified ?? true,
+        phone: u.phone,
+        cedula: u.cedula,
+        province: u.province,
+        city: u.city,
+        address: u.address,
+        reference: u.reference,
+        preferredDeliveryMethod: u.preferredDeliveryMethod,
+      });
+    }).catch(() => {});
+  }, []);
+
+  const updateField = (key: keyof typeof form, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const emailChanged = !isGoogleUser && email.trim() !== '' && email.trim() !== originalEmail.current;
+      const payload = emailChanged ? { ...form, email: email.trim() } : form;
+      const { data } = await axiosInstance.patch(API_ENDPOINTS.USER_ME, payload);
+      const u = data?.data ?? data;
       if (user) {
         setUser({
           ...user,
@@ -75,36 +111,13 @@ export default function ProfileTab() {
           preferredDeliveryMethod: u.preferredDeliveryMethod,
         });
       }
-    }).catch(() => {});
-  }, []);
-
-  const updateField = (key: keyof typeof form, value: string) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      const { data } = await axiosInstance.patch(API_ENDPOINTS.USER_ME, form);
-      const u = data?.data ?? data;
-      if (user) {
-        setUser({
-          ...user,
-          name: `${u.firstName} ${u.lastName}`.trim(),
-          firstName: u.firstName,
-          lastName: u.lastName,
-          phone: u.phone,
-          cedula: u.cedula,
-          province: u.province,
-          city: u.city,
-          address: u.address,
-          reference: u.reference,
-          preferredDeliveryMethod: u.preferredDeliveryMethod,
-        });
-      }
       sonnerResponse('Perfil actualizado', 'success');
-    } catch {
-      sonnerResponse('Error al guardar', 'error');
+    } catch (e: any) {
+      const msg = e?.response?.data?.message;
+      sonnerResponse(
+        typeof msg === 'string' ? msg : 'Error al guardar',
+        'error',
+      );
     } finally {
       setIsSaving(false);
     }
@@ -189,7 +202,22 @@ export default function ProfileTab() {
               Email
               {isGoogleUser && <span className="ml-1.5 normal-case text-text-muted">(Google — no editable)</span>}
             </label>
-            <input type="email" value={email} readOnly className={INPUT_RO} />
+            {isGoogleUser ? (
+              <input type="email" value={email} readOnly className={INPUT_RO} />
+            ) : (
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@correo.com"
+                className={INPUT}
+              />
+            )}
+            {!isGoogleUser && (
+              <p className="mt-1.5 font-body text-[11px] text-text-muted">
+                Si cambias el correo, úsalo en tu próximo inicio de sesión.
+              </p>
+            )}
           </div>
           <div>
             <label className={LABEL}>Cédula</label>

@@ -34,9 +34,11 @@ export default function ProfileSidebar({ activeTab, onTabChange }: ProfileSideba
       {PROFILE_TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
-          <button
+          <a
             key={tab.id}
+            href={`#${tab.id}`}
             onClick={() => onTabChange(tab.id)}
+            aria-current={isActive ? 'page' : undefined}
             className={[
               'flex items-center gap-2.5 whitespace-nowrap border-l-2 px-4 py-3 font-body text-xs uppercase tracking-[0.16em] transition-colors',
               isActive
@@ -46,7 +48,7 @@ export default function ProfileSidebar({ activeTab, onTabChange }: ProfileSideba
           >
             {TAB_ICONS[tab.id]}
             {tab.label}
-          </button>
+          </a>
         );
       })}
     </nav>

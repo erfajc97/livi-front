@@ -1,27 +1,12 @@
 import { useState } from 'react';
-import {
-  CATALOG_GENDERS,
-  CATALOG_TIME_OF_DAY,
-  CATALOG_CONCENTRATIONS,
-  CATALOG_PROJECTIONS,
-} from '../data';
 import FilterPillGroup from './FilterPillGroup';
 import FilterPriceRange from './FilterPriceRange';
 import {
   useCategoriesWithMarcasQuery,
   sortCategoriesByHierarchy,
 } from '@/app/tanstack-queries/categoriesQuery';
-import type { Gender, TimeOfDay, Concentration, Projection } from '@/app/types/global.types';
 
 interface CatalogFiltersProps {
-  gender: Gender | '';
-  onGenderChange: (v: Gender | '') => void;
-  timeOfDay: TimeOfDay | '';
-  onTimeOfDayChange: (v: TimeOfDay | '') => void;
-  concentration: Concentration | '';
-  onConcentrationChange: (v: Concentration | '') => void;
-  projection: Projection | '';
-  onProjectionChange: (v: Projection | '') => void;
   minPrice?: number;
   maxPrice?: number;
   onPriceRangeChange: (min?: number, max?: number) => void;
@@ -37,8 +22,8 @@ interface CatalogFiltersProps {
 const normalizeText = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-/** Indicador cuadrado (estilo checkbox de la referencia) para listas de
- *  selección única: la API filtra por UN solo valor de marca/concentración. */
+/** Indicador cuadrado para listas de selección única: la API filtra por UN
+ *  solo valor de marca. */
 function CheckRow({
   label,
   active,
@@ -75,14 +60,6 @@ function CheckRow({
 }
 
 export default function CatalogFilters({
-  gender,
-  onGenderChange,
-  timeOfDay,
-  onTimeOfDayChange,
-  concentration,
-  onConcentrationChange,
-  projection,
-  onProjectionChange,
   maxPrice,
   onPriceRangeChange,
   categoryId,
@@ -122,7 +99,7 @@ export default function CatalogFilters({
         </button>
       )}
 
-      {/* 1. Categoría — chips (Árabes / Diseñador / Nicho primero) */}
+      {/* 1. Categoría — chips */}
       {!hideCategories && filteredCategories.length > 0 && (
         <FilterPillGroup
           label="1. Categoría"
@@ -136,34 +113,10 @@ export default function CatalogFilters({
         />
       )}
 
-      {/* 2. Género — chips */}
-      <FilterPillGroup
-        label="2. Género"
-        options={CATALOG_GENDERS}
-        selected={gender ? [gender] : []}
-        onChange={(values) => {
-          const next = values.find((v) => v !== gender) || '';
-          onGenderChange(next as Gender | '');
-        }}
-        singleSelect
-      />
-
-      {/* 3. Ocasión — chips */}
-      <FilterPillGroup
-        label="3. Ocasión"
-        options={CATALOG_TIME_OF_DAY}
-        selected={timeOfDay ? [timeOfDay] : []}
-        onChange={(values) => {
-          const next = values.find((v) => v !== timeOfDay) || '';
-          onTimeOfDayChange(next as TimeOfDay | '');
-        }}
-        singleSelect
-      />
-
-      {/* 4. Marca — buscador + lista */}
+      {/* 2. Marca — buscador + lista */}
       {marcas.length > 0 && (
         <div>
-          <p className="eyebrow-strong mb-3">4. Marca</p>
+          <p className="eyebrow-strong mb-3">2. Marca</p>
           {marcas.length > 5 && (
             <input
               type="search"
@@ -189,41 +142,12 @@ export default function CatalogFilters({
         </div>
       )}
 
-      {/* 5. Concentración — lista */}
-      <div>
-        <p className="eyebrow-strong mb-3">5. Concentración</p>
-        <div className="space-y-2.5">
-          {CATALOG_CONCENTRATIONS.map((opt) => (
-            <CheckRow
-              key={opt.value}
-              label={opt.label}
-              active={concentration === opt.value}
-              onToggle={() =>
-                onConcentrationChange(concentration === opt.value ? '' : (opt.value as Concentration))
-              }
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* 6. Proyección — chips */}
-      <FilterPillGroup
-        label="6. Proyección"
-        options={CATALOG_PROJECTIONS}
-        selected={projection ? [projection] : []}
-        onChange={(values) => {
-          const newVal = values.find((v) => v !== projection) || '';
-          onProjectionChange(newVal as Projection | '');
-        }}
-        singleSelect
-      />
-
       <FilterPriceRange
         label="Precio máximo"
         min={0}
-        max={500}
-        value={maxPrice ?? 500}
-        onChange={(val) => onPriceRangeChange(undefined, val < 500 ? val : undefined)}
+        max={300}
+        value={maxPrice ?? 300}
+        onChange={(val) => onPriceRangeChange(undefined, val < 300 ? val : undefined)}
       />
     </div>
   );

@@ -1,49 +1,84 @@
 ---
-// Empty frontmatter — todo hardcoded
+// Hero LIVI (ref. PDF pág. 14 + mobile home):
+// · Mobile: foto a pantalla completa con el copy superpuesto abajo a la
+//   izquierda (eyebrow mono + titular serif + botón blanco).
+// · Desktop: panel editorial con wordmark + foto a la derecha.
 ---
 
-<section class="relative flex min-h-screen flex-col overflow-hidden -mt-16">
-
-  {/* ── Imagen de fondo full-vh ── */}
+{/* ── MOBILE: full-bleed con overlay ── */}
+<section class="relative flex h-[86svh] flex-col justify-end overflow-hidden lg:hidden">
   <img
-    src="/home.png"
-    alt=""
-    aria-hidden="true"
+    src="/productos/olivia-espresso-2.jpg"
+    alt="Olivia Maxi Tote en cuero espresso"
     class="absolute inset-0 h-full w-full object-cover object-center"
     fetchpriority="high"
   />
+  {/* Veladura para leer el copy sin tapar la foto */}
+  <div class="absolute inset-0 bg-gradient-to-t from-text/70 via-text/20 to-transparent" aria-hidden="true"></div>
 
-  {/* ── Overlay gradiente: Black Carbón izquierda → transparente derecha ── */}
-  <div class="absolute inset-0 bg-linear-to-r from-[--color-bg] via-[--color-bg]/80 to-[--color-bg]/25" />
-  {/* Capa extra en móvil para legibilidad */}
-  <div class="absolute inset-0 bg-[--color-bg]/50 lg:hidden" />
+  <div class="relative flex flex-col items-start gap-3 px-6 pb-10">
+    <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-bg/80">
+      — For Modern Parenthood
+    </p>
+    <h1 class="font-heading text-4xl font-normal leading-[1.05] tracking-[-0.01em] text-bg">
+      La pañalera que no<br />lo parece
+    </h1>
+    <a
+      href="/producto/2-olivia-maxi-tote"
+      class="mt-3 inline-block bg-bg px-7 py-3.5 font-mono text-[10px] uppercase tracking-[0.22em] text-text transition-colors hover:bg-butter"
+    >
+      Comprar la tote
+    </a>
+  </div>
+</section>
 
-  {/* ── Contenido principal ── */}
-  <div class="relative -top-14 lg:top-0 z-10 flex flex-1 items-start">
-    <div class="mx-auto w-full max-w-8xl px-2 pt-48 pb-20 lg:px-28">
-      <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+{/* ── DESKTOP: split editorial ── */}
+<section class="hidden min-h-[82vh] grid-cols-2 lg:grid">
 
-        {/* ── Columna izquierda ── */}
-        <div class="flex flex-col gap-8">
-          <div>
-            <h1 class="font-heading text-[clamp(1.6rem,2vw,2.8rem)] font-normal uppercase leading-[0.96] tracking-[-0.02em] text-white">
-              Única Experiencia
-            </h1>
-            <span class="mt-1 block font-body text-[clamp(3.5rem,8vw,7rem)] font-black italic leading-[0.96] tracking-[-0.02em] text-accent">
-              Decants
-            </span>
-          </div>
-        </div>
-
-        {/* ── Columna derecha (solo desktop) ── */}
-        <div class="hidden flex-col items-end gap-5 self-start lg:flex">
-          <p class="max-w-88 text-right text-xl leading-relaxed text-white">
-            Conoce nuestra experiencia en perfumes somos nondecants el mayor comercio en perfumes decants.
-          </p>
-        </div>
-
-      </div>
+  {/* Panel izquierdo: marca + headline */}
+  <div class="relative flex flex-col justify-center gap-10 bg-bg px-14 py-0">
+    <div class="flex flex-col items-start gap-3">
+      <img src="/logo-livi.svg" alt="LIVI" class="h-20 w-auto" />
+      <span class="font-heading text-xl italic tracking-[0.08em] text-text-soft">Ecuador</span>
     </div>
+
+    <p class="font-mono text-[11px] uppercase tracking-[0.32em] text-text-muted">
+      — For Modern Parenthood
+    </p>
+
+    <h1 class="font-heading text-[clamp(2.6rem,5vw,4.6rem)] font-normal uppercase leading-[1.02] tracking-[-0.01em] text-text">
+      Family<br />Collection
+    </h1>
+
+    <p class="max-w-md font-body text-lg leading-relaxed text-text-soft">
+      Pañaleras y mochilas de cuero premium, hechas a mano en Ecuador.
+      Diseñadas para llevar más, sin parecer una pañalera.
+    </p>
+
+    <div class="flex flex-wrap items-center gap-4">
+      <a
+        href="/producto/2-olivia-maxi-tote"
+        class="inline-block bg-accent px-8 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent-hover"
+      >
+        Comprar tote
+      </a>
+      <a
+        href="/nuestra-historia"
+        class="inline-block border border-text px-8 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-text transition-colors hover:border-accent hover:text-accent"
+      >
+        Conocer LIVI
+      </a>
+    </div>
+  </div>
+
+  {/* Panel derecho: foto editorial */}
+  <div class="relative overflow-hidden bg-bg-alt">
+    <img
+      src="/productos/olivia-espresso-2.jpg"
+      alt="Olivia Maxi Tote en cuero espresso"
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      fetchpriority="high"
+    />
   </div>
 
 </section>

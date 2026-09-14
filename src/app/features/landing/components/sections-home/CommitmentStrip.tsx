@@ -10,8 +10,8 @@ import GlobeSearchLineIcon from '@/assets/svg/GlobeSearchLineIcon';
 const COMMITMENTS = [
   {
     Icon: ShieldCheckLineIcon,
-    title: 'Autenticidad\ngarantizada',
-    text: 'Cada decant es revisado por nosotros.',
+    title: 'Calidad\ngarantizada',
+    text: 'Cada pieza es revisada por nosotros.',
     motion: 'commit-icon--seal',
   },
   {
@@ -22,14 +22,14 @@ const COMMITMENTS = [
   },
   {
     Icon: BottlesFrameLineIcon,
-    title: 'Más de 300\nreferencias',
-    text: 'Un catálogo pensado, disponible para ti.',
+    title: 'Cuero\npremium',
+    text: 'Materiales genuinos, hechos a mano en Ecuador.',
     motion: 'commit-icon--rise',
   },
   {
     Icon: GlobeSearchLineIcon,
-    title: 'Fragancias\npor encargo',
-    text: 'Encontramos perfumes de todo el mundo.',
+    title: 'Diseño\nfuncional',
+    text: 'Pensado para la vida real de los padres.',
     motion: 'commit-icon--search',
   },
 ];

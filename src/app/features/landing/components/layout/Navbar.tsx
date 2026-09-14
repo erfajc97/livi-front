@@ -1,25 +1,21 @@
+import { useEffect, useState } from 'react';
 import AuthModalIsland from '@/app/features/auth/AuthModalIsland';
+import CartDrawer from '@/app/features/cart/components/CartDrawer';
+import { useCartStore } from '@/app/store/cart/cartStore';
 import AppProviders from '@/app/providers/AppProviders';
-import { useNavbarHook } from '../../hooks/useNavbarHook';
+import { useNavbarHook, isLinkActive } from '../../hooks/useNavbarHook';
 import AnnouncementBar from './AnnouncementBar';
-import PerfumesMegaMenu from './PerfumesMegaMenu';
 import MobileMenu from './MobileMenu';
 import NavbarSearch from './NavbarSearch';
-import LiquidTabBar from './LiquidTabBar';
 
-/* ── Iconos de línea fina (estilo Noir) ───────────────────────────────── */
-const ico = 'h-[18px] w-[18px]';
-const IconUser = () => (
-  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><circle cx="12" cy="9" r="4" /><path d="M4 21c0-4 4-7 8-7s8 3 8 7" /></svg>
-);
-const IconHeart = () => (
-  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M12 20s-7-4.5-9-9.5C1.5 6.5 4.5 4 7.5 5 9 5.5 12 8 12 8s3-2.5 4.5-3c3-1 6 1.5 4.5 6.5-2 5-9 9.5-9 9.5z" /></svg>
-);
-const IconBag = () => (
-  <svg className={ico} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></svg>
-);
-
-
+/**
+ * Navbar LIVI — dirección de arte del PDF:
+ * barra de anuncios burgundy, fila principal butter con links mono en
+ * mayúsculas a la izquierda, wordmark centrado y BUSCAR / CUENTA /
+ * CARRITO (n) a la derecha. Sin mega menú ni tab bar inferior.
+ * Tras el scroll (ref. PDF navegación B): sombra mínima y logo reducido;
+ * el carrito con piezas se vuelve píldora burgundy.
+ */
 export default function Navbar() {
   const {
     itemCount,
@@ -28,141 +24,108 @@ export default function Navbar() {
     setAuthOpen,
     mobileOpen,
     setMobileOpen,
-    openDropdown,
-    setOpenDropdown,
-    dropdownRef,
     pathname,
-    handleDropdownEnter,
-    handleDropdownLeave,
-    handleDropdownContentEnter,
-    handleDropdownContentLeave,
   } = useNavbarHook();
 
-  const megaMode =
-    openDropdown === 'perfumes' ? 'perfumes'
-    : openDropdown === 'bajoPedido' ? 'bajoPedido'
-    : null;
+  const [scrolled, setScrolled] = useState(false);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
 
-  // Enlace simple — mismo serif cursivo que los títulos del mega menú, sin
-  // cambio de fuente/color al hover (ref. Atelier)
-  const NavLink = ({ label, href, muted = false }: { label: string; href: string; muted?: boolean }) => (
-    <a
-      href={href}
-      onMouseEnter={() => setOpenDropdown(null)}
-      className={`cursor-pointer ${muted ? 'text-text-soft' : 'text-text'}`}
-    >
-      {label}
-    </a>
-  );
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 32);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  // Trigger para items con mega menú (Perfumes / Bajo Pedido).
-  // Solo el subrayado aparece al abrir el mega — la tipografía nunca cambia.
-  const MegaTrigger = ({ id, label, href }: { id: string; label: string; href: string }) => (
-    <span
-      onMouseEnter={() => handleDropdownEnter(id)}
-      onMouseLeave={handleDropdownLeave}
-      className="relative flex cursor-pointer items-center gap-2 text-text"
-    >
-      <a href={href}>{label}</a>
-      {/* Trazo grueso: a 1.4 la flecha se perdía junto al serif */}
-      <svg
-        className={`h-3 w-3 transition-transform ${openDropdown === id ? 'rotate-180' : ''}`}
-        viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"
-        strokeLinecap="round" strokeLinejoin="round"
-      >
-        <path d="M6 9l6 6 6-6" />
-      </svg>
-      <span className={`absolute -bottom-2 left-0 right-4 h-px bg-text transition-opacity ${openDropdown === id ? 'opacity-100' : 'opacity-0'}`} />
-    </span>
-  );
+  const NAV = [
+    { href: '/catalogo', label: 'Tienda' },
+    { href: '/nuestra-historia', label: 'Nuestra Historia' },
+    { href: '/el-taller', label: 'El Taller' },
+  ];
+
+  const linkCls = (href: string) =>
+    `font-mono text-[11px] uppercase tracking-[0.18em] transition-colors hover:text-accent ${
+      isLinkActive(href, pathname, href === '/')
+        ? 'text-text underline underline-offset-8 decoration-2'
+        : 'text-text'
+    }`;
 
   return (
     <AppProviders withToaster>
-      <header className="sticky top-0 z-40 bg-bg text-text">
-        {/* Barra de promociones — textos administrables + flechas */}
+      <header
+        className={`sticky top-0 z-40 bg-bg text-text transition-shadow duration-300 ${
+          scrolled ? 'shadow-[0_1px_14px_rgba(35,24,21,0.10)]' : ''
+        }`}
+      >
+        {/* Barra burgundy — textos administrables desde el admin */}
         <AnnouncementBar />
 
         {/* Fila principal */}
-        <div className="relative">
-          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-4 md:grid-cols-[1fr_auto_1fr] md:gap-8 md:px-14 md:py-6">
-            {/* Izquierda: nav desktop + hamburguesa móvil */}
+        <div className="relative border-b border-border">
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-4 md:grid-cols-[1fr_auto_1fr] md:gap-8 md:px-14 md:py-5">
+            {/* Izquierda: hamburguesa móvil + links desktop */}
             <div className="flex items-center">
               <button
-                className="p-1 md:hidden"
+                className="flex items-center gap-2 p-1 font-mono text-[11px] uppercase tracking-[0.18em] md:hidden"
                 onClick={() => setMobileOpen((o) => !o)}
                 aria-label="Menú"
               >
-                <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
                   {mobileOpen
                     ? <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
                     : <><path d="M3 7h18" /><path d="M3 17h18" /></>}
                 </svg>
+                <span>Menú</span>
               </button>
 
-              <nav
-                className="hidden items-center gap-9 font-display text-xl font-normal italic leading-none tracking-[-0.01em] md:flex"
-                aria-label="Navegación principal"
-              >
-                <MegaTrigger id="perfumes" label="Perfumes" href="/catalogo/perfumes" />
-                <NavLink label="Combos" href="/catalogo/combos" />
-                <MegaTrigger id="bajoPedido" label="Bajo pedido" href="/bajo-pedido" />
-                <NavLink label="Blog" href="/blog" muted />
+              <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
+                {NAV.map((l) => (
+                  <a key={l.href} href={l.href} className={linkCls(l.href)}>
+                    {l.label}
+                  </a>
+                ))}
               </nav>
             </div>
 
-            {/* Centro: logo */}
-            <a href="/" className="justify-self-center text-text" aria-label="NonDecants — Inicio">
+            {/* Centro: wordmark — se reduce tras el scroll (ref. PDF nav B) */}
+            <a href="/" className="justify-self-center text-text" aria-label="LIVI — Inicio">
               <img
-                src="/logonondecants.png"
-                alt="NonDecants"
-                width={543}
-                height={127}
-                className="h-6 w-auto sm:h-7 md:h-9"
+                src="/logo-livi.svg"
+                alt="LIVI"
+                width={260}
+                height={64}
+                className={`w-auto transition-all duration-300 ${
+                  scrolled ? 'h-6 sm:h-6 md:h-7' : 'h-7 sm:h-8 md:h-9'
+                }`}
               />
             </a>
 
-            {/* Derecha: iconos */}
-            <div
-              className="flex items-center justify-end gap-5 text-text md:gap-6"
-              onMouseEnter={() => setOpenDropdown(null)}
-            >
+            {/* Derecha: utilidades en mono */}
+            <div className="flex items-center justify-end gap-6 md:gap-7">
               <NavbarSearch />
               {isAuthenticated ? (
-                <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Mi cuenta">
-                  <IconUser />
+                <a href="/mi-cuenta" className="hidden font-mono text-[11px] uppercase tracking-[0.18em] transition-colors hover:text-accent md:block">
+                  Cuenta
                 </a>
               ) : (
-                <button onClick={() => setAuthOpen(true)} className="hidden p-0.5 hover:text-accent md:block" aria-label="Ingresar">
-                  <IconUser />
+                <button onClick={() => setAuthOpen(true)} className="hidden font-mono text-[11px] uppercase tracking-[0.18em] transition-colors hover:text-accent md:block">
+                  Cuenta
                 </button>
               )}
-              <a href="/mi-cuenta" className="hidden p-0.5 hover:text-accent md:block" aria-label="Favoritos">
-                <IconHeart />
-              </a>
-              <a href="/carrito" className="relative p-0.5 hover:text-accent" aria-label="Carrito">
-                <IconBag />
-                {itemCount > 0 && (
-                  <span className="absolute -right-2 -top-1.5 flex items-center justify-center rounded-full bg-text px-[5px] py-[1px] font-body text-[9px] font-medium text-bg">
-                    {itemCount > 9 ? '9+' : itemCount}
-                  </span>
-                )}
-              </a>
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Abrir carrito"
+                className={
+                  itemCount > 0
+                    ? 'bg-accent px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.18em] text-bg transition-colors hover:bg-accent-hover'
+                    : 'font-mono text-[11px] uppercase tracking-[0.18em] transition-colors hover:text-accent'
+                }
+              >
+                Carrito ({itemCount})
+              </button>
             </div>
           </div>
-
-          <div className="h-px bg-border" />
-
-          {/* Mega menú — Perfumes o Bajo Pedido */}
-          {megaMode && (
-            <PerfumesMegaMenu
-              key={megaMode}
-              mode={megaMode}
-              onClose={() => setOpenDropdown(null)}
-              dropdownRef={dropdownRef}
-              onMouseEnter={handleDropdownContentEnter}
-              onMouseLeave={handleDropdownContentLeave}
-            />
-          )}
         </div>
 
         {/* Menú móvil */}
@@ -176,15 +139,8 @@ export default function Navbar() {
         )}
       </header>
 
-      {/* Bottom tab líquida — experimento mobile */}
-      <LiquidTabBar
-        pathname={pathname}
-        itemCount={itemCount}
-        isAuthenticated={isAuthenticated}
-        onAuthOpen={() => setAuthOpen(true)}
-      />
-
       <AuthModalIsland open={authOpen} onClose={() => setAuthOpen(false)} />
+      <CartDrawer />
     </AppProviders>
   );
 }

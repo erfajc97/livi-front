@@ -16,43 +16,21 @@ interface ProductRankingSectionProps {
   viewAllHref?: string;
 }
 
-const CONCENTRATION_SHORT: Record<string, string> = {
-  EAU_DE_PARFUM: 'EDP',
-  EAU_DE_TOILETTE: 'EDT',
-  EAU_DE_TOILETTE_INTENSE: 'EDT Intense',
-  EAU_DE_COLOGNE: 'EDC',
-  BODY_MIST: 'Body Mist',
-  ELIXIR: 'Elixir',
-  PARFUM: 'Parfum',
-  EXTRAIT_DE_PARFUM: 'Extrait',
-};
-const GENDER_LABELS: Record<string, string> = { HOMBRE: 'Hombre', MUJER: 'Mujer', UNISEX: 'Unisex' };
-const TIME_LABELS: Record<string, string> = { DIA: 'Día', NOCHE: 'Noche' };
-
 function derive(p: Product) {
   const imgs = (p.images ?? []).map((i: any) => (typeof i === 'string' ? i : i.url)).filter(Boolean);
   const image = imgs[0] || p.image || p.imageUrl;
 
-  // Precio del ranking: SIEMPRE el decant de entrada (el de menor ml, sin
-  // frasco), mostrado como "Desde $X" (REQ-013). Se prefiere la lista compacta
-  // `formats` del backend; si no está, se deriva de las variantes cargadas.
+  // Precio del ranking: el de entrada (el más barato entre colores), mostrado
+  // como "Desde $X". Se prefiere la lista compacta `formats` del backend; si
+  // no está, se deriva de las variantes cargadas.
   const formats = (p.formats && p.formats.length
     ? p.formats
-    : (p.variants ?? []).map((v) => ({ ml: v.ml, price: v.price, isFullBottle: v.isFullBottle }))
+    : (p.variants ?? []).map((v) => ({ price: Number(v.price) }))
   ).filter((f) => f.price > 0);
-  const entryDecant = formats
-    .filter((f) => !f.isFullBottle)
-    .slice()
-    .sort((a, b) => a.ml - b.ml)[0];
   const cheapest = formats.slice().sort((a, b) => a.price - b.price)[0];
-  const entryPrice = entryDecant?.price ?? cheapest?.price ?? p.minFormatPrice ?? p.price ?? 0;
+  const entryPrice = cheapest?.price ?? p.minFormatPrice ?? p.price ?? 0;
 
-  const tags = [
-    p.gender && (GENDER_LABELS[p.gender] ?? p.gender),
-    p.timeOfDay && (TIME_LABELS[p.timeOfDay] ?? p.timeOfDay),
-    p.concentration && (CONCENTRATION_SHORT[p.concentration] ?? p.concentration),
-  ].filter(Boolean);
-  return { image, entryPrice, tags: tags.join(' · '), href: productUrl(p) };
+  return { image, entryPrice, tags: '', href: productUrl(p) };
 }
 
 const Arrow = () => (
@@ -119,7 +97,7 @@ export default function ProductRankingSection({
 
   // Cada página es un tramo completo del ranking: el primero de la página va
   // destacado y los siguientes en la lista. Antes el destacado se quedaba fijo
-  // en el nº1 y al pasar de página seguía mostrando el mismo perfume.
+  // en el nº1 y al pasar de página seguía mostrando el mismo producto.
   const PAGE_SIZE = PER_PAGE + 1;
   const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);

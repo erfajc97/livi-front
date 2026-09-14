@@ -18,8 +18,8 @@ function DesktopCard({ card }: { card: ExploreCategoryCard }) {
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-text via-text/70 to-text/25" />
       <div className="relative px-6 py-6">
-        <p className="font-body text-[10px] uppercase tracking-[0.22em] text-accent">
-          {card.marcaCount} {card.marcaCount === 1 ? 'marca' : 'marcas'}
+        <p className="font-body text-[10px] uppercase tracking-[0.22em] text-[#F5EFC6]/80">
+          LIVI · Ecuador
         </p>
         <h3 className="mt-2 font-display text-[28px] font-light leading-none tracking-[-0.02em] text-bg">
           {card.heading}
@@ -38,7 +38,7 @@ function MobileCard({ card }: { card: ExploreCategoryCard }) {
   return (
     <a href={card.href} className="block border border-border bg-surface px-5 py-5">
       <p className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
-        {card.marcaCount} {card.marcaCount === 1 ? 'marca' : 'marcas'}
+        LIVI · Ecuador
       </p>
       <h3 className="mt-2 font-display text-[26px] font-light leading-none tracking-[-0.02em] text-text">
         {card.heading}
@@ -51,7 +51,7 @@ function MobileCard({ card }: { card: ExploreCategoryCard }) {
 }
 
 export default function ExploreCategoriesSection() {
-  const { cards, isLoading, marcaCount } = useExploreCategories();
+  const { cards, isLoading } = useExploreCategories();
 
   if (isLoading) {
     return (
@@ -80,10 +80,10 @@ export default function ExploreCategoriesSection() {
           Explora por categoría
         </h2>
         <a
-          href="/catalogo/perfumes"
+          href="/catalogo"
           className="hidden shrink-0 font-body text-[11.5px] uppercase tracking-[0.12em] text-accent transition-colors hover:text-text md:inline"
         >
-          {marcaCount > 0 ? `Ver las ${marcaCount} marcas →` : 'Ver catálogo →'}
+          Ver toda la tienda →
         </a>
       </div>
 

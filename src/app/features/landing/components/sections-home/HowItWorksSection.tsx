@@ -1,11 +1,11 @@
 const STEPS = [
-  { n: '01', h: 'Descubre', t: 'Empieza con 3 ml. Conoce el perfume antes de invertir en un frasco completo.' },
-  { n: '02', h: 'Decide', t: 'Decide con calma cuál es tu fragancia, probando las que quieras.' },
-  { n: '03', h: 'Disfruta', t: 'Recíbelo en decant o en frasco sellado, como prefieras.' },
+  { n: '01', h: 'Elige', t: 'Escoge tu pañalera o mochila y el color que va contigo.' },
+  { n: '02', h: 'Ordena', t: 'Paga con tarjeta, PayPhone o transferencia, como prefieras.' },
+  { n: '03', h: 'Disfruta', t: 'Recíbela en 24 a 72 horas en todo el Ecuador.' },
 ];
 
 /**
- * "Cómo funciona" — tres pasos editoriales (ref. DecantStory).
+ * "Cómo funciona" — tres pasos editoriales.
  *
  * Sin el rótulo "— Cómo funciona" (REQ-007): el título arranca la sección.
  * Los números mandan (REQ-008) y el alto es compacto en desktop (REQ-009).
@@ -15,7 +15,7 @@ export default function HowItWorksSection() {
     <section className="border-y border-border bg-surface-raised px-6 py-8 md:px-14 md:py-16">
       <div className="mx-auto max-w-[720px] text-center">
         <h2 className="font-display text-3xl font-light leading-none tracking-[-0.02em] text-text md:text-6xl">
-          Tres pasos hacia <span className="italic">tu fragancia.</span>
+          Tres pasos hacia <span className="italic">tu LIVI.</span>
         </h2>
       </div>
 

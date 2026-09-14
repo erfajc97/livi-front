@@ -1,4 +1,5 @@
 import AppProviders from '@/app/providers/AppProviders';
+import { Component } from 'react';
 import { useProfileHook } from './hooks/useProfileHook';
 import ProfileSidebar from './components/ProfileSidebar';
 import OrdersTab from './components/OrdersTab';
@@ -10,6 +11,31 @@ const TAB_CONTENT = {
   direcciones: AddressesTab,
   pedidos: OrdersTab,
 } as const;
+
+/** Si una pestaña falla al renderizar, la página no muere: se muestra un
+    aviso y el sidebar sigue navegable. */
+class TabErrorBoundary extends Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(err: unknown) { console.error('[mi-cuenta] error en pestaña:', err); }
+  render() {
+    if (this.state.failed) {
+      return (
+        <div className="border border-border bg-surface p-6">
+          <p className="font-body text-sm text-text">No se pudo cargar esta sección.</p>
+          <button
+            type="button"
+            onClick={() => this.setState({ failed: false })}
+            className="mt-3 border-b border-text pb-0.5 font-body text-xs text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Reintentar
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function ProfileContent() {
   const { activeTab, setActiveTab, user } = useProfileHook();
@@ -37,7 +63,9 @@ function ProfileContent() {
 
           {/* Content */}
           <main className="flex-1 min-w-0">
-            <ActiveComponent />
+            <TabErrorBoundary key={activeTab}>
+              <ActiveComponent />
+            </TabErrorBoundary>
           </main>
         </div>
       </div>

@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Navbar from '@/app/features/landing/components/layout/Navbar';
 import Footer from '@/app/features/landing/components/layout/Footer.astro';
+import WhatsAppFloat from '@/app/features/landing/components/layout/WhatsAppFloat.astro';
 import { organizationJsonLd } from '@/app/helpers/seoMeta';
 
 interface Props {
@@ -47,4 +48,5 @@ const {
   <!-- El respiro para la tab bar mobile (fixed) vive dentro del footer, que es
        el último bloque de la página. -->
   <Footer />
+  <WhatsAppFloat />
 </BaseLayout>

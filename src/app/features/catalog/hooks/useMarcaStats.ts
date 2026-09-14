@@ -29,14 +29,10 @@ export function useMarcaStats(marcaId?: number) {
   });
 
   const products = query.data?.content ?? [];
-  const inStock = products.filter((product) => !product.bajoPedido);
-  const backorder = products.filter((product) => product.bajoPedido);
   const prices = products.map(minPriceOf).filter((price): price is number => price != null);
 
   return {
     total: query.data?.pagination?.total ?? products.length,
-    decants: inStock.length,
-    bajoPedido: backorder.length,
     fromPrice: prices.length ? Math.min(...prices) : null,
     isLoading: enabled && query.isLoading,
   };

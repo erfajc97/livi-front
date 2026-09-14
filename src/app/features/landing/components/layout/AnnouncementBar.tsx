@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 
-const ANNOUNCEMENT_DEFAULT = 'Envíos a todo el Ecuador · Servientrega 24–72h';
+const ANNOUNCEMENT_DEFAULT = 'Envíos a todo Ecuador · Empaque de regalo incluido';
 /** Rotación automática entre promociones (ms). */
 const ROTATE_MS = 6000;
 
@@ -61,11 +61,11 @@ export default function AnnouncementBar() {
     setIndex((i) => (i + dir + items.length) % items.length);
 
   const arrowCls =
-    'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-text-muted transition-colors hover:text-text';
+    'absolute top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center text-bg/60 transition-colors hover:text-bg';
 
   return (
-    <div className="border-b border-border bg-bg-alt">
-      <div className="relative flex items-center justify-center overflow-hidden px-10 py-3 md:px-14 md:py-3.5">
+    <div className="bg-accent">
+      <div className="relative flex items-center justify-center overflow-hidden px-10 py-2.5 md:px-14">
         {hasMultiple && (
           <button
             type="button"
@@ -83,7 +83,7 @@ export default function AnnouncementBar() {
 
         <p
           key={index}
-          className="announce-slide text-center font-body text-[11px] leading-5 tracking-[0.06em] text-text-soft md:text-[12px]"
+          className="announce-slide text-center font-mono text-[10px] uppercase leading-5 tracking-[0.22em] text-bg md:text-[11px]"
         >
           {current}
         </p>

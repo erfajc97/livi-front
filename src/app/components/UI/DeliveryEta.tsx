@@ -2,14 +2,13 @@ import type { ComponentType } from 'react';
 import PackageLineIcon from '@/assets/svg/PackageLineIcon';
 import TruckLineIcon from '@/assets/svg/TruckLineIcon';
 import {
-  BACKORDER_LABEL,
   DEFAULT_DISPATCH_CUTOFF_HOUR,
   deliveryRangeShort,
   dispatchDateShort,
 } from '@/app/helpers/deliveryWindow';
 
 interface DeliveryEtaProps {
-  variant: 'immediate' | 'backorder';
+  variant?: 'immediate';
   offsetDays?: number;
   cutoffHour?: number;
   compact?: boolean;
@@ -53,13 +52,11 @@ function EtaStep({ Icon, motion, label, value, compact }: EtaStepProps) {
 }
 
 export default function DeliveryEta({
-  variant,
   offsetDays = 0,
   cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR,
   compact = false,
 }: DeliveryEtaProps) {
-  const isBackorder = variant === 'backorder';
-  const eta = isBackorder ? BACKORDER_LABEL : deliveryRangeShort(offsetDays, cutoffHour);
+  const eta = deliveryRangeShort(offsetDays, cutoffHour);
 
   return (
     <div
@@ -72,8 +69,8 @@ export default function DeliveryEta({
       <EtaStep
         Icon={PackageLineIcon}
         motion="commit-icon commit-icon--pack"
-        label={compact ? undefined : isBackorder ? 'Despacho' : 'Se despacha'}
-        value={isBackorder ? 'Bajo pedido' : dispatchDateShort(cutoffHour)}
+        label={compact ? undefined : 'Se despacha'}
+        value={dispatchDateShort(cutoffHour)}
         compact={compact}
       />
       {!compact && (

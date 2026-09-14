@@ -7,8 +7,7 @@ interface OrderItem {
   id: number;
   productName?: string;
   productImage?: string;
-  mlSize?: number;
-  isFullBottle?: boolean;
+  variationName?: string;
   price: number;
   quantity: number;
   subtotal: number;
@@ -118,7 +117,7 @@ export default function OrdersTab() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-text truncate">{item.productName || 'Producto'}</p>
-                <p className="text-xs text-text-muted">{item.mlSize ? `${item.mlSize}ml ${item.isFullBottle ? 'Botella' : 'Decant'}` : ''} · {item.quantity}x</p>
+                <p className="text-xs text-text-muted">{item.variationName ? `${item.variationName} · ` : ''}{item.quantity}x</p>
               </div>
               <p className="text-sm font-bold text-text">{formatCurrency(item.subtotal)}</p>
             </div>

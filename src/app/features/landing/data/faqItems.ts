@@ -3,37 +3,37 @@ export interface FaqItem {
   answer: string;
 }
 
-/** Preguntas de decants — las mismas de /decants y /faq. */
-export const DECANT_FAQ: FaqItem[] = [
+/** Preguntas de producto — las mismas de /faq. */
+export const PRODUCT_FAQ: FaqItem[] = [
   {
-    question: '¿El decant es el mismo perfume que el frasco?',
+    question: '¿De qué material son las pañaleras y mochilas LIVI?',
     answer:
-      'Sí. Sale de la botella original de la casa. Lo único que cambia es el envase: un atomizador de 3, 5 o 10 ml.',
+      'Cuero vacuno genuino premium, trabajado a mano por artesanos ecuatorianos. Cada pieza incluye dust bag y caja de regalo LIVI.',
   },
   {
-    question: '¿Cuántos usos trae un decant de 3 ml?',
+    question: '¿Qué colores están disponibles?',
     answer:
-      'Unas 33 pulsaciones. Con cuatro al día, alrededor de una semana: suficiente para saber si vale el frasco.',
+      'Cada producto muestra sus colores disponibles en la ficha (Negro, Espresso, Beige…). El stock es por producto y compartido entre colores.',
   },
   {
-    question: '¿Puedo comprar el frasco después?',
+    question: '¿Caben laptops o tablets?',
     answer:
-      'Sí, y es la idea. Cada ficha ofrece los decants y el frasco sellado en la misma página.',
+      'Sí. Nuestras pañaleras y mochilas tienen compartimento acolchado para laptop o tablet de hasta 15 pulgadas, además de bolsillos organizadores.',
   },
   {
-    question: '¿Y si el perfume que quiero no está en decant?',
+    question: '¿Cómo cuido el cuero?',
     answer:
-      'Lo traemos por encargo en frasco, en 13 a 17 días. Si nos lo piden lo suficiente, abrimos una botella para decants.',
+      'Límpialo con un paño suave apenas húmedo y guárdalo en su dust bag cuando no lo uses. Evita la exposición prolongada al sol y a la lluvia.',
   },
   {
-    question: '¿Cómo sé que es original?',
+    question: '¿Cómo sé que la pieza es auténtica?',
     answer:
-      'Cada frasco se verifica antes de abrirlo. Los decants se extraen de esa misma botella, con instrumento propio por fragancia.',
+      'Cada pieza pasa por control de calidad en nuestro taller antes de despacharse. Comprando en livi.ec tienes la garantía completa de la marca.',
   },
 ];
 
 export const SITE_FAQ: FaqItem[] = [
-  ...DECANT_FAQ,
+  ...PRODUCT_FAQ,
   {
     question: '¿Hacen envíos a todo Ecuador?',
     answer:
@@ -55,13 +55,8 @@ export const SITE_FAQ: FaqItem[] = [
       'Transferencia bancaria, Payphone y tarjetas. En Payphone se aplica un recargo del 6% que verás desglosado en el checkout antes de pagar.',
   },
   {
-    question: '¿Cuánto tarda un perfume bajo pedido?',
+    question: '¿Puedo devolver un producto?',
     answer:
-      'Entre 13 y 17 días después de confirmar el pago. Lo importamos exclusivamente para ti y lo verificamos antes de enviártelo.',
-  },
-  {
-    question: '¿Puedo devolver un decant o un sellado?',
-    answer:
-      'Los sellados sin abrir se rigen por los Términos. Un decant, al estar abierto y ser de uso personal, no se cambia salvo defecto de fabricación. Escríbenos por WhatsApp y lo revisamos.',
+      'Los productos sin uso, con sus etiquetas y empaque original, se rigen por los Términos. Escríbenos por WhatsApp y lo revisamos caso por caso.',
   },
 ];

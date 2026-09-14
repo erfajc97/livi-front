@@ -494,3 +494,4 @@ npm run test:watch
 - 🎨 Marca: `common-skills/skills/front/estilo-marca/`
 - 🔌 API: `common-skills/skills/front/logica-negocio-back/`
 - 🎯 Arch: `common-skills/skills/front/arquitectura-front/`
+# livi-front

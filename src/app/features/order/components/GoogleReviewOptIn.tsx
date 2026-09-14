@@ -6,7 +6,6 @@ interface GoogleReviewOptInProps {
   orderId?: string | number | null;
   email?: string | null;
   deliveryMethod?: string;
-  hasBackorder?: boolean;
 }
 
 /** Dispara el popup de reseñas de Google una vez hay pedido + email. */
@@ -14,16 +13,15 @@ export default function GoogleReviewOptIn({
   orderId,
   email,
   deliveryMethod,
-  hasBackorder = false,
 }: GoogleReviewOptInProps) {
   useEffect(() => {
     if (!orderId || !email) return;
     startGoogleReviewOptIn({
       orderId: String(orderId),
       email,
-      estimatedDeliveryDate: estimatedDeliveryIso(deliveryMethod, hasBackorder),
+      estimatedDeliveryDate: estimatedDeliveryIso(deliveryMethod),
     });
-  }, [orderId, email, deliveryMethod, hasBackorder]);
+  }, [orderId, email, deliveryMethod]);
 
   return null;
 }

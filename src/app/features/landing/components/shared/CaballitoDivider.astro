@@ -1,0 +1,30 @@
+---
+/**
+ * Separador editorial LIVI — "Dónde vive el caballito" (PDF identidad):
+ * entre bloques editoriales, centrado, a 38 px, línea — caballito — línea.
+ * Sustituye a cualquier título decorativo.
+ */
+interface Props {
+  /** burgundy sobre fondos claros (default) · butter sobre burgundy/oscuros */
+  tone?: 'burgundy' | 'butter' | 'espresso';
+  class?: string;
+}
+
+const { tone = 'burgundy', class: cls = '' } = Astro.props;
+
+const line =
+  tone === 'butter' ? 'bg-[#F5EFC6]/40' : tone === 'espresso' ? 'bg-text/30' : 'bg-accent/30';
+---
+
+<div class={`flex items-center justify-center gap-5 ${cls}`} aria-hidden="true">
+  <span class={`h-px w-16 md:w-24 ${line}`}></span>
+  <img
+    src={`/caballito-${tone}.png`}
+    alt=""
+    width="38"
+    height="31"
+    loading="lazy"
+    class="h-[31px] w-[38px] object-contain"
+  />
+  <span class={`h-px w-16 md:w-24 ${line}`}></span>
+</div>

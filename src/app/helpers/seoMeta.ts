@@ -1,12 +1,12 @@
 import { productUrl } from '@/app/helpers/productUrl';
-import type { Combo, Product } from '@/app/types/global.types';
+import type { Product } from '@/app/types/global.types';
 
-export const SITE_ORIGIN = 'https://nondecants.com';
+export const SITE_ORIGIN = 'https://livi.ec';
 
 /** Copy de la tarjeta al compartir (WhatsApp, Linktree, Facebook). */
 export const SHARE_DESCRIPTION =
-  'Perfumes y decants sellados al mejor precio 100% originales.';
-export const SHARE_TITLE = `NonDecants — ${SHARE_DESCRIPTION.replace(/\.$/, '')}`;
+  'Pañaleras y mochilas de cuero premium, hechas a mano en Ecuador.';
+export const SHARE_TITLE = `LIVI — ${SHARE_DESCRIPTION.replace(/\.$/, '')}`;
 
 export function absoluteUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) return path;
@@ -31,33 +31,16 @@ export function formatUsd(amount: number | string): string {
   return Number.isFinite(n) ? n.toFixed(2).replace('.', ',') : '0,00';
 }
 
-const GENDER_LABEL: Record<string, string> = {
-  HOMBRE: 'hombre',
-  MUJER: 'mujer',
-  UNISEX: 'unisex',
-};
-
-const CONCENTRATION_LABEL: Record<string, string> = {
-  EAU_DE_PARFUM: 'Eau de Parfum',
-  EAU_DE_TOILETTE: 'Eau de Toilette',
-  EAU_DE_TOILETTE_INTENSE: 'Eau de Toilette Intense',
-  EAU_DE_COLOGNE: 'Eau de Cologne',
-  BODY_MIST: 'Body mist',
-  ELIXIR: 'Elixir',
-  PARFUM: 'Parfum',
-  EXTRAIT_DE_PARFUM: 'Extrait de Parfum',
-};
-
 export function organizationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'NonDecants',
+    name: 'LIVI',
     url: SITE_ORIGIN,
     logo: absoluteUrl('/favicon.png'),
     sameAs: [
-      'https://www.instagram.com/nondecants',
-      'https://www.tiktok.com/@nondecants_',
+      'https://www.instagram.com/livi.ec',
+      'https://www.tiktok.com/@livi.ec',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -77,7 +60,7 @@ export function websiteJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'NonDecants',
+    name: 'LIVI',
     url: SITE_ORIGIN,
     potentialAction: {
       '@type': 'SearchAction',
@@ -94,8 +77,8 @@ export function homepageBannersJsonLd(
   const images = banners
     .map((banner) => ({
       url: absoluteImageUrl(banner.imageUrl || banner.image),
-      name: (banner.title || 'NonDecants').trim(),
-      description: (banner.subtitle || banner.title || 'Perfumes originales en Ecuador').trim(),
+      name: (banner.title || 'LIVI').trim(),
+      description: (banner.subtitle || banner.title || 'Pañaleras de cuero premium en Ecuador').trim(),
     }))
     .filter((item): item is { url: string; name: string; description: string } => Boolean(item.url));
 
@@ -104,7 +87,7 @@ export function homepageBannersJsonLd(
   return {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Banners NonDecants',
+    name: 'Banners LIVI',
     numberOfItems: images.length,
     itemListElement: images.map((image, index) => ({
       '@type': 'ListItem',
@@ -160,36 +143,24 @@ export function maxOfferPrice(product: Product): number | undefined {
   return prices.length > 0 ? Math.max(...prices) : undefined;
 }
 
-function schemaAvailability(inStock: boolean, backorder: boolean): string {
-  if (inStock) return 'https://schema.org/InStock';
-  if (backorder) return 'https://schema.org/BackOrder';
-  return 'https://schema.org/OutOfStock';
+function schemaAvailability(inStock: boolean): string {
+  return inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
 }
 
 export function productSeoTitle(product: Product): string {
-  return `${productDisplayName(product)} original | NonDecants`;
+  return `${productDisplayName(product)} | LIVI`;
 }
 
 export function productSeoDescription(product: Product): string {
   const name = productDisplayName(product);
-  const raw = (product.description || product.detailDescription || '')
+  const body = (product.description || product.detailDescription || '')
     .replace(/\s+/g, ' ')
     .trim();
-  // El bloque editorial "El proceso" está quemado en todas las PDP; si alguien
-  // lo pegó en la descripción del producto, no debe salir en Google/WhatsApp.
-  const body =
-    raw && !/^el proceso\b/i.test(raw) && !/cada decant se extrae/i.test(raw)
-      ? raw
-      : '';
-  const bits = [
-    product.concentration ? CONCENTRATION_LABEL[product.concentration] : '',
-    product.gender ? GENDER_LABEL[product.gender] : '',
-  ].filter(Boolean);
   const min = minOfferPrice(product);
-  const priceBit = min != null ? `desde $${formatUsd(min)}` : 'decant o frasco sellado';
+  const priceBit = min != null ? `desde $${formatUsd(min)}` : '';
   if (body) return clipMeta(`${name}. ${body}`);
   return clipMeta(
-    `${name} original en Ecuador. ${bits.join(', ')}${bits.length ? '. ' : ''}${priceBit}.`,
+    `${name} en Ecuador. Cuero premium, hecho a mano${priceBit ? `, ${priceBit}` : ''}.`,
   );
 }
 
@@ -197,38 +168,30 @@ export function productJsonLd(product: Product) {
   const images = [
     product.image,
     product.imageUrl,
-    ...(product.images ?? []),
+    ...(product.images ?? []).map((img: any) => (typeof img === 'string' ? img : img?.url)),
   ]
     .map((url) => absoluteImageUrl(url))
     .filter((url, index, list): url is string => !!url && list.indexOf(url) === index);
 
+  const inStock = (product.stock ?? 0) > 0;
   const formats = (product.formats?.length ? product.formats : undefined) ??
     product.variants.map((variant) => ({
       id: variant.id,
-      ml: variant.ml || variant.mlSize,
+      name: variant.name,
       price: variant.price,
-      isFullBottle: variant.isFullBottle,
-      availableQuantity: variant.availableQuantity,
     }));
 
-  const offers = formats.map((format) => {
-    const isDecant = !format.isFullBottle;
-    const inStock = isDecant
-      ? (product.availableMl ?? 0) > 0 || ('availableQuantity' in format && Number(format.availableQuantity) > 0)
-      : ('availableQuantity' in format && Number(format.availableQuantity) > 0) || (product.stock ?? 0) > 0;
-    return {
-      '@type': 'Offer',
-      name: isDecant ? `Decant ${format.ml} ml` : `Frasco sellado ${format.ml} ml`,
-      price: Number(format.price).toFixed(2),
-      priceCurrency: 'USD',
-      availability: schemaAvailability(inStock, !!product.bajoPedido || (!inStock && !isDecant)),
-      url: absoluteUrl(productUrl(product)),
-    };
-  });
+  const offers = formats.map((format) => ({
+    '@type': 'Offer',
+    name: format.name ? `Color ${format.name}` : productDisplayName(product),
+    price: Number(format.price).toFixed(2),
+    priceCurrency: 'USD',
+    availability: schemaAvailability(inStock),
+    url: absoluteUrl(productUrl(product)),
+  }));
 
   const low = minOfferPrice(product);
   const high = maxOfferPrice(product);
-  const anyInStock = offers.some((offer) => offer.availability === 'https://schema.org/InStock');
   const aggregateOffers = offers.length
     ? {
         '@type': 'AggregateOffer',
@@ -236,7 +199,7 @@ export function productJsonLd(product: Product) {
         lowPrice: low != null ? low.toFixed(2) : undefined,
         highPrice: high != null ? high.toFixed(2) : undefined,
         offerCount: offers.length,
-        availability: schemaAvailability(anyInStock, !!product.bajoPedido),
+        availability: schemaAvailability(inStock),
         offers,
       }
     : undefined;
@@ -249,26 +212,11 @@ export function productJsonLd(product: Product) {
     image: images,
     brand: product.marca?.name
       ? { '@type': 'Brand', name: product.marca.name }
-      : undefined,
+      : { '@type': 'Brand', name: 'LIVI' },
     sku: String(product.id),
     url: absoluteUrl(productUrl(product)),
-    additionalProperty: [
-      product.concentration
-        ? { '@type': 'PropertyValue', name: 'Concentración', value: CONCENTRATION_LABEL[product.concentration] ?? product.concentration }
-        : undefined,
-      product.gender
-        ? { '@type': 'PropertyValue', name: 'Género', value: GENDER_LABEL[product.gender] ?? product.gender }
-        : undefined,
-    ].filter((item) => item != null),
     offers: aggregateOffers,
   };
-}
-
-export function comboSeoDescription(combo: Combo): string {
-  const base = combo.description?.trim() || `Combo ${combo.name} de perfumes originales en Ecuador.`;
-  const price = Number(combo.finalPrice);
-  const priceBit = Number.isFinite(price) && price > 0 ? ` Desde $${formatUsd(price)}` : '';
-  return clipMeta(`${base}${priceBit} · envío 24–72 h.`);
 }
 
 export function articleJsonLd(post: {
@@ -288,10 +236,10 @@ export function articleJsonLd(post: {
     image: absoluteImageUrl(post.imageUrl),
     datePublished: post.publishedAt || post.createdAt,
     dateModified: post.updatedAt || post.publishedAt || post.createdAt,
-    author: { '@type': 'Organization', name: 'NonDecants' },
+    author: { '@type': 'Organization', name: 'LIVI' },
     publisher: {
       '@type': 'Organization',
-      name: 'NonDecants',
+      name: 'LIVI',
       logo: { '@type': 'ImageObject', url: absoluteUrl('/favicon.png') },
     },
     mainEntityOfPage: absoluteUrl(`/blog/${post.slug}`),

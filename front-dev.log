@@ -1,0 +1,184 @@
+23:50:03 [types] Generated 2ms
+
+ astro  v4.16.19 ready in 338 ms
+
+┃ Local    http://localhost:4800/
+┃ Network  use --host to expose
+
+23:50:03 watching for file changes...
+23:50:07 [200] / 404ms
+Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attr14:13:22 [302] /login 489ms
+14:13:22 [404] /@id/__x00__virtual:astro:adapter-config/client 511ms
+14:13:22 [200] / 236ms
+14:15:45 [watch] src/app/features/order/components/OrderConfirmation.tsx
+14:15:45 [watch] src/app/features/order/data.ts
+14:15:45 [watch] src/app/features/order/components/OrderConfirmationIsland.tsx
+14:15:45 [watch] src/app/features/blog/services/blogService.ts
+14:15:45 [watch] src/app/features/catalog/components/CatalogProductIndex.astro
+14:15:45 [watch] /src/styles/global.css, /@fs/C:\Users\Jaely\Documents\LIVI\nondecants-front\src\app\features\auth\components\RegisterForm.tsx, /@fs/C:\Users\Jaely\Documents\LIVI\nondecants-front\src\app\features\auth\components\LoginForm.tsx, /@fs/C:\Users\Jaely\Documents\LIVI\nondecants-front\src\app\features\auth\components\ForgotPasswordForm.tsx
+14:15:45 [watch] /src/app/features/auth/components/AuthModal.tsx, /src/styles/global.css
+14:15:45 [watch] /@fs/C:\Users\Jaely\Documents\LIVI\nondecants-front\src\app\features\auth\components\LoginForm.tsx, /src/styles/global.css
+14:15:46 [200] / 103ms
+14:17:20 [watch] src/app/features/profile/components/OrdersTab.tsx
+14:17:20 [watch] src/app/features/profile/data.ts
+14:17:20 [200] / 81ms
+14:18:58 [watch] src/app/features/checkout/hooks/useCheckoutHook.ts
+14:18:58 [watch] src/app/features/order/components/PaymentConfirmation.tsx
+14:18:58 [200] / 121ms
+14:20:32 [watch] src/assets/logo.svg
+14:20:33 [200] / 95ms
+14:24:56 [watch] /src/styles/global.css
+14:24:56 [watch] src/app/features/product/components/ProductEditorial.astro
+14:24:57 [200] / 100ms
+14:27:51 [watch] /src/styles/global.css
+14:28:07 [watch] /src/styles/global.css
+14:28:41 [watch] src/layouts/BaseLayout.astro
+14:28:42 [200] / 66ms
+14:29:01 [watch] src/layouts/BaseLayout.astro
+14:29:02 [200] / 69ms
+14:30:55 [watch] .astro/types.d.ts
+14:30:56 [200] / 78ms
+14:41:24 [watch] .astro/types.d.ts
+14:41:24 [200] / 82ms
+14:42:12 Configuration file updated. Restarting...
+14:42:12 [watch] astro.config.mjs
+14:42:12 [types] Generated 1ms
+14:42:13 [200] / 283ms
+14:52:01 [200] / 25ms
+Warning: React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead. If you accidentally passed it from a parent component, remove it from the DOM element.
+    at img
+    at picture
+    at div
+    at div
+    at div
+    at div
+    at section
+    at BannerCarousel (C:/Users/Jaely/Documents/LIVI/nondecants-front/src/app/features/landing/components/sections-home/BannerCarousel.tsx:17:27)
+    at BannerCarouselContent (C:/Users/Jaely/Documents/LIVI/nondecants-front/src/app/features/landing/components/sections-home/BannerCarouselIsland.tsx:11:34)
+    at QueryClientProvider (file:///C:/Users/Jaely/Documents/LIVI/nondecants-front/node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:20:3)
+    at GoogleOAuthProvider (C:\Users\Jaely\Documents\LIVI\nondecants-front\node_modules\@react-oauth\google\dist\index.js:46:32)
+    at AppProviders (C:/Users/Jaely/Documents/LIVI/nondecants-front/src/app/providers/AppProviders.tsx:14:25)
+    at BannerCarouselIsland (C:/Users/Jaely/Documents/LIVI/nondecants-front/src/app/features/landing/components/sections-home/BannerCarouselIsland.tsx:23:3)
+alog/hooks/useMarcaStats.ts
+12:29:08 [watch] src/app/features/catalog/components/CatalogBanner.tsx
+12:29:36 [watch] src/app/features/catalog/components/CatalogBanner.tsx
+12:53:48 [watch] src/app/store/cart/cartStore.ts
+12:54:03 [watch] src/app/store/cart/cartStore.ts
+12:54:36 [watch] src/app/features/cart/hooks/useCartPageHook.ts
+12:55:37 [watch] src/app/features/cart/components/CartLine.tsx
+12:55:59 [watch] src/app/features/cart/components/CartPage.tsx
+12:56:37 [watch] src/app/features/cart/components/CartPage.tsx
+12:57:24 [watch] src/app/features/cart/components/CartPage.tsx
+12:58:22 [watch] src/app/features/cart/components/CartRecommendations.tsx
+12:58:54 [watch] src/app/tanstack-queries/categoriesQuery.ts
+12:59:40 [watch] src/app/helpers/deliveryWindow.ts
+13:00:11 [watch] src/app/components/UI/DeliveryEta.tsx
+13:00:45 [watch] src/app/components/UI/DeliveryEta.tsx
+13:01:21 [watch] src/app/features/order/components/GoogleReviewOptIn.tsx
+13:01:52 [watch] src/app/features/checkout/components/CheckoutOrderSummary.tsx
+13:02:32 [watch] src/app/features/checkout/components/CheckoutOrderSummary.tsx
+13:03:25 [watch] src/app/features/checkout/components/CheckoutOrderSummary.tsx
+13:05:56 [watch] src/app/features/checkout/hooks/useCheckoutHook.ts
+13:07:14 [watch] src/app/features/checkout/hooks/useCheckoutHook.ts
+13:08:18 [watch] src/app/features/checkout/hooks/useCheckoutHook.ts
+13:09:19 [watch] src/app/features/checkout/components/Checkout.tsx
+13:10:15 [watch] src/app/features/landing/components/layout/LiquidTabBar.tsx
+13:14:11 [watch] src/app/features/product/components/ProductPurchaseOptions.tsx
+13:16:02 [watch] src/app/features/product/components/ProductCard.tsx
+13:17:20 [watch] src/app/features/product/hooks/useProductDetailHook.ts
+13:18:23 [watch] src/app/features/product/components/ProductInfo.tsx
+13:19:20 [watch] src/app/features/product/ProductDetail.tsx
+13:21:04 [watch] src/app/features/product/components/ProductDetailIsland.tsx
+13:21:04 [watch] src/app/features/product/components/ProductImages.tsx
+13:22:59 [watch] src/app/features/product/data.ts
+13:22:59 [watch] src/app/features/product/components/VariantSelector.tsx
+13:22:59 [watch] src/app/features/product/components/AddToCartButton.tsx
+13:22:59 [watch] src/app/features/product/components/ProductTypeBadge.tsx
+13:24:45 [watch] src/app/features/product/components/ProductEditorial.astro
+13:24:45 [watch] src/app/features/product/components/ProductShippingTimeline.astro
+13:26:37 [watch] src/app/tanstack-queries/productsQuery.ts
+13:29:07 [watch] src/app/features/catalog/hooks/useMarcaStats.ts
+13:30:01 [watch] src/app/features/landing/components/decants/DecantsCategoryExits.tsx
+13:30:01 [watch] src/app/tanstack-queries/combosQuery.ts
+13:33:29 [watch] src/app/features/landing/data/faqItems.ts
+13:34:29 [watch] src/app/features/landing/components/sections-home/ProductRankingSection.tsx
+13:35:14 [watch] src/app/features/landing/components/sections-home/ProductRankingSection.tsx
+13:35:15 [watch] src/app/features/landing/components/sections-home/NewsletterSection.tsx
+13:35:15 [watch] src/app/features/landing/components/sections-home/ExploreCategoriesSection.tsx
+13:37:39 [watch] src/app/features/landing/hooks/useExploreCategories.ts
+13:40:59 [watch] src/app/features/landing/hooks/useExploreCategories.ts
+13:42:54 [watch] src/app/features/landing/components/sections-home/BannerHeroCopy.tsx
+13:43:44 [watch] src/app/features/landing/components/sections-home/HeroSection.astro
+13:44:49 [watch] src/app/features/landing/components/sections-home/CommitmentStrip.tsx
+13:44:49 [watch] src/app/features/landing/components/sections-home/HowItWorksSection.tsx
+13:46:41 [watch] src/app/features/landing/components/layout/NavbarSearch.tsx
+13:46:41 [watch] src/app/features/landing/pages/home/Home.tsx
+13:46:41 [watch] src/app/features/landing/components/layout/Navbar.tsx
+13:46:41 [watch] src/app/features/landing/components/sections-home/BannerCarousel.tsx
+13:49:14 [watch] src/app/api/endpoints.ts
+13:50:15 [watch] src/app/tanstack-queries/bannersQuery.ts
+13:50:57 [watch] src/app/types/global.types.ts
+13:52:18 [watch] src/app/helpers/seoMeta.ts
+13:54:15 [watch] src/app/helpers/ogCard.ts
+13:55:02 [watch] src/app/helpers/secureStorage.ts
+13:55:02 [watch] src/app/config/axiosConfig.ts
+13:55:59 [watch] src/pages/sitemap.xml.ts
+13:59:29 [watch] src/pages/producto/[id].astro
+13:59:29 [watch] src/pages/faq.astro
+13:59:29 [watch] src/pages/catalogo.astro
+13:59:29 [watch] src/pages/carrito.astro
+13:59:29 [watch] src/pages/index.astro
+14:01:12 [watch] src/pages/404.astro
+14:01:12 [watch] src/pages/checkout.astro
+14:01:12 [watch] src/pages/confirmacion.astro
+14:01:12 [watch] src/pages/contacto.astro
+14:01:12 [watch] src/pages/cookies.astro
+14:01:12 [watch] src/pages/mi-cuenta.astro
+14:01:12 [watch] src/pages/privacidad.astro
+14:01:12 [watch] src/pages/rastrear.astro
+14:01:12 [watch] src/pages/restablecer-contrasena.astro
+14:01:12 [watch] src/pages/terminos.astro
+14:01:12 [watch] src/pages/verificar-email.astro
+14:01:12 [watch] src/pages/blog/index.astro
+14:01:12 [watch] src/pages/blog/[slug].astro
+14:01:12 [watch] src/pages/orden/confirmacion.astro
+14:01:12 [watch] src/pages/orden/[id].astro
+14:07:34 [watch] src/pages/terminos.astro
+14:08:35 [watch] src/pages/contacto.astro
+14:08:35 [watch] src/pages/privacidad.astro
+14:08:35 [watch] src/pages/blog/index.astro
+14:08:35 [watch] src/pages/confirmacion.astro
+14:08:35 [watch] src/pages/rastrear.astro
+14:15:45 [watch] src/app/features/order/components/OrderConfirmation.tsx
+14:15:45 [watch] src/app/features/order/data.ts
+14:15:45 [watch] src/app/features/blog/services/blogService.ts
+14:15:45 [watch] src/app/features/order/components/OrderConfirmationIsland.tsx
+14:15:45 [watch] src/app/features/catalog/components/CatalogProductIndex.astro
+14:15:45 [watch] src/app/features/auth/services/authService.ts
+14:15:45 [watch] src/app/features/auth/components/AuthModal.tsx
+14:15:45 [watch] src/app/features/auth/components/LoginForm.tsx
+14:17:20 [watch] src/app/features/profile/components/OrdersTab.tsx
+14:17:20 [watch] src/app/features/profile/data.ts
+14:18:58 [watch] src/app/features/checkout/hooks/useCheckoutHook.ts
+14:18:58 [watch] src/app/features/order/components/PaymentConfirmation.tsx
+14:20:32 [watch] src/assets/logo.svg
+14:24:56 [watch] /src/styles/global.css
+14:24:56 [watch] src/app/features/product/components/ProductEditorial.astro
+14:27:51 [watch] /src/styles/global.css
+14:28:07 [watch] /src/styles/global.css
+14:28:41 [watch] src/layouts/BaseLayout.astro
+14:29:01 [watch] src/layouts/BaseLayout.astro
+14:30:55 [watch] .astro/types.d.ts
+14:31:27 [200] / 32ms
+14:31:53 [200] / 48ms
+[fetchProducts] API error — falling back to mock filters: 400 {
+  statusCode: 400,
+  message: [ 'limit must not be greater than 100' ],
+  error: 'Bad Request',
+  timestamp: '2026-09-12T17:31:53.966Z',
+  path: '/api/products?limit=200&page=1'
+}
+14:31:53 [200] /catalogo 22ms
+14:32:03 [200] / 45ms
+14:34:54 [200] / 45ms
+14:36:39 [200] / 44ms

@@ -6,18 +6,14 @@ import {
 import type { ExploreCategoryCard } from '../types';
 
 function editorialHeading(name: string): string {
-  const n = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  if (/arab/.test(n)) return 'Perfumes árabes';
-  if (/nicho|niche/.test(n)) return 'Perfumes nicho';
-  if (/disenador|designer/.test(n)) return 'Perfumes de diseñador';
   return name;
 }
 
 function editorialRank(name: string): number {
-  const n = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  if (/arab/.test(n)) return 0;
-  if (/nicho|niche/.test(n)) return 1;
-  if (/disenador|designer/.test(n)) return 2;
+  const n = name.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  if (/panalera|diaper/.test(n)) return 0;
+  if (/mochila|backpack/.test(n)) return 1;
+  if (/accesorio/.test(n)) return 2;
   return 3;
 }
 
@@ -33,7 +29,8 @@ function brandLine(marcas: NavMarca[], max: number, compact: boolean): string {
 function toCard(category: NavCategory): ExploreCategoryCard {
   return {
     id: category.id,
-    href: `/catalogo/perfumes?category=${category.id}`,
+    // El catálogo resuelve la categoría por slug (?categoria=panaleras).
+    href: `/catalogo?categoria=${category.slug ?? category.id}`,
     heading: editorialHeading(category.name),
     imageUrl: category.imageUrl,
     brandLineDesktop: brandLine(category.marcas, 5, false),

@@ -1,0 +1,71 @@
+---
+import PublicLayout from '@/layouts/PublicLayout.astro';
+---
+
+<PublicLayout
+  title="El Taller — LIVI"
+  description="Cuero genuino trabajado a mano por artesanos ecuatorianos. Así se hace cada pieza LIVI: selección por lote, rebaje a mano y costura con hilo encerado."
+  canonical="/el-taller"
+>
+  {/* ── Hero a sangre con foto del taller (ref. PDF pág. 19) ── */}
+  <section class="relative flex min-h-[70vh] items-end overflow-hidden">
+    <img
+      src="/productos/marca-taller.jpg"
+      alt="Artesano ecuatoriano trabajando el cuero en el taller LIVI"
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/25 to-transparent" />
+    <div class="relative px-6 pb-14 md:px-14 md:pb-20">
+      <p class="font-mono text-[10px] uppercase tracking-[0.32em] text-white/70">
+        El taller · Quito
+      </p>
+      <h1 class="mt-5 max-w-3xl font-heading text-4xl font-normal leading-[1.05] text-white md:text-6xl">
+        Cuero genuino. Hecho por artesanos ecuatorianos.
+      </h1>
+    </div>
+  </section>
+
+  {/* ── Proceso — dos columnas (ref. PDF pág. 19) ── */}
+  <section class="grid grid-cols-1 gap-10 border-b border-border px-6 py-14 md:grid-cols-2 md:gap-16 md:px-14 md:py-20">
+    <p class="font-body text-base leading-relaxed text-text-soft">
+      Trabajamos con un taller familiar en Quito. El cuero se selecciona por
+      lote, se rebaja a mano y se cose con hilo encerado. No hay dos piezas
+      idénticas porque no hay dos cortes idénticos: cada una lleva el carácter
+      del material y de quien la trabajó.
+    </p>
+    <p class="font-body text-base leading-relaxed text-text-soft">
+      El origen ecuatoriano no es un adorno: es la razón por la que podemos
+      controlar cada etapa, corregir un patrón en una semana y garantizar que
+      quien cosió tu pieza conoce tu pieza. Del taller a tu casa, sin
+      intermediarios.
+    </p>
+  </section>
+
+  {/* ── Galería del material ── */}
+  <section class="grid grid-cols-1 gap-px border-b border-border bg-border md:grid-cols-3">
+    <div class="aspect-[4/5] overflow-hidden bg-bg-alt">
+      <img src="/productos/marca-textura.jpg" alt="Textura del cuero LIVI" class="h-full w-full object-cover" loading="lazy" />
+    </div>
+    <div class="aspect-[4/5] overflow-hidden bg-bg-alt">
+      <img src="/productos/olivia-interior-1.jpg" alt="Interior organizado de una pieza LIVI" class="h-full w-full object-cover" loading="lazy" />
+    </div>
+    <div class="aspect-[4/5] overflow-hidden bg-bg-alt">
+      <img src="/productos/marca-empaque.jpg" alt="Empaque de regalo LIVI" class="h-full w-full object-cover" loading="lazy" />
+    </div>
+  </section>
+
+  {/* ── CTA ── */}
+  <section class="px-6 py-14 text-center md:px-14 md:py-20">
+    <p class="font-mono text-[10px] uppercase tracking-[0.32em] text-text-muted">La colección</p>
+    <h2 class="mt-5 font-heading text-3xl font-normal text-text md:text-5xl">
+      Cada pieza, verificada a mano.
+    </h2>
+    <a
+      href="/catalogo"
+      class="mt-10 inline-block bg-accent px-8 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent-hover"
+    >
+      Ver la tienda
+    </a>
+  </section>
+</PublicLayout>

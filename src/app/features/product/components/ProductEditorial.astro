@@ -1,5 +1,6 @@
 ---
 import type { Product } from '@/app/types/global.types';
+import CaballitoDivider from '@/app/features/landing/components/shared/CaballitoDivider.astro';
 
 interface Props {
   product: Product;
@@ -7,153 +8,33 @@ interface Props {
 
 const { product } = Astro.props;
 
-const sections = product.scentSections ?? [];
-const hasScent = sections.length > 0;
-
-const mood = product.mood ?? [];
-const occasion = product.occasion ?? [];
-const longevity = product.longevity;
-const projectionScore = product.projectionScore;
-const hasIdentity =
-  mood.length > 0 || occasion.length > 0 || longevity != null || projectionScore != null;
-
-const hasSignature = !!(product.signatureTitle || product.signatureDescription || product.signatureImageUrl);
-
 const pad = (n: number) => String(n).padStart(2, '0');
 
-// Promesa de autenticidad — quemada en todos los productos
+// Promesa de calidad — quemada en todos los productos
 const TRUST = [
   {
-    title: 'El frasco original',
-    desc: 'Solo trabajamos con perfumes reales, de boutiques oficiales y distribuidores autorizados. Cada frasco es verificado por nosotros.',
+    title: 'Cuero premium',
+    desc: 'Trabajamos solo con cuero genuino seleccionado a mano. Cada pieza envejece con carácter y se vuelve más tuya con el tiempo.',
   },
   {
-    title: 'El proceso',
-    desc: 'Cada decant se extrae de una botella 100% auténtica y se decanta con su propio instrumento, para que ningún aroma se mezcle con otro.',
+    title: 'Hecho con intención',
+    desc: 'Cada costura, herraje y compartimento está pensado para la vida real de los padres modernos: funcional, cómodo y duradero.',
   },
   {
-    title: 'La etiqueta',
-    desc: 'Cada decant lleva su etiqueta personalizada con el sello de la casa.',
+    title: 'Verificado por LIVI',
+    desc: 'Cada pieza pasa por control de calidad antes de salir de nuestro taller, para que llegue a tus manos impecable.',
   },
 ];
 ---
 
-{/* ── Perfil olfativo ── */}
-{hasScent && (
-  /* pt corto en mobile (REQ-035): venía del bloque PAGO y quedaba un hueco muerto */
-  <section class="border-y border-border bg-bg-alt px-6 pb-10 pt-6 md:px-14 md:py-20">
-    <div class="mx-auto max-w-3xl text-center">
-      <span class="eyebrow">— Perfil olfativo</span>
-      {product.scentProfileTitle && (
-        <h2 class="mt-3 font-display text-3xl font-light leading-[1.05] tracking-[-0.02em] text-text md:text-5xl">
-          {product.scentProfileTitle}
-        </h2>
-      )}
-    </div>
-
-    <div class="mx-auto mt-7 grid max-w-5xl gap-7 md:mt-14 md:grid-cols-3 md:gap-14">
-      {sections.map((sec, i) => (
-        <div>
-          {/* REQ-030: numeración grande y llamativa, protagonista del bloque */}
-          <span class="font-display text-2xl font-light italic text-accent md:text-3xl">— {pad(i + 1)}</span>
-          <div class="mt-3 h-px w-full bg-border"></div>
-          <h3 class="mt-5 font-display text-2xl font-light text-text">{sec.title}</h3>
-          {/* Notas: solo punto de color + nombre, sin recuadro */}
-          {sec.notes?.length > 0 && (
-            <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2.5">
-              {sec.notes.map((n) => (
-                <span class="inline-flex items-center gap-2 font-body text-[13px] text-text">
-                  <span class="h-3 w-3 shrink-0 rounded-full" style={`background:${n.color}`}></span>
-                  {n.name}
-                </span>
-              ))}
-            </div>
-          )}
-          {sec.description && (
-            <p class="mt-5 font-body text-[13px] leading-relaxed text-text-soft">{sec.description}</p>
-          )}
-        </div>
-      ))}
-    </div>
-  </section>
-)}
-
-{/* ── Carácter · Ocasión · Longevidad · Proyección ── */}
-{hasIdentity && (
-  <section class="px-6 py-10 md:px-14 md:py-20">
-    <div class="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-7 md:grid-cols-4 md:gap-14">
-      {mood.length > 0 && (
-        <div>
-          <span class="eyebrow">Carácter</span>
-          <p class="mt-3 font-display text-xl font-light italic leading-tight text-text">{mood.join(' · ')}</p>
-        </div>
-      )}
-      {occasion.length > 0 && (
-        <div>
-          <span class="eyebrow">Ocasión</span>
-          <p class="mt-3 font-display text-xl font-light italic leading-tight text-text">{occasion.join(' · ')}</p>
-        </div>
-      )}
-      {longevity != null && (
-        <div>
-          <span class="eyebrow">Longevidad</span>
-          <p class="mt-3 font-display text-5xl font-light leading-none tracking-[-0.02em] text-text">
-            {longevity}<span class="ml-1 font-body text-lg text-text-muted">/10</span>
-          </p>
-          <div class="mt-4 flex gap-[3px]">
-            {Array.from({ length: 10 }).map((_, k) => (
-              <span class={`h-0.5 flex-1 ${k < longevity ? 'bg-text' : 'bg-border'}`}></span>
-            ))}
-          </div>
-        </div>
-      )}
-      {projectionScore != null && (
-        <div>
-          <span class="eyebrow">Proyección</span>
-          <p class="mt-3 font-display text-5xl font-light leading-none tracking-[-0.02em] text-text">
-            {projectionScore}<span class="ml-1 font-body text-lg text-text-muted">/10</span>
-          </p>
-          <div class="mt-4 flex gap-[3px]">
-            {Array.from({ length: 10 }).map((_, k) => (
-              <span class={`h-0.5 flex-1 ${k < projectionScore ? 'bg-text' : 'bg-border'}`}></span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  </section>
-)}
-
-{/* ── La firma ── */}
-{hasSignature && (
-  <section class="bg-bg px-6 pb-10 md:px-14 md:pb-20">
-    <div class="mx-auto grid max-w-6xl items-center gap-7 md:grid-cols-2 md:gap-20">
-      <div class="md:order-1">
-        <span class="eyebrow">— La firma</span>
-        {product.signatureTitle && (
-          <h2 class="mt-3 font-display text-3xl font-light leading-[1.05] tracking-[-0.02em] text-text md:text-5xl">
-            {product.signatureTitle}
-          </h2>
-        )}
-        {product.signatureDescription && (
-          <p class="mt-6 max-w-md font-body text-sm leading-relaxed text-text-soft">{product.signatureDescription}</p>
-        )}
-      </div>
-      {product.signatureImageUrl && (
-        <div class="h-[360px] overflow-hidden bg-surface-raised md:order-2 md:h-[540px]">
-          <img src={product.signatureImageUrl} alt={product.signatureTitle ?? product.name} class="h-full w-full object-cover" />
-        </div>
-      )}
-    </div>
-  </section>
-)}
-
-{/* ── Promesa de autenticidad (quemado) ── */}
-<section class="border-t border-border bg-bg-alt px-6 py-10 md:px-14 md:py-20">
+{/* ── Promesa de calidad (quemado) — fondo sage suave: el beige era color
+     de soporte; los bloques editoriales los sostienen sage y celeste (PDF paleta) ── */}
+<section class="border-t border-border bg-sage/25 px-6 py-8 md:px-14 md:py-12">
   <div class="mx-auto max-w-3xl text-center">
-    <span class="eyebrow">— Promesa de autenticidad</span>
+    <CaballitoDivider tone="burgundy" class="mb-8 w-full max-w-sm mx-auto" />
+    <span class="eyebrow">— Promesa LIVI</span>
     <h2 class="mt-3 font-display text-3xl font-light italic leading-[1.05] tracking-[-0.02em] text-text md:text-5xl">
-      Cada gota, verificada.
+      Cada pieza, verificada.
     </h2>
   </div>
 

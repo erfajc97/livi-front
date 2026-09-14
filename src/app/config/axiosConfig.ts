@@ -3,11 +3,11 @@ import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { secureStorage } from '@/app/helpers/secureStorage';
 import { useAuthStore } from '@/app/store/auth/authStore';
 
-// En dev, si no carga VITE_API_BASE_URL, pega al backend LOCAL (no a staging).
-// En build/prod el fallback sigue siendo staging.
+// En dev, si no carga VITE_API_BASE_URL, pega al backend LOCAL.
+// En build/prod el fallback es el dominio de producción de LIVI.
 const FALLBACK_BASE_URL = import.meta.env.DEV
-  ? 'http://localhost:4001/api'
-  : 'https://stgapi.nondecants.com/api';
+  ? 'http://localhost:4101/api'
+  : 'https://api.livi.ec/api';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || FALLBACK_BASE_URL,

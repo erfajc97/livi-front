@@ -1,9 +1,6 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import { useMarcaStats } from '../hooks/useMarcaStats';
-import {
-  useCatalogPageBanner,
-  type CatalogBannerSlot,
-} from '@/app/tanstack-queries/bannersQuery';
+import type { CatalogBannerSlot } from '@/app/tanstack-queries/bannersQuery';
 import { useRawCategoriesQuery } from '@/app/tanstack-queries/categoriesQuery';
 import type { NavCategory, NavMarca } from '@/app/tanstack-queries/categoriesQuery';
 
@@ -44,22 +41,14 @@ function StatRow({
 }
 
 function marcaSummary(stats: {
-  decants: number;
-  bajoPedido: number;
+  total: number;
   fromPrice: number | null;
   isLoading: boolean;
 }) {
   if (stats.isLoading) return '';
   const from = stats.fromPrice != null ? ` desde ${formatCurrency(stats.fromPrice)}` : '';
-  const decantBit =
-    stats.decants > 0
-      ? `${stats.decants} ${stats.decants === 1 ? 'referencia' : 'referencias'} para probar en decant hoy${from}`
-      : '';
-  const backBit = stats.bajoPedido > 0 ? `${stats.bajoPedido} más por encargo` : '';
-  if (decantBit && backBit) return `${decantBit} y ${backBit}.`;
-  if (decantBit) return `${decantBit}.`;
-  if (stats.bajoPedido > 0) {
-    return `${stats.bajoPedido} ${stats.bajoPedido === 1 ? 'referencia' : 'referencias'} por encargo.`;
+  if (stats.total > 0) {
+    return `${stats.total} ${stats.total === 1 ? 'referencia disponible' : 'referencias disponibles'}${from}.`;
   }
   return '';
 }
@@ -69,10 +58,8 @@ export default function CatalogBanner({
   defaultDescription,
   categoryId,
   marcaId,
-  bannerSlot,
 }: CatalogBannerProps) {
   const { data: categories = [] } = useRawCategoriesQuery();
-  const { data: slotBanner } = useCatalogPageBanner(bannerSlot, marcaId == null);
   const stats = useMarcaStats(marcaId);
 
   const found = marcaId != null ? findMarca(categories, marcaId) : null;
@@ -111,8 +98,6 @@ export default function CatalogBanner({
             <p className="eyebrow">En cifras</p>
             <dl className="mt-1 divide-y divide-border">
               <StatRow label="Referencias" value={String(stats.total)} loading={stats.isLoading} />
-              <StatRow label="En decant" value={String(stats.decants)} loading={stats.isLoading} />
-              <StatRow label="Por encargo" value={String(stats.bajoPedido)} loading={stats.isLoading} />
               <StatRow
                 label="Desde"
                 value={stats.fromPrice != null ? formatCurrency(stats.fromPrice) : '—'}
@@ -129,28 +114,16 @@ export default function CatalogBanner({
   const description =
     category?.description ||
     (category ? `Explora nuestra selección de ${category.name.toLowerCase()}` : defaultDescription);
-  const imageUrl = category?.imageUrl || slotBanner?.imageUrl || slotBanner?.image || '/banner-catalog.png';
-  const mobileSrc = category?.mobileImageUrl || slotBanner?.mobileImageUrl || null;
 
+  // Cabecera editorial LIVI (ref. PDF): serif grande, sin foto de fondo.
   return (
-    <div className="relative h-48 w-full overflow-hidden sm:h-60 md:h-72">
-      <picture>
-        {mobileSrc && <source media="(max-width: 767px)" srcSet={mobileSrc} />}
-        <img
-          src={imageUrl}
-          alt={title}
-          className="absolute inset-0 h-full w-full object-cover object-center brightness-[0.6]"
-        />
-      </picture>
-      <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-transparent" />
-      <div className="absolute inset-0 flex flex-col items-start justify-end gap-2 px-6 py-8 md:px-14 md:py-12">
-        <h1 className="font-display text-4xl font-light italic leading-none text-white sm:text-5xl md:text-6xl">
-          {title}
-        </h1>
-        <p className="max-w-md font-body text-xs tracking-wide text-white/80 sm:text-sm">
-          {description}
-        </p>
-      </div>
+    <div className="border-b border-border px-6 pb-8 pt-10 md:px-14 md:pb-10 md:pt-14">
+      <h1 className="font-heading text-5xl font-normal leading-none text-text sm:text-6xl md:text-7xl">
+        {title}
+      </h1>
+      <p className="mt-4 max-w-md font-body text-sm leading-relaxed text-text-soft md:text-base">
+        {description}
+      </p>
     </div>
   );
 }

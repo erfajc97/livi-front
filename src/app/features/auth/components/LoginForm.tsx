@@ -120,7 +120,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
         {/* Crear cuenta: la acción secundaria del modal, con el tratamiento
             editorial del sitio en vez de un enlace suelto */}
         <div className="mt-4 border-t border-border pt-5 text-center">
-          <p className="eyebrow mb-2 text-text-muted">¿Primera vez en NonDecants?</p>
+          <p className="eyebrow mb-2 text-text-muted">¿Primera vez en LIVI?</p>
           <button
             type="button"
             onClick={onSwitchToRegister}

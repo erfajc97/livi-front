@@ -7,22 +7,22 @@ import type { Product, ProductVariant } from '@/app/types/global.types';
 
 interface ProductDetailIslandProps {
   product: Product;
+  /** Productos "Combina con" resueltos en el servidor (mini carrusel del panel). */
+  pairsWith?: Product[];
 }
 
 function ProductGallery({
   images,
   name,
-  bajoPedido,
 }: {
   images: string[];
   name: string;
-  bajoPedido?: boolean;
 }) {
   const list = images.filter(Boolean);
   const [idx, setIdx] = useState(0);
 
-  /* Arrastre real —con el dedo y con el mouse— en vez del swipe casero, que
-     solo reaccionaba al soltar y se perdía si el gesto empezaba sobre la foto. */
+  /* Arrastre real —con el dedo y con el mouse— en móvil. En desktop la
+     galería es una pila de fotos grandes con scroll (ref. minabaie). */
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: list.length > 1,
     align: 'start',
@@ -52,7 +52,7 @@ function ProductGallery({
 
   if (list.length === 0) {
     return (
-      <div className="flex h-[55svh] items-center justify-center bg-surface-raised text-text-muted">
+      <div className="flex h-[55svh] items-center justify-center bg-bg-alt text-text-muted">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
@@ -63,66 +63,67 @@ function ProductGallery({
   }
 
   return (
-    /* Galería compacta. En MÓVIL se limita a ~42svh y se navega con swipe +
-       puntos (sin miniaturas); en desktop usa el alto grande con miniaturas. */
-    <div className="flex h-[42svh] flex-col gap-2.5 sm:h-[50svh] md:h-[calc(100svh-15rem)] md:max-h-[620px]">
-      {/* Imagen principal — botella completa sobre tile blanco (object-contain) */}
-      <div className="relative min-h-0 flex-1 overflow-hidden bg-white">
-        <div className="h-full overflow-hidden" ref={emblaRef}>
-          <div className="flex h-full">
-            {list.map((img, i) => (
-              <div key={i} className="h-full min-w-0 shrink-0 basis-full">
-                <img
-                  src={img}
-                  alt={i === 0 ? name : `${name} ${i + 1}`}
-                  draggable={false}
-                  className="h-full w-full select-none object-contain p-3 md:p-4"
-                />
-              </div>
-            ))}
+    <>
+      {/* MÓVIL: carrusel con swipe + puntos */}
+      <div className="flex h-[52svh] flex-col gap-2.5 sm:h-[58svh] md:hidden">
+        <div className="relative min-h-0 flex-1 overflow-hidden bg-bg-alt">
+          <div className="h-full overflow-hidden" ref={emblaRef}>
+            <div className="flex h-full">
+              {list.map((img, i) => (
+                <div key={i} className="h-full min-w-0 shrink-0 basis-full">
+                  <img
+                    src={img}
+                    alt={i === 0 ? name : `${name} ${i + 1}`}
+                    draggable={false}
+                    className="h-full w-full select-none object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        {bajoPedido && (
-          <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 border border-accent bg-bg px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.22em] text-text md:left-5 md:top-5">
-            <span className="h-[5px] w-[5px] rounded-full bg-accent" />
-            Bajo Pedido
-          </span>
+        {list.length > 1 && (
+          <div className="flex shrink-0 items-center justify-center gap-1.5 py-1">
+            {list.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Imagen ${i + 1}`}
+                onClick={() => goTo(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  idx === i ? 'w-4 bg-text' : 'w-1.5 bg-text/30'
+                }`}
+              />
+            ))}
+          </div>
         )}
       </div>
-      {/* Puntos del carrusel — solo mobile, bajo la imagen sobre fondo claro */}
-      {list.length > 1 && (
-        <div className="flex shrink-0 items-center justify-center gap-1.5 py-1 md:hidden">
-          {list.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Imagen ${i + 1}`}
-              onClick={() => goTo(i)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                idx === i ? 'w-4 bg-text' : 'w-1.5 bg-text/30'
+
+      {/* DESKTOP: pila editorial de fotos grandes con scroll (2 columnas que
+          alternan; la primera y las impares van a ancho completo si son pocas).
+          Tiles altos 3:4 — más largos, como la ficha de referencia. */}
+      <div className="hidden grid-cols-2 gap-3 md:grid">
+        {list.map((img, i) => (
+          <div
+            key={i}
+            className={`overflow-hidden bg-bg-alt ${
+              list.length % 2 !== 0 && i === list.length - 1 ? 'col-span-2' : ''
+            }`}
+          >
+            <img
+              src={img}
+              alt={i === 0 ? name : `${name} ${i + 1}`}
+              loading={i < 2 ? 'eager' : 'lazy'}
+              className={`w-full object-cover ${
+                list.length % 2 !== 0 && i === list.length - 1
+                  ? 'aspect-[8/5]'
+                  : 'aspect-[3/4]'
               }`}
             />
-          ))}
-        </div>
-      )}
-      {/* Miniaturas cuadradas — solo desktop */}
-      {list.length > 1 && (
-        <div className="hidden w-full max-w-82.5 shrink-0 grid-cols-3 gap-2.5 md:grid">
-          {list.slice(0, 3).map((img, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => goTo(i)}
-              className={`relative aspect-square overflow-hidden border bg-white transition-colors ${
-                idx === i ? 'border-text' : 'border-border opacity-90 hover:opacity-100'
-              }`}
-            >
-              <img src={img} alt={`${name} ${i + 1}`} className="h-full w-full object-contain p-1.5" />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -138,31 +139,38 @@ export default function ProductDetailIsland(props: ProductDetailIslandProps) {
   );
 }
 
-function ProductDetailContent({ product }: ProductDetailIslandProps) {
-  // Default: null = full bottle (product itself), not a variant
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+function ProductDetailContent({ product, pairsWith }: ProductDetailIslandProps) {
+  // Default: primera variante — la galería arranca con SUS fotos (las que el
+  // admin subió a la variante), no con las genéricas del producto.
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    () => product.variants?.[0] ?? null,
+  );
 
   // When a variant is selected and has images, show those; otherwise show product images
   const galleryImages = useMemo(() => {
+    const toUrl = (img: any) => (typeof img === 'string' ? img : img?.url);
     if (selectedVariant?.images && selectedVariant.images.length > 0) {
-      return selectedVariant.images;
+      return selectedVariant.images.map(toUrl).filter(Boolean) as string[];
     }
     const productImages = product.images?.length
-      ? product.images
-      : [product.image].filter((img): img is string => Boolean(img));
+      ? product.images.map(toUrl).filter(Boolean) as string[]
+      : [product.image ?? product.imageUrl].filter((img): img is string => Boolean(img));
     return productImages;
-  }, [selectedVariant, product.images, product.image]);
+  }, [selectedVariant, product.images, product.image, product.imageUrl]);
 
   return (
-    <div className="mt-4 grid grid-cols-1 items-start gap-8 md:grid-cols-[0.82fr_1fr] md:gap-12">
+    /* Izquierda: galería con scroll · Derecha: panel de compra fijo (sticky),
+       estilo minabaie. */
+    <div className="mt-4 grid grid-cols-1 items-start gap-6 md:grid-cols-[1.25fr_1fr] md:gap-10">
       <div className="max-w-full overflow-hidden">
-        <ProductGallery images={galleryImages} name={product.name} bajoPedido={product.bajoPedido} />
+        <ProductGallery images={galleryImages} name={product.name} />
       </div>
-      <div className="md:sticky md:top-20">
+      <div className="md:sticky md:top-24">
         <ProductPurchaseOptions
           product={product}
           selectedVariant={selectedVariant}
           onVariantChange={setSelectedVariant}
+          pairsWith={pairsWith}
         />
       </div>
     </div>

@@ -1,65 +1,99 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
-import DeliveryEta from '@/app/components/UI/DeliveryEta';
+import { colorHex } from '@/app/helpers/colorHex';
 import TrustIcons from '@/app/components/UI/TrustIcons';
 import { productUrl } from '@/app/helpers/productUrl';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { sonnerResponse } from '@/app/helpers/sonnerResponse';
-import { DEFAULT_DISPATCH_CUTOFF_HOUR } from '@/app/helpers/deliveryWindow';
+import { DEFAULT_DISPATCH_CUTOFF_HOUR, deliveryRangeShort, dispatchDateShort } from '@/app/helpers/deliveryWindow';
+import TruckLineIcon from '@/assets/svg/TruckLineIcon';
 import { useDeliveryOffsetQuery, useDispatchCutoffQuery } from '@/app/tanstack-queries/settingsQuery';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import type { Product, ProductVariant } from '@/app/types/global.types';
-
-type SelectedOption =
-  | { type: 'full' }
-  /** Presentación sellada extra (50 ml, 30 ml…) cargada como variante en el admin. */
-  | { type: 'sealed'; variant: ProductVariant }
-  | { type: 'decant'; variant: ProductVariant };
 
 interface ProductPurchaseOptionsProps {
   product: Product;
   selectedVariant?: ProductVariant | null;
   onVariantChange?: (variant: ProductVariant | null) => void;
+  /** Productos "Combina con" (mini carrusel bajo los acordeones, ref. minabaie). */
+  pairsWith?: Product[];
 }
 
+/**
+ * Opciones de compra de la ficha LIVI. Las variantes son COLORES del mismo
+ * producto y comparten el stock del producto (unidades). El precio puede
+ * variar por color (`variant.price`), con fallback al precio del producto.
+ */
+/**
+ * Opciones de compra de la ficha LIVI. Una variante es la COMBINACIÓN
+ * color (name) + talla (size): los swatches eligen color, los botones eligen
+ * talla, y juntos resuelven la variante exacta (su precio y sus fotos).
+ * Si ninguna variante tiene talla, se usa el catálogo de tallas del producto
+ * (product.sizes) como selector suelto; si tampoco hay, no se muestra talla.
+ */
 export default function ProductPurchaseOptions({
   product,
   selectedVariant: externalVariant,
   onVariantChange,
+  pairsWith = [],
 }: ProductPurchaseOptionsProps) {
-  // Default selection: full bottle if available, else first available decant
-  const [selected, setSelected] = useState<SelectedOption>(() => {
-    const stock = Number(product.stock ?? 0);
-    if (stock > 0) return { type: 'full' };
-    const openMl = Number(product.openBottleMlRemaining ?? 0);
-    const totalAvailMl = openMl + stock * Number(product.totalMl ?? 0);
-    const firstAvailable = (product.variants ?? [])
-      .filter(v => !v.isFullBottle && v.ml <= totalAvailMl)
-      .sort((a, b) => a.ml - b.ml)[0];
-    if (firstAvailable) return { type: 'decant', variant: firstAvailable };
-    return { type: 'full' };
-  });
+  const variants = product.variants ?? [];
+
+  // Colores únicos por nombre, en orden de aparición (cada entrada representa
+  // un color; su variante sirve para swatch, hex y fotos).
+  const colors = (() => {
+    const seen = new Map<string, ProductVariant>();
+    for (const v of variants) {
+      const key = v.name ?? '';
+      if (!seen.has(key)) seen.set(key, v);
+    }
+    return [...seen.values()];
+  })();
+
+  // Tallas: las que traen las variantes (combo real); si ninguna trae, cae al
+  // catálogo del producto (tallas sueltas, sin variante por combinación).
+  const variantSizes = [...new Set(variants.map((v) => v.size).filter(Boolean))] as string[];
+  const hasComboSizes = variantSizes.length > 0;
+  const sizes = hasComboSizes ? variantSizes : (product.sizes ?? []);
+
+  const [selectedColor, setSelectedColor] = useState<string | null>(colors[0]?.name ?? null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
   const [hasHydrated, setHasHydrated] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
 
-  // Sync external variant prop
+  // Variante resuelta: color + talla exactos; si el combo no existe, el
+  // primero del color (mantiene precio/fotos del color aunque falte la talla).
+  const selected =
+    variants.find((v) => (v.name ?? null) === selectedColor && (v.size ?? null) === selectedSize) ??
+    variants.find((v) => (v.name ?? null) === selectedColor) ??
+    variants[0] ??
+    null;
+
+  // Avisar a la galería cuando cambia la variante resuelta.
+  useEffect(() => {
+    onVariantChange?.(selected);
+  }, [selected?.id]);
+
+  const handleSelectColor = (name: string) => {
+    setSelectedColor(name);
+    // Si la talla elegida no existe para este color, saltar a la primera que sí.
+    if (hasComboSizes && selectedSize) {
+      const exists = variants.some((v) => (v.name ?? null) === name && v.size === selectedSize);
+      if (!exists) {
+        const firstForColor = variants.find((v) => (v.name ?? null) === name && v.size);
+        setSelectedSize(firstForColor?.size ?? sizes[0] ?? null);
+      }
+    }
+  };
+
+  // Sync external variant prop (galería): null = volver al default.
   useEffect(() => {
     if (externalVariant === null) {
-      setSelected({ type: 'full' });
+      setSelectedColor(colors[0]?.name ?? null);
+      setSelectedSize(sizes[0] ?? null);
     }
   }, [externalVariant]);
-
-  // Notify parent when selection changes (for gallery image switching)
-  const handleSelectFull = () => {
-    setSelected({ type: 'full' });
-    onVariantChange?.(null);
-  };
-
-  const handleSelectDecant = (v: ProductVariant) => {
-    setSelected({ type: 'decant', variant: v });
-    onVariantChange?.(v);
-  };
 
   useEffect(() => {
     const unsub = useCartStore.subscribe((state: any) => {
@@ -69,23 +103,17 @@ export default function ProductPurchaseOptions({
     return unsub;
   }, []);
 
-  // ?variant=<id> — se llega desde el "+" de la card con un formato ya elegido.
+  // ?variant=<id> — se llega desde el "+" de la card con un color ya elegido.
   // Se aplica tras montar (no en el estado inicial) para no romper la hidratación.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const variantId = new URLSearchParams(window.location.search).get('variant');
     if (!variantId) return;
 
-    const variant = (product.variants ?? []).find((v) => String(v.id) === variantId);
-    if (variant && !variant.isFullBottle) {
-      setSelected({ type: 'decant', variant });
-      onVariantChange?.(variant);
-    } else if (variant && sealedExtras.some((s) => s.id === variant.id)) {
-      setSelected({ type: 'sealed', variant });
-      onVariantChange?.(variant);
-    } else {
-      setSelected({ type: 'full' });
-      onVariantChange?.(null);
+    const variant = variants.find((v) => String(v.id) === variantId);
+    if (variant) {
+      setSelectedColor(variant.name ?? null);
+      if (variant.size) setSelectedSize(variant.size);
     }
   }, [product.id]);
 
@@ -93,145 +121,48 @@ export default function ProductPurchaseOptions({
   const { data: deliveryOffset = 0 } = useDeliveryOffsetQuery();
   const { data: cutoffHour = DEFAULT_DISPATCH_CUTOFF_HOUR } = useDispatchCutoffQuery();
 
-  // Number(): los decimales llegan como string desde el backend; sin esto las
-  // sumas de ml concatenan y la disponibilidad sale mal.
-  const fullBottlePrice = Number(product.price ?? 0);
-  const fullBottleStock = Number(product.stock ?? 0);
-  const fullBottleMl = Number(product.totalMl ?? 0);
+  // Number(): los decimales llegan como string desde el backend.
+  const basePrice = Number(product.price ?? 0);
+  const stock = Number(product.stock ?? 0);
 
-  const variants = product.variants ?? [];
-  // Siempre de menor a mayor: el orden en que llegan del backend depende del id
-  // de creación y dejaba tarjetas salteadas (10 ml antes que 3 ml).
-  const byMl = (a: ProductVariant, b: ProductVariant) => a.ml - b.ml;
-  const decants = variants.filter(v => !v.isFullBottle).sort(byMl);
-  // Presentaciones selladas cargadas como variante (REQ-056). El backend crea
-  // además una variante espejo del frasco del producto: esa no se pinta dos
-  // veces, ya es la tarjeta principal.
-  const sealedExtras = variants
-    .filter((v) => v.isFullBottle && !(v.ml === fullBottleMl && v.price === fullBottlePrice))
-    .sort(byMl);
-
-  const isFullSelected = selected.type === 'full';
-  const selectedSealed = selected.type === 'sealed' ? selected.variant : null;
-  const selectedDecant = selected.type === 'decant' ? selected.variant : null;
-
-  // Price display
-  const currentPrice = isFullSelected
-    ? fullBottlePrice
-    : (selectedSealed?.price ?? selectedDecant?.price ?? 0);
+  const currentPrice = Number(selected?.price ?? basePrice);
   const discount = product.discount ?? 0;
   const hasDiscount = discount > 0;
   const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
 
-  // Stock — use available ml to determine what's purchasable
-  const openMl = Number(product.openBottleMlRemaining ?? 0);
-  const availableMl = openMl + fullBottleStock * fullBottleMl;
-  // El flag `bajoPedido` define SOLO la sección (importación exclusiva). El
-  // frasco completo SIEMPRE se puede comprar: si no queda stock sellado, se
-  // importa bajo pedido. Los decants NO: requieren abrir un frasco real, así
-  // que se topan por ml disponible.
-  const isBajoPedidoFlag = !!product.bajoPedido;
-  const canBuyFullBottle = fullBottlePrice > 0;
-  const canBuyDecant = (ml: number) => availableMl >= ml;
-  // El frasco va "bajo pedido" cuando está marcado como tal o cuando no queda
-  // stock sellado (todas las unidades se importan).
-  const fullIsBackorder = isBajoPedidoFlag || fullBottleStock <= 0;
-  /**
-   * Las presentaciones selladas extra van siempre bajo pedido: no existe stock
-   * por variante en la base —el `availableQuantity` que llega es el del frasco
-   * principal, así que un 50 ml heredaría el stock de los de 100— y prometer
-   * unidades que no están contadas es peor que avisar los 13–17 días.
-   */
-  const sealedIsBackorder = (_v: ProductVariant) => true;
-  // Sólo la opción seleccionada determina el tag/modal de bajo pedido.
-  const selectedIsBajoPedido = isFullSelected
-    ? fullIsBackorder
-    : selectedSealed
-      ? sealedIsBackorder(selectedSealed)
-      : false;
-
-  const inStock = isFullSelected
-    ? canBuyFullBottle
-    : selectedSealed
-      ? selectedSealed.price > 0
-      : selectedDecant ? canBuyDecant(selectedDecant.ml) : false;
-
-  const hasImmediateStock = fullBottleStock > 0 || availableMl > 0;
-  const statusLabel = hasImmediateStock
-    ? 'En stock'
-    : canBuyFullBottle || isBajoPedidoFlag ? 'Bajo pedido' : 'Agotado';
-  const statusIsBad = statusLabel === 'Agotado';
+  const inStock = stock > 0;
+  const statusLabel = inStock ? 'En stock' : 'Agotado';
+  const statusIsBad = !inStock;
 
   const getCartItem = () => {
-    if (isFullSelected) {
-      return {
-        productId: product.id,
-        variantId: `full-${product.id}`,
-        name: product.name,
-        image: product.image || product.images?.[0] || '',
-        ml: fullBottleMl,
-        price: hasDiscount ? discountedPrice : fullBottlePrice,
-        quantity: 1,
-        bajoPedido: fullIsBackorder,
-        // Frasco completo: el usuario PUEDE pedir más de lo que hay en stock; el
-        // excedente se desglosa como "bajo pedido" en el carrito. Sin tope duro.
-        maxQty: undefined,
-        // Sin stock sellado → todo bajo pedido (stockAvailable undefined). Con
-        // stock parcial → el carrito parte el excedente a bajo pedido.
-        stockAvailable: fullIsBackorder ? undefined : fullBottleStock,
-        // Pool compartido con los decants: cada frasco vendido lo consume.
-        availableMl,
-      };
-    }
-    if (selectedSealed) {
-      const backorder = true; // ver `sealedIsBackorder`
-      const price = hasDiscount
-        ? selectedSealed.price * (1 - discount / 100)
-        : selectedSealed.price;
-      return {
-        productId: product.id,
-        variantId: selectedSealed.id,
-        name: product.name,
-        image: selectedSealed.images?.[0] || product.image || '',
-        ml: selectedSealed.ml,
-        price,
-        quantity: 1,
-        bajoPedido: backorder,
-        // Frasco sellado: como el principal, se puede pedir de más y el
-        // excedente se desglosa como bajo pedido en el carrito.
-        maxQty: undefined,
-        stockAvailable: backorder ? undefined : Number(selectedSealed.availableQuantity ?? 0),
-      };
-    }
-    if (selectedDecant) {
-      return {
-        productId: product.id,
-        variantId: selectedDecant.id,
-        name: product.name,
-        image: selectedDecant.images?.[0] || product.image || '',
-        ml: selectedDecant.ml,
-        price: hasDiscount ? selectedDecant.price * (1 - discount / 100) : selectedDecant.price,
-        quantity: 1,
-        // El decant no se marca bajo pedido de origen: se topa por las unidades
-        // que dan los ml disponibles. Pero si en el carrito hay frascos del
-        // mismo producto que consumen esos ml, el excedente sí pasa a bajo
-        // pedido (el reparto lo hace `splitCartStock`).
-        bajoPedido: false,
-        maxQty: selectedDecant.availableQuantity,
-        availableMl,
-      };
-    }
-    return null;
+    if (!selected) return null;
+    return {
+      productId: product.id,
+      // Con combos reales (variante.color+talla) el id ya ES la combinación.
+      // El "|talla" solo aplica al fallback de catálogo suelto (product.sizes);
+      // en ambos casos el backend recibe el id numérico (parseInt corta en "|").
+      variantId:
+        !hasComboSizes && sizes.length > 0 && selectedSize
+          ? `${selected.id}|${selectedSize}`
+          : String(selected.id),
+      name: product.name,
+      variationName: selected.name,
+      size: selectedSize ?? undefined,
+      image: selected.images?.[0]?.url ?? product.image ?? product.imageUrl ?? '',
+      price: hasDiscount ? discountedPrice : currentPrice,
+      quantity: 1,
+      maxQty: inStock ? stock : undefined,
+      stockAvailable: stock,
+    };
   };
-
-  const [pendingAction, setPendingAction] = useState<null | 'add' | 'fast'>(null);
 
   const proceedAdd = () => {
     const item = getCartItem();
     if (!item) return;
     addItem(item);
-    // Se queda en la ficha: agregar no debería sacar al cliente de lo que está
-    // mirando. Para ir a pagar está "Comprar ahora" y el ícono del carrito.
+    // Añadir abre el carrito drawer (ref. PDF carrito): el cliente ve su
+    // pieza entrar sin salir de la ficha. Para pagar: FINALIZAR COMPRA.
+    useCartStore.getState().setDrawerOpen(true);
     sonnerResponse(`${product.name} agregado al carrito.`, 'success');
   };
 
@@ -242,182 +173,156 @@ export default function ProductPurchaseOptions({
     window.location.href = '/checkout';
   };
 
-  /** Tarjetas del selector, ya ordenadas de menor a mayor ml. */
-  const formatCards = [
-    ...(fullBottlePrice > 0
-      ? [
-          {
-            key: 'full',
-            ml: fullBottleMl,
-            // "Disponible" en vez de "Sellada": lo que el cliente necesita saber
-            // es que ese frasco se puede llevar hoy.
-            type: fullBottleStock > 0 ? 'Disponible' : 'Bajo pedido',
-            price: fullBottlePrice,
-            active: isFullSelected,
-            disabled: !canBuyFullBottle,
-            // El frasco completo lleva el marco dorado para que resalte.
-            highlight: true,
-            onClick: canBuyFullBottle ? handleSelectFull : undefined,
-          },
-        ]
-      : []),
-    ...sealedExtras.map((v) => ({
-      key: v.id,
-      ml: v.ml,
-      type: sealedIsBackorder(v) ? 'Bajo pedido' : 'Disponible',
-      price: v.price,
-      active: selectedSealed?.id === v.id,
-      disabled: false,
-      highlight: true,
-      onClick: () => {
-        setSelected({ type: 'sealed', variant: v });
-        onVariantChange?.(v);
-      },
-    })),
-    ...decants.map((v) => {
-      const available = canBuyDecant(v.ml);
-      return {
-        key: v.id,
-        ml: v.ml,
-        // Un decant sin ml suficientes no se puede servir (hay que abrir un
-        // frasco): la tarjeta dice por qué en vez de quedar muda.
-        type: available ? 'Decant' : 'Sin stock',
-        price: v.price,
-        active: selectedDecant?.id === v.id,
-        disabled: !available,
-        highlight: false,
-        onClick: available ? () => handleSelectDecant(v) : undefined,
-      };
-    }),
-  ].sort((a, b) => a.ml - b.ml);
+  const sizeMissing = sizes.length > 0 && !selectedSize;
 
   const handleAddToCart = () => {
     if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
-    const item = getCartItem();
-    if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
+    if (!selected) { sonnerResponse('Selecciona un color.', 'error'); return; }
+    if (sizeMissing) { sonnerResponse('Selecciona una talla.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    if (selectedIsBajoPedido) { setPendingAction('add'); return; }
     proceedAdd();
   };
 
   const handleFastPurchase = () => {
     if (!hasHydrated) { sonnerResponse('Cargando carrito...', 'error'); return; }
-    const item = getCartItem();
-    if (!item) { sonnerResponse('Selecciona una opcion.', 'error'); return; }
+    if (!selected) { sonnerResponse('Selecciona un color.', 'error'); return; }
+    if (sizeMissing) { sonnerResponse('Selecciona una talla.', 'error'); return; }
     if (!inStock) { sonnerResponse('No hay stock disponible.', 'error'); return; }
-    if (selectedIsBajoPedido) { setPendingAction('fast'); return; }
     proceedFastPurchase();
-  };
-
-  const confirmBajoPedido = () => {
-    if (pendingAction === 'add') proceedAdd();
-    else if (pendingAction === 'fast') proceedFastPurchase();
-    setPendingAction(null);
   };
 
   const handleWhatsapp = () => {
     const url =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://nondecants.com${productUrl(product)}`;
-    const msg = `Hola, estoy interesado/a en el perfume ${product.name}: ${url}`;
+        : `https://livi.ec${productUrl(product)}`;
+    const msg = `Hola, me interesa ${product.name} de LIVI: ${url}`;
     window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const detailTags = [
-    product.gender && { label: 'Género', value: product.gender === 'HOMBRE' ? 'Hombre' : product.gender === 'MUJER' ? 'Mujer' : 'Unisex' },
-    product.concentration && { label: 'Concentración', value: product.concentration.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).replace('De ', 'de ') },
-    product.timeOfDay && { label: 'Hora', value: product.timeOfDay === 'DIA' ? 'Día' : 'Noche' },
-    product.projection && { label: 'Proyección', value: product.projection === 'DISCRETA' ? 'Discreta' : product.projection === 'MODERADA' ? 'Moderada' : 'Alta' },
-  ].filter(Boolean) as { label: string; value: string }[];
-
   return (
-    <div className="flex flex-col gap-4 text-text">
-      {/* Title */}
+    <div className="flex flex-col gap-3 text-text">
+      {/* Title + precio (ref. PDF ficha) */}
       <div>
-        {detailTags.length > 0 && (
-          <span className="font-body text-[10px] uppercase tracking-[0.22em] text-text-muted">
-            {detailTags.map((t) => t.value).join(' · ')}
+        <h1 className="font-heading text-3xl font-normal leading-[1.02] tracking-[-0.01em] text-text md:text-4xl">{product.name}</h1>
+        <div className="mt-2 flex items-baseline gap-3">
+          <span className="font-heading text-2xl text-text md:text-3xl">
+            {formatCurrency(discountedPrice)}
           </span>
-        )}
-        {/* La casa, sobre el nombre y enlazada a su catálogo: es lo primero que
-            busca quien ya conoce la marca. */}
-        {product.marca?.name && (
-          <a
-            href={`/catalogo/perfumes?marca=${product.marca.slug || product.marca.id}`}
-            className="mt-2 block w-fit font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:text-accent"
-          >
-            {product.marca.name}
-          </a>
-        )}
-        <div className="mt-1.5 flex items-start justify-between gap-3">
-          <h1 className="font-display text-3xl font-light leading-[0.98] tracking-[-0.025em] text-text md:text-4xl">{product.name}</h1>
-          <button className="mt-1 shrink-0 text-text-muted transition-colors hover:text-accent" aria-label="Favorito">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-              <path d="M12 20s-7-4.5-9-9.5C1.5 6.5 4.5 4 7.5 5 9 5.5 12 8 12 8s3-2.5 4.5-3c3-1 6 1.5 4.5 6.5-2 5-9 9.5-9 9.5z" />
-            </svg>
-          </button>
-        </div>
-        <div className="mt-2">
-          <span className={`font-body text-[11px] uppercase tracking-[0.16em] ${statusIsBad ? 'text-error' : 'text-text-muted'}`}>
+          {hasDiscount && (
+            <span className="font-body text-sm text-text-muted line-through">
+              {formatCurrency(currentPrice)}
+            </span>
+          )}
+          <span className={`ml-auto font-mono text-[10px] uppercase tracking-[0.2em] ${statusIsBad ? 'text-error' : 'text-text-muted'}`}>
             {statusLabel}
           </span>
         </div>
+        {product.description && <Description text={product.description} />}
       </div>
 
-      {/* Selector de formato */}
-      <div>
-        <p className="eyebrow mb-2.5">Selecciona tu formato</p>
-        {/* Tarjetas cuadradas y compactas (tamaño fijo, no se estiran) */}
-        {/* Un solo listado ordenado de menor a mayor ml, sin importar si es
-            decant o frasco: así el cliente lee la escala de un vistazo. */}
-        <div className="flex flex-wrap gap-2">
-          {formatCards.map((card) => (
-            <SizeCard
-              key={card.key}
-              ml={card.ml}
-              type={card.type}
-              price={card.price}
-              discount={discount}
-              active={card.active}
-              disabled={card.disabled}
-              highlight={card.highlight}
-              onClick={card.onClick}
-            />
-          ))}
+      {/* Selector de color — puntos redondos (ref. PDF ficha). Se mapean los
+          COLORES únicos (una variante puede repetir color con distinta talla);
+          el hex lo define el admin en la variante y si falta se infiere. */}
+      {colors.length > 0 && (
+        <div>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">
+            Color{selectedColor ? ` · ${selectedColor}` : ''}
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            {colors.map((v) => {
+              const active = selectedColor === (v.name ?? null);
+              return (
+                <button
+                  key={v.name ?? 'unico'}
+                  onClick={() => handleSelectColor(v.name ?? '')}
+                  title={v.name ?? 'Color'}
+                  aria-label={`Color ${v.name ?? 'único'}`}
+                  aria-pressed={active}
+                  className={`h-9 w-9 rounded-full border border-border transition-all ${
+                    active ? 'outline outline-2 outline-offset-[3px] outline-accent' : 'hover:scale-110'
+                  }`}
+                  style={{ backgroundColor: v.colorHex ?? colorHex(v.name) }}
+                />
+              );
+            })}
+          </div>
         </div>
+      )}
+
+      {/* Selector de talla (ref. minabaie "Size: Full / Midi / Mini"). Con
+          combos reales, la talla que no existe para el color queda apagada. */}
+      {sizes.length > 0 && (
+        <div>
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted">
+            Talla{selectedSize ? ` · ${selectedSize}` : ''}
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            {sizes.map((size) => {
+              const active = selectedSize === size;
+              const available =
+                !hasComboSizes ||
+                selectedColor === null ||
+                variants.some((v) => (v.name ?? null) === selectedColor && v.size === size);
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  disabled={!available}
+                  onClick={() => setSelectedSize(size)}
+                  aria-pressed={active}
+                  className={`min-w-16 border px-5 py-2.5 font-body text-xs tracking-[0.04em] transition-colors ${
+                    active
+                      ? 'border-text bg-text text-bg'
+                      : available
+                        ? 'border-border bg-transparent text-text hover:border-text'
+                        : 'cursor-not-allowed border-border bg-transparent text-text-muted opacity-40 line-through'
+                  }`}
+                >
+                  {size}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Entrega — una sola línea editorial, sin caja (ref. minabaie). */}
+      <div className="-mx-4 flex items-center gap-3 border-y border-border px-4 py-3">
+        <span className="commit-icon commit-icon--drive inline-flex h-5 w-5 shrink-0 text-text-soft">
+          <TruckLineIcon size={16} />
+        </span>
+        <p className="font-body text-xs leading-snug text-text-soft">
+          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-text-muted">
+            Se despacha&nbsp;
+          </span>
+          <span className="text-text">{dispatchDateShort(cutoffHour)}</span>
+          <span className="text-text-muted"> · entrega estimada </span>
+          <span className="text-text">{deliveryRangeShort(deliveryOffset, cutoffHour)}</span>
+        </p>
       </div>
 
-      <div className="overflow-x-hidden border-y border-border bg-bg-alt/60 px-4 py-3.5 -mx-4">
-        <DeliveryEta
-          variant={selectedIsBajoPedido ? 'backorder' : 'immediate'}
-          offsetDays={deliveryOffset}
-          cutoffHour={cutoffHour}
-        />
-        <div className="mt-3.5 border-t border-border/80 pt-3.5">
-          <TrustIcons />
-        </div>
-      </div>
+      <TrustIcons />
 
       <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-border bg-bg/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
         <button
           onClick={handleAddToCart}
-          /* Marco dorado en loop en el CTA de añadir. */
-          className="gold-frame flex w-full items-center justify-center gap-2 bg-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          disabled={!inStock}
+          className="gold-frame flex w-full items-center justify-center gap-2 bg-accent py-4 font-mono text-[11px] uppercase tracking-[0.24em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Añadir — {formatCurrency(discountedPrice)}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
+          {inStock ? 'Añadir al carrito' : 'Agotado'}
         </button>
         <div className="flex gap-2">
           <button
             onClick={handleFastPurchase}
-            className="flex-1 border border-border py-3 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text"
+            disabled={!inStock}
+            className="flex-1 border border-text py-3.5 font-mono text-[11px] uppercase tracking-[0.2em] text-text transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
             Comprar ahora
           </button>
           <button
             onClick={handleWhatsapp}
-            className="flex h-[42px] w-[42px] shrink-0 items-center justify-center bg-green-700 text-white transition-colors hover:bg-green-600"
+            className="flex h-[42px] w-[42px] shrink-0 items-center justify-center bg-[#25D366] text-white transition-colors hover:bg-[#1EBE5B]"
             title="Consultar por WhatsApp"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -427,91 +332,247 @@ export default function ProductPurchaseOptions({
         </div>
       </div>
 
-      {/* Pago — medios aceptados */}
-      <div className="border-t border-border pt-4">
-        <span className="eyebrow">Pago</span>
-        <PaymentMethodIcons className="mt-2.5" />
+      {/* Envoltura de regalo (ref. PDF ficha) — el empaque de regalo LIVI
+          viene incluido en cada pedido; se muestra como compromiso, no como add-on. */}
+      <div className="flex items-center gap-3 border border-border px-4 py-3.5">
+        <img src="/caballito-burgundy.png" alt="" width="26" height="21" className="h-[21px] w-[26px] object-contain" aria-hidden />
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-text">
+            Envoltura de regalo LIVI incluida
+          </p>
+          <p className="mt-0.5 font-body text-xs text-text-muted">
+            Caja beige, faja burgundy y tarjeta firmada — sin costo.
+          </p>
+        </div>
       </div>
 
-      {pendingAction !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setPendingAction(null)}>
-          <div className="flex w-full max-w-md flex-col gap-4 border border-border bg-surface p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start gap-3">
-              <span className="mt-2 h-[7px] w-[7px] shrink-0 rounded-full bg-accent" />
-              <div>
-                <h3 className="font-display text-xl text-text">Producto bajo pedido</h3>
-                <p className="mt-1 font-body text-sm leading-relaxed text-text-soft">
-                  Este producto se importa bajo pedido. Tras confirmar el pago, la entrega estimada es de <span className="text-text">13–17 días</span>. ¿Deseas continuar?
-                </p>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setPendingAction(null)} className="border border-border px-5 py-2.5 font-body text-xs uppercase tracking-[0.16em] text-text-soft hover:border-text hover:text-text">
-                Cancelar
-              </button>
-              <button onClick={confirmBajoPedido} className="bg-text px-5 py-2.5 font-body text-xs uppercase tracking-[0.16em] text-bg hover:bg-accent">
-                Continuar
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Acordeones de la ficha (estilo minabaie, en español):
+          Características y detalles · Usos comunes · Medidas y organización ·
+          Envío y devoluciones (quemado) · Nuestra garantía (quemado). */}
+      <div className="border-t border-border">
+        {product.detailDescription && (
+          <Accordion title="Características y detalles" defaultOpen>
+            <p className="font-body text-sm leading-relaxed text-text-soft">
+              {product.detailDescription}
+            </p>
+          </Accordion>
+        )}
+        {(product.commonUses ?? []).length > 0 && (
+          <Accordion title="Usos comunes">
+            <ul className="flex flex-col gap-2">
+              {(product.commonUses ?? []).map((u) => (
+                <li key={u} className="font-body text-sm leading-relaxed text-text-soft">
+                  — {u}
+                </li>
+              ))}
+            </ul>
+          </Accordion>
+        )}
+        {(product.benefits ?? []).length > 0 && (
+          <Accordion title="Medidas y organización">
+            <ul className="flex flex-col gap-2">
+              {(product.benefits ?? []).map((b) => (
+                <li key={b} className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.14em] text-text-soft">
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </Accordion>
+        )}
+        <Accordion title="Envío y devoluciones">
+          <ul className="flex flex-col gap-2">
+            <li className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.14em] text-text-soft">
+              Envíos a todo Ecuador · Servientrega 24–72 h
+            </li>
+            <li className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.14em] text-text-soft">
+              El valor del envío se calcula en el checkout
+            </li>
+            <li className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.14em] text-text-soft">
+              Empaque de regalo LIVI incluido
+            </li>
+            <li className="font-mono text-[11px] uppercase leading-relaxed tracking-[0.14em] text-text-soft">
+              Cambios dentro de 15 días · pieza sin uso
+            </li>
+          </ul>
+        </Accordion>
+        <Accordion title="Nuestra garantía">
+          <p className="font-body text-sm leading-relaxed text-text-soft">
+            Cada pieza LIVI pasa por control de calidad en nuestro taller antes
+            de salir. Si llega con un defecto de fabricación, la reparamos o
+            reemplazamos sin costo dentro de los 30 días posteriores a la
+            entrega.
+          </p>
+        </Accordion>
+      </div>
+
+      {/* Combina con — mini carrusel dentro del panel (ref. minabaie "Pairs
+          With"): cards pequeñas con dots y enlace Agregar. */}
+      {pairsWith.length > 0 && <PairsWithRail products={pairsWith} />}
+
+      {/* Pago — medios aceptados */}
+      <div className="border-t border-border pt-3">
+        <span className="eyebrow">Pago</span>
+        <PaymentMethodIcons className="mt-2" />
+      </div>
+    </div>
+  );
+}
+
+/* Acordeón de la ficha — borde fino, título editorial, contenido mono. */
+function Accordion({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="border-b border-border">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between py-3 text-left"
+      >
+        <span className="font-body text-sm font-medium text-text">{title}</span>
+        <span className={`text-text-muted transition-transform ${open ? 'rotate-45' : ''}`} aria-hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 5v14M5 12h14" /></svg>
+        </span>
+      </button>
+      {open && <div className="pb-4">{children}</div>}
+    </div>
+  );
+}
+
+/* Los hex viven en @/app/helpers/colorHex (compartido con las cards). */
+
+/* Descripción con "Ver más" (ref. minabaie "Show More"): se corta a 3 líneas
+   y se despliega en línea. */
+function Description({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const isLong = text.length > 140;
+  return (
+    <div className="mt-3">
+      <p className={`font-body text-sm leading-relaxed text-text-soft ${!expanded && isLong ? 'line-clamp-3' : ''}`}>
+        {text}
+      </p>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded((e) => !e)}
+          className="mt-1.5 border-b border-text pb-0.5 font-body text-xs text-text transition-colors hover:border-accent hover:text-accent"
+        >
+          {expanded ? 'Ver menos' : 'Ver más'}
+        </button>
       )}
     </div>
   );
 }
 
-/* Tarjeta de formato (ml + tipo + precio) — estilo editorial Noir.
-   Con descuento muestra el % en la esquina y el precio ya rebajado. */
-function SizeCard({ ml, type, price, discount = 0, active, disabled, highlight, onClick }: {
-  ml: number;
-  type: string;
-  price: number;
-  discount?: number;
-  active: boolean;
-  disabled?: boolean;
-  /** Marco dorado en loop: distingue el frasco completo del resto de formatos. */
-  highlight?: boolean;
-  onClick?: () => void;
-}) {
-  const hasDiscount = discount > 0;
-  const finalPrice = hasDiscount ? price * (1 - discount / 100) : price;
+/* "Combina con" (Pairs With) — mini carrusel bajo los acordeones, dentro del
+   panel derecho (ref. minabaie). Cards compactas: foto, nombre, color, precio,
+   dots y enlace "Agregar" que hace quick-add del primer color. */
+function PairsWithRail({ products }: { products: Product[] }) {
+  const railRef = useState(() => ({ current: null as HTMLDivElement | null }))[0];
+  const addItem = useCartStore((s) => s.addItem);
+
+  const scrollBy = (dir: -1 | 1) => {
+    railRef.current?.scrollBy({ left: dir * 220, behavior: 'smooth' });
+  };
+
+  const quickAdd = (p: Product) => {
+    const format = (p.formats ?? []).find((f) => f.price > 0);
+    const price = Number(format?.price ?? p.minFormatPrice ?? p.price ?? 0);
+    if (!format || price <= 0) {
+      window.location.href = `/producto/${p.id}`;
+      return;
+    }
+    addItem({
+      productId: p.id,
+      variantId: String(format.id),
+      name: p.name,
+      variationName: format.name,
+      image: format.imageUrl || p.image || '',
+      price,
+      quantity: 1,
+      maxQty: Number(p.stock ?? 0) > 0 ? Number(p.stock) : undefined,
+      stockAvailable: Number(p.stock ?? 0),
+    });
+    useCartStore.getState().setDrawerOpen(true);
+    sonnerResponse(`${p.name} agregado al carrito.`, 'success');
+  };
 
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      /* Bloque centrado y compacto: tipografía más grande, sin huecos muertos */
-      className={`relative flex aspect-square w-26 flex-col items-start justify-center gap-1.5 p-3 text-left transition-all ${
-        highlight && !disabled ? 'gold-frame' : ''
-      } ${
-        disabled
-          ? 'cursor-not-allowed border border-border opacity-40'
-          : active
-            ? 'bg-text text-bg'
-            : 'border border-border text-text hover:border-text'
-      }`}
-    >
-      {hasDiscount && (
-        <span className="absolute right-0 top-0 bg-accent px-1.5 py-px font-body text-[9px] font-medium tracking-wide text-bg">
-          -{discount}%
-        </span>
-      )}
+    <div className="border-t border-border pt-3">
+      <div className="mb-2.5 flex items-center justify-between">
+        <span className="font-body text-sm font-medium text-text">Combina con</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="Anterior"
+            onClick={() => scrollBy(-1)}
+            className="flex h-6 w-6 items-center justify-center text-text-muted transition-colors hover:text-text"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M15 18l-6-6 6-6" /></svg>
+          </button>
+          <button
+            type="button"
+            aria-label="Siguiente"
+            onClick={() => scrollBy(1)}
+            className="flex h-6 w-6 items-center justify-center text-text-muted transition-colors hover:text-text"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 6l6 6-6 6" /></svg>
+          </button>
+        </div>
+      </div>
 
-      {/* El tipo va arriba: primero qué es, después cuánto trae */}
-      <span className={`font-body text-[9px] uppercase leading-none tracking-[0.14em] ${active ? 'text-bg/70' : 'text-text-muted'}`}>
-        {type}
-      </span>
-      <span className="font-display text-2xl leading-none">
-        {ml}<span className="ml-1 font-body text-[11px] opacity-70">ml</span>
-      </span>
-      <span className="flex flex-col gap-0.5">
-        {hasDiscount && (
-          <span className={`font-body text-[10px] leading-none line-through ${active ? 'text-bg/60' : 'text-text-muted'}`}>
-            {formatCurrency(price)}
-          </span>
-        )}
-        <span className="font-body text-[13px] leading-none">{formatCurrency(finalPrice)}</span>
-      </span>
-    </button>
+      <div
+        ref={(el) => { railRef.current = el; }}
+        className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {products.map((p) => {
+          const formats = (p.formats ?? []).filter((f) => f.price > 0);
+          const first = formats[0];
+          const price = Number(first?.price ?? p.minFormatPrice ?? p.price ?? 0);
+          const img = first?.imageUrl || p.image || '';
+          return (
+            <div key={p.id} className="w-[118px] shrink-0">
+              <a href={`/producto/${p.id}`} className="block aspect-[4/5] overflow-hidden bg-bg-alt">
+                {img && (
+                  <img
+                    src={img}
+                    alt={p.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-[1.03]"
+                  />
+                )}
+              </a>
+              <a href={`/producto/${p.id}`}>
+                <p className="mt-1.5 line-clamp-1 font-body text-[11px] leading-snug text-text">{p.name}</p>
+              </a>
+              {first?.name && (
+                <p className="line-clamp-1 font-body text-[10px] text-text-muted">{first.name}</p>
+              )}
+              <p className="mt-0.5 font-body text-[11px] text-text">{formatCurrency(price)}</p>
+              <div className="mt-1 flex items-center gap-1.5">
+                {formats.slice(0, 4).map((f) => (
+                  <span
+                    key={f.id}
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: f.colorHex ?? colorHex(f.name) }}
+                    title={f.name ?? 'Color'}
+                  />
+                ))}
+                {formats.length > 4 && (
+                  <span className="font-body text-[9px] text-text-muted">+{formats.length - 4}</span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => quickAdd(p)}
+                className="mt-1 border-b border-text pb-px font-body text-[11px] text-text transition-colors hover:border-accent hover:text-accent"
+              >
+                Agregar
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }

@@ -3,6 +3,8 @@ export const prerender = false;
 
 import PublicLayout from '@/layouts/PublicLayout.astro';
 import { fetchProducts, fetchProductById } from '@/app/tanstack-queries/productsQuery';
+import axiosInstance from '@/app/config/axiosConfig';
+import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { productUrl } from '@/app/helpers/productUrl';
 import {
   breadcrumbJsonLd,
@@ -14,6 +16,7 @@ import { productShareImagePath } from '@/app/helpers/ogCard';
 import ProductDetailIsland from '@/app/features/product/components/ProductDetailIsland';
 import ProductEditorial from '@/app/features/product/components/ProductEditorial.astro';
 import ExploreCategoriesCarousel from '@/app/features/product/components/ExploreCategoriesCarousel';
+import InstagramSection from '@/app/features/landing/components/sections-home/InstagramSection';
 
 const { id } = Astro.params;
 const product = await fetchProductById(id!);
@@ -30,16 +33,45 @@ if (Astro.url.pathname !== canonical) {
   return Astro.redirect(`${canonical}${Astro.url.search}`, 301);
 }
 
-// "De la misma familia": el resto de perfumes de la MISMA casa. Antes traía la
-// categoría entera excluyendo la marca, que es justo lo contrario de lo que
-// espera quien acaba de entrar por una marca.
-const relatedProducts = product.marcaId
+// "Combina con" (Pairs With): IDs asignados desde el admin por producto.
+const pairsWithIds = Array.isArray(product.pairsWith) ? product.pairsWith : [];
+const pairsWithProducts =
+  pairsWithIds.length > 0
+    ? (await fetchProducts({ limit: 100 })).content.filter((p) =>
+        pairsWithIds.includes(Number(p.id)),
+      )
+    : [];
+
+// "Te puede interesar": primero el resto de productos de la MISMA marca;
+// si no hay (catálogo pequeño), cae a los demás productos activos.
+let relatedProducts = product.marcaId
   ? (await fetchProducts({ marcaId: product.marcaId, limit: 12 })).content
       .filter((p) => p.id !== product.id)
   : [];
+if (relatedProducts.length === 0) {
+  relatedProducts = (await fetchProducts({ limit: 12 })).content
+    .filter((p) => p.id !== product.id);
+}
 
-const listingHref = product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes';
-const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
+// Categoría del producto para el breadcrumb (ref. PDF ficha: TIENDA / PAÑALERAS)
+let categoryName = '';
+let categoryHref = '/catalogo';
+try {
+  const { data } = await axiosInstance.get(API_ENDPOINTS.CATEGORIES);
+  const raw = data?.data?.data ?? data?.data ?? data ?? [];
+  const cat = Array.isArray(raw)
+    ? raw.find((c: any) => Number(c.id) === Number(product.categoryId))
+    : null;
+  if (cat) {
+    categoryName = cat.name ?? '';
+    categoryHref = `/catalogo?categoria=${cat.slug ?? cat.id}`;
+  }
+} catch {
+  // Si falla la API de categorías, el breadcrumb cae al nombre del producto.
+}
+
+const listingHref = '/catalogo';
+const listingLabel = 'Tienda';
 ---
 
 <PublicLayout
@@ -60,32 +92,48 @@ const listingLabel = product.bajoPedido ? 'Bajo Pedido' : 'Perfumes';
   ]}
 >
   <div class="bg-bg min-h-screen pt-3 md:pt-5">
-    {/* pb mobile compacto (REQ-035): el bloque PAGO cierra la columna y
-        "Perfil olfativo" arranca enseguida; en desktop se mantiene pb-10 */}
+    {/* pb mobile compacto: el bloque PAGO cierra la columna y
+        el detalle arranca enseguida; en desktop se mantiene pb-10 */}
     <div class="max-w-[1400px] mx-auto px-6 md:px-14 py-3 pb-5 md:pb-10">
-      {/* Breadcrumb */}
-      <nav class="mb-4 font-body text-[11px] tracking-[0.04em] text-text-muted flex items-center gap-2">
-        <a href="/" class="hover:text-text transition-colors">Inicio</a>
-        <span>·</span>
-        <a href={product.bajoPedido ? '/bajo-pedido' : '/catalogo/perfumes'} class="hover:text-text transition-colors">
-          {product.bajoPedido ? 'Bajo Pedido' : 'Perfumes'}
+      {/* Breadcrumb — mono editorial (ref. PDF ficha: TIENDA / PAÑALERAS) */}
+      <nav class="mb-4 font-mono text-[10px] uppercase tracking-[0.24em] text-text-muted flex items-center gap-3">
+        <a href="/catalogo" class="hover:text-text transition-colors">
+          Tienda
         </a>
-        <span>·</span>
-        <span class="text-text">{product.name}</span>
+        <span>/</span>
+        {categoryName ? (
+          <a href={categoryHref} class="text-text hover:text-accent transition-colors">
+            {categoryName}
+          </a>
+        ) : (
+          <span class="text-text">{product.name}</span>
+        )}
       </nav>
 
-      <ProductDetailIsland product={product} client:load />
+      <ProductDetailIsland
+        product={product}
+        pairsWith={pairsWithProducts}
+        client:load
+      />
     </div>
 
-    {/* Secciones editoriales (perfil olfativo · carácter/ocasión · firma · promesas) */}
+    {/* Secciones editoriales (detalle · beneficios · promesa LIVI) */}
     <ProductEditorial product={product} />
 
-    {/* Relacionados — misma categoría, otras casas. Sin relacionados no se
+    {/* Te puede interesar — misma marca. Sin relacionados no se
         pinta el contenedor: si no, queda un bloque vacío antes del footer. */}
     {relatedProducts.length > 0 && (
-      <div class="max-w-[1400px] mx-auto px-6 md:px-14 pb-12 pt-8 md:pb-20 md:pt-16">
-        <ExploreCategoriesCarousel products={relatedProducts} client:visible />
+      <div class="max-w-[1400px] mx-auto px-6 md:px-14 pb-10 pt-6 md:pb-12 md:pt-8">
+        <ExploreCategoriesCarousel
+          products={relatedProducts}
+          title="Te puede interesar"
+          client:visible
+        />
       </div>
     )}
+
+    {/* Instagram — posts propios del producto si los tiene (admin), si no la
+        selección general de marca */}
+    <InstagramSection posts={product.instagramPosts} client:visible />
   </div>
 </PublicLayout>

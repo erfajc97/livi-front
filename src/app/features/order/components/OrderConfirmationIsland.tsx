@@ -164,7 +164,7 @@ function OrderConfirmationContent() {
         <a href="/mi-cuenta" className="flex-1 bg-text px-6 py-4 text-center font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent">
           Ver mi pedido
         </a>
-        <a href="/catalogo/perfumes" className="flex-1 border border-border px-6 py-4 text-center font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text">
+        <a href="/catalogo" className="flex-1 border border-border px-6 py-4 text-center font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:border-text">
           Seguir comprando
         </a>
       </div>

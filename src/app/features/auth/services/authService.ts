@@ -9,7 +9,7 @@ function buildMockResponse(): AuthResponse {
   return {
     access_token: `${header}.${payload}.mock-signature`,
     refresh_token: 'mock-refresh-token',
-    user: { id: 'mock-user-001', name: 'Phillipe Diaz', email: 'test@nondecants.com', role: 'CLIENT', isEmailVerified: true },
+    user: { id: 'mock-user-001', name: 'Phillipe Diaz', email: 'test@livi.ec', role: 'CLIENT', isEmailVerified: true },
   };
 }
 
@@ -30,7 +30,7 @@ function mapBackendAuthResponse(backendData: any): AuthResponse {
 export const authService = {
   login: async (payload: LoginPayload): Promise<AuthResponse> => {
     if (MOCK_ENABLED) {
-      if (payload.email === 'test@nondecants.com' && payload.password === '123456') {
+      if (payload.email === 'test@livi.ec' && payload.password === '123456') {
         return buildMockResponse();
       }
       throw new Error('Credenciales incorrectas');
