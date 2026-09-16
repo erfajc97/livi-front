@@ -7,7 +7,8 @@ import CatalogProductIndex from '@/app/features/catalog/components/CatalogProduc
 import { fetchProducts } from '@/app/tanstack-queries/productsQuery';
 
 const robots = Astro.url.search ? 'noindex,follow' : 'index,follow';
-const indexed = await fetchProducts({ limit: 200, page: 1 });
+// El API limita `limit` a 100 — pedir más devuelve 400 y el índice caía al fallback.
+const indexed = await fetchProducts({ limit: 100, page: 1 });
 ---
 
 <PublicLayout

@@ -20,9 +20,11 @@ services:
     buildCommand: npm install && npm run build
     # Servidor standalone del adapter @astrojs/node
     startCommand: node ./dist/server/entry.mjs
-    healthCheckPath: /
+    healthCheckPath: /robots.txt # estático: no depende de que el API esté despierto
     autoDeploy: true
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: HOST
         value: 0.0.0.0 # Render enruta tráfico externo; sin esto solo escucha localhost
       # PORT lo inyecta Render automáticamente y Astro lo respeta
@@ -30,3 +32,7 @@ services:
         sync: false # https://livi-api.onrender.com/api (TODO dominio propio)
       - key: VITE_SECRET_KEY
         sync: false # clave para cifrado local del cliente (secureStorage)
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false # mismo Client ID de Google que el API
+      - key: VITE_USE_MOCK
+        value: "false"

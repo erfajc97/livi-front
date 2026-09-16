@@ -55,7 +55,10 @@ export default function OrderConfirmation({ order }: OrderConfirmationProps) {
           {order.items.map((item, i) => (
             <div key={i} className="flex justify-between text-sm">
               <span className="text-[--color-text-muted]">
-                {item.name}{item.variationName ? ` · ${item.variationName}` : ''} × {item.quantity}
+                {/* El API devuelve productName (+ variante: color · talla) */}
+                {item.productName ?? item.name}
+                {item.variationName ? ` · ${item.variationName}` : ''}
+                {item.variationSize ? ` · Talla ${item.variationSize}` : ''} × {item.quantity}
               </span>
               <span className="text-[--color-text]">{formatCurrency(item.price * item.quantity)}</span>
             </div>

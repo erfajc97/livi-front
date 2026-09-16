@@ -23,6 +23,10 @@ export default defineConfig({
     port: 4321,
   },
   vite: {
+    // Las islas React leen VITE_* (API, Google, clave de storage). Astro solo
+    // expone PUBLIC_* al navegador por defecto: sin esto el checkout, login y
+    // subida de comprobante pegaban al fallback en vez de VITE_API_BASE_URL.
+    envPrefix: ['PUBLIC_', 'VITE_'],
     plugins: [tailwindcss()],
     resolve: {
       alias: {

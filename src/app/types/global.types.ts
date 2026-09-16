@@ -120,7 +120,12 @@ export interface OrderItem {
   productId: string;
   variantId: string;
   name: string;
+  /** Nombre del producto que devuelve el API (OrderItemResponseDto). */
+  productName?: string;
   variationName?: string;
+  /** Talla de la variante comprada (OrderItemResponseDto). */
+  variationSize?: string;
+  variationColorHex?: string;
   price: number;
   quantity: number;
 }
