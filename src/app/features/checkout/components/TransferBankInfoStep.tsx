@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import Loader from '@/app/components/Loader';
+import { BTN_PRIMARY } from '@/app/components/UI/formClasses';
 import { BANK_LOGO_SRC } from '@/app/components/paymentLogos';
 import TermsAcceptance from './TermsAcceptance';
 
@@ -75,7 +76,7 @@ export default function TransferBankInfoStep({ total, isPending, termsAccepted, 
 
   return (
     <div className="flex flex-col gap-5">
-      <h2 className="font-display text-2xl font-light text-text">Datos para transferencia</h2>
+      <h2 className="font-heading text-2xl font-normal text-text">Datos para transferencia</h2>
 
       <p className="font-body text-sm text-text-soft">
         Realiza la transferencia por <span className="text-text">${total.toFixed(2)}</span> a una de las siguientes cuentas y sube tu comprobante.
@@ -113,7 +114,7 @@ export default function TransferBankInfoStep({ total, isPending, termsAccepted, 
                 <div className="divide-y divide-border border-t border-border bg-bg-alt">
                   {bank.rows.map(([label, value, mono]) => (
                     <div key={label} className="flex justify-between gap-4 px-4 py-2.5">
-                      <span className="font-body text-xs uppercase tracking-[0.14em] text-text-muted">{label}</span>
+                      <span className="font-mono text-xs uppercase tracking-[0.22em] text-text-muted">{label}</span>
                       <span className={`text-right text-sm text-text ${mono ? 'font-body tabular-nums' : 'font-body'}`}>{value}</span>
                     </div>
                   ))}
@@ -180,11 +181,9 @@ export default function TransferBankInfoStep({ total, isPending, termsAccepted, 
         type="button"
         onClick={() => receiptFile && termsAccepted && onConfirm(receiptFile)}
         disabled={!receiptFile || !termsAccepted || isPending}
-        className={`mt-2 w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 ${
-          receiptFile && termsAccepted && !isPending ? 'gold-frame' : ''
-        }`}
+        className={`mt-2 ${BTN_PRIMARY}`}
       >
-        {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Confirmar pedido'}
+        {isPending ? <Loader size={18} color="currentColor" className="mx-auto" /> : 'Confirmar pedido'}
       </button>
       <button
         type="button"

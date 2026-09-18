@@ -12,7 +12,7 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
   return (
     <div>
       {/* Title */}
-      <h2 className="mb-1 text-center font-display text-3xl font-light text-text">Recuperar contraseña</h2>
+      <h2 className="mb-1 text-center font-heading text-3xl font-normal text-text">Recuperar contraseña</h2>
       <p className="mb-8 text-center font-body text-sm text-text-soft">
         {sent
           ? 'Revisa tu bandeja de entrada'
@@ -22,8 +22,8 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
       {sent ? (
         <div className="flex flex-col items-center gap-5">
           {/* Success icon */}
-          <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5">
+          <div className="flex h-14 w-14 items-center justify-center bg-success-muted text-success">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
@@ -51,7 +51,7 @@ export default function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFo
 
           {/* Submit */}
           <button type="submit" disabled={isPending} className={AUTH_SUBMIT_CLASS}>
-            {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Enviar enlace'}
+            {isPending ? <Loader size={18} color="currentColor" className="mx-auto" /> : 'Enviar enlace'}
           </button>
 
           {/* Back to login */}

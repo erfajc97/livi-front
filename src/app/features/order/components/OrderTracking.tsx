@@ -1,3 +1,5 @@
+import { BTN_PRIMARY, LABEL_MONO } from '@/app/components/UI/formClasses';
+
 interface OrderTrackingProps {
   trackingCode?: string;
 }
@@ -5,11 +7,9 @@ interface OrderTrackingProps {
 export default function OrderTracking({ trackingCode }: OrderTrackingProps) {
   if (!trackingCode) {
     return (
-      <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: 'var(--radius-md)' }}>
-        <p className="font-heading text-xs uppercase tracking-wider text-gray-500 mb-2">
-          Seguimiento Servientrega
-        </p>
-        <p className="text-sm text-gray-500">
+      <div className="border border-border bg-surface p-5">
+        <p className={`${LABEL_MONO} mb-2`}>Seguimiento Servientrega</p>
+        <p className="font-body text-sm text-text-soft">
           El código de seguimiento estará disponible cuando el pedido sea despachado.
         </p>
       </div>
@@ -25,17 +25,15 @@ export default function OrderTracking({ trackingCode }: OrderTrackingProps) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-5" style={{ borderRadius: 'var(--radius-md)' }}>
-      <p className="font-heading text-xs uppercase tracking-wider text-gray-500 mb-2">
-        Seguimiento Servientrega
-      </p>
-      <p className="font-heading text-lg text-[--color-accent] mb-3">{trackingCode}</p>
+    <div className="border border-border bg-surface p-5">
+      <p className={`${LABEL_MONO} mb-2`}>Seguimiento Servientrega</p>
+      <p className="mb-3 font-heading text-lg tabular-nums text-accent">{trackingCode}</p>
       <a
         href={trackingUrl}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleTrackingClick}
-        className="inline-flex cursor-pointer items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 rounded-full bg-black text-white font-heading text-xs font-bold uppercase tracking-wider hover:bg-neutral-800 transition-colors no-underline"
+        className={`inline-flex cursor-pointer items-center justify-center gap-2 no-underline sm:max-w-sm ${BTN_PRIMARY}`}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="1" y="3" width="15" height="13" />

@@ -1,15 +1,8 @@
 import SearchableSelect from '@/app/components/UI/SearchableSelect';
+import { INPUT_UNDERLINE } from '@/app/components/UI/formClasses';
 import { PROVINCE_NAMES, cantonsOf, ALL_CANTONS } from '@/app/data/ecuadorLocations';
 import type { CustomerFormData } from '../types';
 import type { Address } from '@/app/features/profile/types';
-
-const INPUT_CLASS =
-  'w-full border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:ring-0 transition-colors';
-
-/* Mismo subrayado que el resto del checkout, para que el buscador no rompa la
-   línea visual de los campos. */
-const SELECT_CLASS =
-  'w-full border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text outline-none transition-colors placeholder:text-text-muted focus:border-text focus:ring-0';
 
 interface AddressSectionProps {
   customer: CustomerFormData;
@@ -41,16 +34,16 @@ export default function AddressSection({
 
   return (
     <section>
-      <h2 className="mb-1 text-center font-display text-xl font-light text-text">
+      <h2 className="mb-1 font-heading text-xl font-normal text-text">
         {isPickup ? '¿Quién retira el pedido?' : '¿Dónde enviamos tu pedido?'}
       </h2>
-      <p className="mb-5 text-center font-body text-[11px] text-text-muted">
+      <p className="mb-5 font-body text-[11px] text-text-muted">
         {isPickup ? 'Datos de quien pasa a retirar' : 'Nombre y dirección de entrega'}
       </p>
 
       {showSavedSelector && (
         <div className="mb-6">
-          <p className="mb-2.5 font-body text-[11px] uppercase tracking-[0.16em] text-text-muted">
+          <p className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">
             Usa una dirección guardada
           </p>
           <div className="flex flex-col gap-2">
@@ -66,11 +59,11 @@ export default function AddressSection({
                   }`}
                 >
                   <span
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center border transition-colors ${
                       active ? 'border-text' : 'border-border'
                     }`}
                   >
-                    {active && <span className="h-2 w-2 rounded-full bg-text" />}
+                    {active && <span className="h-2 w-2 bg-text" />}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
@@ -98,11 +91,11 @@ export default function AddressSection({
               }`}
             >
               <span
-                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                className={`flex h-4 w-4 shrink-0 items-center justify-center border transition-colors ${
                   selectedAddressId === null ? 'border-text' : 'border-border'
                 }`}
               >
-                {selectedAddressId === null && <span className="h-2 w-2 rounded-full bg-text" />}
+                {selectedAddressId === null && <span className="h-2 w-2 bg-text" />}
               </span>
               <span className="font-body text-[13px] leading-snug text-text">
                 Nueva dirección — escribir los datos a mano
@@ -118,7 +111,7 @@ export default function AddressSection({
           placeholder="Nombres *"
           value={customer.name}
           onChange={(e) => onChange('name', e.target.value)}
-          className={INPUT_CLASS}
+          className={INPUT_UNDERLINE}
           required
         />
         <input
@@ -126,7 +119,7 @@ export default function AddressSection({
           placeholder="Apellidos *"
           value={customer.lastName}
           onChange={(e) => onChange('lastName', e.target.value)}
-          className={INPUT_CLASS}
+          className={INPUT_UNDERLINE}
           required
         />
         <input
@@ -137,7 +130,7 @@ export default function AddressSection({
           placeholder="Cédula / RUC"
           value={customer.cedula}
           onChange={(e) => onChange('cedula', e.target.value)}
-          className={INPUT_CLASS}
+          className={INPUT_UNDERLINE}
         />
         <input
           type="tel"
@@ -147,7 +140,7 @@ export default function AddressSection({
           placeholder="Número telefónico (10 dígitos) *"
           value={customer.phone}
           onChange={(e) => onChange('phone', e.target.value)}
-          className={INPUT_CLASS}
+          className={INPUT_UNDERLINE}
           required
         />
 
@@ -157,7 +150,7 @@ export default function AddressSection({
             placeholder="Dirección *"
             value={customer.address}
             onChange={(e) => onChange('address', e.target.value)}
-            className={`${INPUT_CLASS} md:col-span-2`}
+            className={`${INPUT_UNDERLINE} md:col-span-2`}
             required
           />
         )}
@@ -167,7 +160,7 @@ export default function AddressSection({
             value={customer.province}
             options={PROVINCE_NAMES}
             placeholder="Provincia"
-            inputClassName={SELECT_CLASS}
+            inputClassName={INPUT_UNDERLINE}
             onChange={(v) => {
               onChange('province', v);
               if (v !== customer.province) onChange('city', '');
@@ -182,7 +175,7 @@ export default function AddressSection({
             value={customer.city}
             options={customer.province ? cantonsOf(customer.province) : ALL_CANTONS}
             placeholder="Ciudad *"
-            inputClassName={SELECT_CLASS}
+            inputClassName={INPUT_UNDERLINE}
             onChange={(v) => onChange('city', v)}
           />
         )}
@@ -192,7 +185,7 @@ export default function AddressSection({
           placeholder="Referencia (opcional)"
           value={customer.reference}
           onChange={(e) => onChange('reference', e.target.value)}
-          className={`${INPUT_CLASS} md:col-span-2`}
+          className={`${INPUT_UNDERLINE} md:col-span-2`}
         />
       </div>
     </section>

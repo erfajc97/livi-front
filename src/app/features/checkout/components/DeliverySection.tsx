@@ -56,7 +56,7 @@ export default function DeliverySection({
     <section className="flex flex-col gap-7">
       {/* 1 · Cómo lo recibe */}
       <div>
-        <h2 className="mb-4 text-center font-display text-xl font-light text-text">
+        <h2 className="mb-4 font-heading text-xl font-normal text-text">
           ¿Cómo quieres recibir tu pedido?
         </h2>
         <div className="grid grid-cols-2 gap-3">
@@ -83,7 +83,7 @@ export default function DeliverySection({
 
       {/* 2 · Método concreto, con su costo siempre visible */}
       <div>
-        <h2 className="mb-4 text-center font-display text-xl font-light text-text">
+        <h2 className="mb-4 font-heading text-xl font-normal text-text">
           {mode === 'pickup' ? 'Puntos de retiro' : 'Métodos de envío'}
         </h2>
 
@@ -114,11 +114,11 @@ export default function DeliverySection({
                   >
                     <span className="flex items-center gap-3">
                       <span
-                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center border transition-colors ${
                           active ? 'border-text' : 'border-border'
                         }`}
                       >
-                        {active && <span className="h-2 w-2 rounded-full bg-text" />}
+                        {active && <span className="h-2 w-2 bg-text" />}
                       </span>
                       <span className="font-body text-[13px] leading-snug text-text">
                         {place?.name ?? opt.label}
@@ -141,7 +141,7 @@ export default function DeliverySection({
                       href={place.mapsUrl}
                       target="_blank"
                       rel="noopener"
-                      className="flex items-center gap-1.5 border-t border-border px-4 py-2.5 font-body text-[11px] uppercase tracking-[0.16em] text-text-muted transition-colors hover:text-text"
+                      className="flex items-center gap-1.5 border-t border-border px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted transition-colors hover:text-text"
                     >
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0Z" />

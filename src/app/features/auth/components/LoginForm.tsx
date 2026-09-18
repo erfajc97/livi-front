@@ -3,6 +3,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useLoginMutation } from '../mutations/useLoginMutation';
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 import { AUTH_INPUT_CLASS, AUTH_SUBMIT_CLASS, AUTH_LABEL_CLASS } from '../data';
+import { BTN_SECONDARY } from '@/app/components/UI/formClasses';
 import EyeIcon from '@/assets/svg/EyeIcon';
 import EyeOffIcon from '@/assets/svg/EyeOffIcon';
 import GoogleIcon from '@/assets/svg/GoogleIcon';
@@ -31,7 +32,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
   return (
     <div>
       {/* Title */}
-      <h2 className="mb-1 text-center font-display text-3xl font-light text-text">Iniciar sesión</h2>
+      <h2 className="mb-1 text-center font-heading text-3xl font-normal text-text">Iniciar sesión</h2>
       <p className="mb-8 text-center font-body text-sm text-text-soft">Ingresa para comprar con tu cuenta</p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -96,13 +97,13 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
           disabled={isPending}
           className={AUTH_SUBMIT_CLASS}
         >
-          {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Login'}
+          {isPending ? <Loader size={18} color="currentColor" className="mx-auto" /> : 'Login'}
         </button>
 
         {/* Divider */}
         <div className="my-2 flex items-center gap-4">
           <div className="h-px flex-1 bg-border" />
-          <span className="font-body text-[10px] uppercase tracking-[0.2em] text-text-muted">o</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">o</span>
           <div className="h-px flex-1 bg-border" />
         </div>
 
@@ -124,7 +125,7 @@ export default function LoginForm({ onSuccess, onSwitchToRegister, onSwitchToFor
           <button
             type="button"
             onClick={onSwitchToRegister}
-            className="w-full border border-text py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-text transition-colors hover:bg-text hover:text-bg"
+            className={`w-full ${BTN_SECONDARY}`}
           >
             Crear cuenta
           </button>

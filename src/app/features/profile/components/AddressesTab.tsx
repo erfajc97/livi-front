@@ -31,7 +31,7 @@ export default function AddressesTab() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-display text-2xl font-light text-text">Mis direcciones</h2>
+        <h2 className="font-heading text-2xl font-normal text-text">Mis direcciones</h2>
         <p className="mt-1 font-body text-sm text-text-soft">
           Guárdalas una vez y reutilízalas en cada compra
         </p>
@@ -59,7 +59,7 @@ export default function AddressesTab() {
             return (
               <div key={address.id} className="border border-border bg-surface p-5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-display text-lg font-light text-text">{address.alias}</p>
+                  <p className="font-heading text-lg font-normal text-text">{address.alias}</p>
                   {address.isDefault && (
                     <span className="bg-accent/10 px-2 py-0.5 font-body text-[9px] uppercase tracking-[0.12em] text-accent">
                       Predeterminada
@@ -115,7 +115,7 @@ export default function AddressesTab() {
                         type="button"
                         onClick={() => confirmDelete(address.id)}
                         disabled={isDeleting}
-                        className="bg-error px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                        className="bg-error px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bg transition-opacity hover:opacity-90 disabled:opacity-50"
                       >
                         {isDeleting && deletingId === address.id ? 'Eliminando…' : 'Sí, eliminar'}
                       </button>

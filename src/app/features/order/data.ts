@@ -15,23 +15,26 @@ export const SEARCH_PLACEHOLDERS: Record<SearchType, string> = {
   factura: 'Número de Factura : Ejemplo 87654321',
 };
 
+/* Mismo mapa de tokens que la pestaña de pedidos de mi-cuenta: pendiente y
+   retrasado en warning, pagado/en proceso/enviado en burgundy, entregado en
+   sage y cancelado/rechazado en error. Sin paletas sueltas de Tailwind. */
 export const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   // Backend keys (current)
-  order_created:   { label: 'Pendiente de pago', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
-  order_received:  { label: 'Pagado',            color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-  order_accepted:  { label: 'Pagado',            color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-  order_shipped:   { label: 'Enviado',           color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' },
-  order_delivered: { label: 'Entregado',         color: 'bg-success/20 text-success border-success/40' },
-  order_delayed:   { label: 'Retrasado',         color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
-  order_cancelled: { label: 'Cancelado',         color: 'bg-error/20 text-error border-error/40' },
-  order_rejected:  { label: 'Rechazado',         color: 'bg-error/20 text-error border-error/40' },
+  order_created:   { label: 'Pendiente de pago', color: 'bg-warning-muted text-warning border-warning/40' },
+  order_received:  { label: 'Pagado',            color: 'bg-accent/10 text-accent border-accent/40' },
+  order_accepted:  { label: 'Pagado',            color: 'bg-accent/10 text-accent border-accent/40' },
+  order_shipped:   { label: 'Enviado',           color: 'bg-accent/10 text-accent border-accent/40' },
+  order_delivered: { label: 'Entregado',         color: 'bg-success-muted text-success border-success/40' },
+  order_delayed:   { label: 'Retrasado',         color: 'bg-warning-muted text-warning border-warning/40' },
+  order_cancelled: { label: 'Cancelado',         color: 'bg-error-muted text-error border-error/40' },
+  order_rejected:  { label: 'Rechazado',         color: 'bg-error-muted text-error border-error/40' },
   // Legacy uppercase keys (mock / older data)
-  PENDING:    { label: 'Pendiente',    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/40' },
-  CONFIRMED:  { label: 'Confirmada',   color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-  PROCESSING: { label: 'En proceso',   color: 'bg-purple-500/20 text-purple-400 border-purple-500/40' },
-  SHIPPED:    { label: 'Enviada',      color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' },
-  DELIVERED:  { label: 'Entregada',    color: 'bg-success/20 text-success border-success/40' },
-  CANCELLED:  { label: 'Cancelada',    color: 'bg-error/20 text-error border-error/40' },
+  PENDING:    { label: 'Pendiente',    color: 'bg-warning-muted text-warning border-warning/40' },
+  CONFIRMED:  { label: 'Confirmada',   color: 'bg-accent/10 text-accent border-accent/40' },
+  PROCESSING: { label: 'En proceso',   color: 'bg-accent/10 text-accent border-accent/40' },
+  SHIPPED:    { label: 'Enviada',      color: 'bg-accent/10 text-accent border-accent/40' },
+  DELIVERED:  { label: 'Entregada',    color: 'bg-success-muted text-success border-success/40' },
+  CANCELLED:  { label: 'Cancelada',    color: 'bg-error-muted text-error border-error/40' },
 };
 
 export const MOCK_ORDER: Order = {

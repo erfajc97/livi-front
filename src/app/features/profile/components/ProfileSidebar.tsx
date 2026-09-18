@@ -40,7 +40,7 @@ export default function ProfileSidebar({ activeTab, onTabChange }: ProfileSideba
             onClick={() => onTabChange(tab.id)}
             aria-current={isActive ? 'page' : undefined}
             className={[
-              'flex items-center gap-2.5 whitespace-nowrap border-l-2 px-4 py-3 font-body text-xs uppercase tracking-[0.16em] transition-colors',
+              'flex items-center gap-2.5 whitespace-nowrap border-l-2 px-4 py-3 font-mono text-[10px] uppercase tracking-[0.22em] transition-colors',
               isActive
                 ? 'border-accent bg-bg-alt text-text'
                 : 'border-transparent text-text-soft hover:text-text',

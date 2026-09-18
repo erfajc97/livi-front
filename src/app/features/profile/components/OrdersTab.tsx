@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import { formatCurrency } from '@/app/helpers/formatCurrency';
+import { BTN_PRIMARY } from '@/app/components/UI/formClasses';
 
 interface OrderItem {
   id: number;
@@ -28,15 +29,18 @@ interface Order {
   createdAt: string;
 }
 
+/* Estados con los tokens de marca: nada de paletas sueltas de Tailwind.
+   Pendiente/retrasado en warning, pagado/enviado en burgundy, entregado en
+   sage y cancelado/rechazado en error. */
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
-  order_created: { label: 'Pendiente de pago', color: 'bg-amber-100 text-amber-700' },
-  order_received: { label: 'Pagado', color: 'bg-blue-100 text-blue-700' },
-  order_accepted: { label: 'Pagado', color: 'bg-blue-100 text-blue-700' },
-  order_shipped: { label: 'Enviado', color: 'bg-indigo-100 text-indigo-700' },
-  order_delivered: { label: 'Entregado', color: 'bg-green-100 text-green-700' },
-  order_cancelled: { label: 'Cancelado', color: 'bg-error text-white' },
-  order_delayed: { label: 'Retrasado', color: 'bg-amber-100 text-amber-700' },
-  order_rejected: { label: 'Rechazado', color: 'bg-error text-white' },
+  order_created:   { label: 'Pendiente de pago', color: 'bg-warning-muted text-warning' },
+  order_received:  { label: 'Pagado',            color: 'bg-accent/10 text-accent' },
+  order_accepted:  { label: 'Pagado',            color: 'bg-accent/10 text-accent' },
+  order_shipped:   { label: 'Enviado',           color: 'bg-accent/10 text-accent' },
+  order_delivered: { label: 'Entregado',         color: 'bg-success-muted text-success' },
+  order_cancelled: { label: 'Cancelado',         color: 'bg-error-muted text-error' },
+  order_delayed:   { label: 'Retrasado',         color: 'bg-warning-muted text-warning' },
+  order_rejected:  { label: 'Rechazado',         color: 'bg-error-muted text-error' },
 }
 
 const isServientrega = (m?: string) => m === 'SERVIENTREGA_GYE' || m === 'SERVIENTREGA_NACIONAL';
@@ -98,10 +102,10 @@ export default function OrdersTab() {
 
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-display text-2xl font-light text-text">{selected.orderNumber}</h2>
+            <h2 className="font-heading text-2xl font-normal text-text">{selected.orderNumber}</h2>
             <p className="mt-0.5 font-body text-xs text-text-muted">{new Date(selected.createdAt).toLocaleDateString('es-EC', { dateStyle: 'long' })}</p>
           </div>
-          <span className={`px-3 py-1 font-body text-[10px] uppercase tracking-[0.14em] ${s.color}`}>{s.label}</span>
+          <span className={`px-3 py-1 font-mono text-[10px] uppercase tracking-[0.22em] ${s.color}`}>{s.label}</span>
         </div>
 
         {/* Items */}
@@ -119,23 +123,23 @@ export default function OrdersTab() {
                 <p className="text-sm font-medium text-text truncate">{item.productName || 'Producto'}</p>
                 <p className="text-xs text-text-muted">{item.variationName ? `${item.variationName} · ` : ''}{item.quantity}x</p>
               </div>
-              <p className="text-sm font-bold text-text">{formatCurrency(item.subtotal)}</p>
+              <p className="font-body text-sm font-medium text-text">{formatCurrency(item.subtotal)}</p>
             </div>
           ))}
         </div>
 
         {/* Total */}
-        <div className="flex justify-between items-center text-base font-bold text-text">
+        <div className="flex items-center justify-between font-body text-base font-medium text-text">
           <span>Total</span>
           <span>{formatCurrency(selected.total)}</span>
         </div>
 
         {/* Tracking for Servientrega */}
         {isServientrega(selected.deliveryMethod) && selected.trackingCode && (
-          <div className="border border-blue-200 bg-blue-50 p-4">
-            <p className="text-sm font-bold text-blue-800 mb-1">Número de guía Servientrega</p>
-            <p className="text-lg font-body font-bold tabular-nums text-blue-900 mb-2">{selected.trackingCode}</p>
-            <p className="text-xs text-blue-700 mb-2">
+          <div className="border border-border bg-surface p-4">
+            <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">Número de guía Servientrega</p>
+            <p className="mb-2 font-heading text-lg tabular-nums text-accent">{selected.trackingCode}</p>
+            <p className="mb-2 font-body text-xs text-text-soft">
               Haz clic para rastrear tu envío con tu número de guía:
             </p>
             <button
@@ -149,7 +153,7 @@ export default function OrdersTab() {
                   'noopener,noreferrer',
                 )
               }}
-              className="inline-flex items-center gap-2 cursor-pointer bg-blue-600 text-white text-xs font-bold px-4 py-2 hover:bg-blue-700 transition-colors"
+              className={`cursor-pointer ${BTN_PRIMARY} inline-flex max-w-sm items-center justify-center gap-2`}
             >
               Rastrear en Servientrega
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -187,13 +191,13 @@ export default function OrdersTab() {
                 const isFirst = i === 0;
                 return (
                   <div key={entry.id} className={`relative pb-5 last:pb-0 ${isLast ? '' : ''}`}>
-                    <div className={`absolute -left-8 top-0 w-6 h-6 rounded-full flex items-center justify-center text-xs ${
-                      isLast ? 'bg-accent shadow-md shadow-accent/30' : isFirst ? 'bg-surface-raised' : 'bg-surface-raised'
+                    <div className={`absolute -left-8 top-0 flex h-6 w-6 items-center justify-center text-xs ${
+                      isLast ? 'bg-accent' : isFirst ? 'bg-surface-raised' : 'bg-surface-raised'
                     }`}>
                       <span className={isLast ? 'grayscale-0' : 'grayscale opacity-60'}>{icon}</span>
                     </div>
                     <div>
-                      <p className={`text-sm font-semibold ${isLast ? 'text-text' : 'text-text-muted'}`}>{label}</p>
+                      <p className={`font-body text-sm font-medium ${isLast ? 'text-text' : 'text-text-muted'}`}>{label}</p>
                       {entry.note && <p className="text-xs text-text-muted mt-0.5">{entry.note}</p>}
                       <p className="text-sm text-text-muted">
                         {new Date(entry.createdAt).toLocaleString('es-EC', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
@@ -213,7 +217,7 @@ export default function OrdersTab() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-display text-2xl font-light text-text">Mis pedidos</h2>
+        <h2 className="font-heading text-2xl font-normal text-text">Mis pedidos</h2>
         <p className="mt-1 font-body text-sm text-text-soft">Revisa el estado de tus pedidos</p>
       </div>
 
@@ -250,25 +254,25 @@ export default function OrdersTab() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-display text-lg font-light text-text">{order.orderNumber}</p>
-                    <span className={`px-2 py-0.5 font-body text-[9px] uppercase tracking-[0.12em] ${s.color}`}>{s.label}</span>
+                    <p className="font-heading text-lg font-normal text-text">{order.orderNumber}</p>
+                    <span className={`px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.22em] ${s.color}`}>{s.label}</span>
                   </div>
                   <p className="text-xs text-text-muted mt-0.5">
                     {order.items.length} producto{order.items.length > 1 ? 's' : ''} · {new Date(order.createdAt).toLocaleDateString('es-EC', { day: '2-digit', month: 'short' })}
-                    {' · '}<span className="font-bold text-text">{formatCurrency(order.total)}</span>
+                    {' · '}<span className="font-medium text-text">{formatCurrency(order.total)}</span>
                   </p>
                   {hasTracking && (
-                    <p className="text-sm text-blue-600 font-semibold mt-1 flex items-center gap-1">
+                    <p className="mt-1 flex items-center gap-1 font-body text-sm text-accent">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
                       Guía asignada — Ver detalle de envío
                     </p>
                   )}
                   {awaitingTracking && (
-                    <p className="text-sm text-amber-600 mt-1">Guía pendiente de asignación</p>
+                    <p className="mt-1 font-body text-sm text-warning">Guía pendiente de asignación</p>
                   )}
                 </div>
                 <div className="flex shrink-0 flex-col items-center gap-1">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border transition-colors group-hover:border-accent">
+                  <div className="flex h-8 w-8 items-center justify-center border border-border transition-colors group-hover:border-accent">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="text-text-muted transition-colors group-hover:text-accent"><polyline points="9 18 15 12 9 6" /></svg>
                   </div>
                 </div>

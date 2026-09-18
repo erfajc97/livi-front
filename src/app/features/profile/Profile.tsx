@@ -47,7 +47,7 @@ function ProfileContent() {
       <div className="border-b border-border">
         <div className="mx-auto max-w-6xl px-6 py-8 md:px-8">
           <span className="eyebrow">— Mi cuenta</span>
-          <h1 className="mt-2 font-display text-3xl font-light leading-none tracking-[-0.01em] text-text md:text-4xl">
+          <h1 className="mt-2 font-heading text-3xl font-normal leading-none tracking-[-0.01em] text-text md:text-4xl">
             {user?.name ?? 'Hola'}
           </h1>
         </div>

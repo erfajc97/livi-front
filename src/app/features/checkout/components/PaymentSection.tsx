@@ -45,8 +45,8 @@ export default function PaymentSection({ selected, onSelect }: PaymentSectionPro
           className={`flex cursor-pointer items-center justify-between border px-5 py-4 transition-colors ${selected === m.key ? 'border-text bg-bg-alt' : 'border-border hover:border-text'}`}
         >
           <div className="flex items-center gap-3">
-            <div className={`flex h-5 w-5 items-center justify-center rounded-full border transition-colors ${selected === m.key ? 'border-text' : 'border-border'}`}>
-              {selected === m.key && <div className="h-2.5 w-2.5 rounded-full bg-text" />}
+            <div className={`flex h-5 w-5 items-center justify-center border transition-colors ${selected === m.key ? 'border-text' : 'border-border'}`}>
+              {selected === m.key && <div className="h-2.5 w-2.5 bg-text" />}
             </div>
             {m.icon}
             <span className="font-body text-sm text-text">{m.label}</span>

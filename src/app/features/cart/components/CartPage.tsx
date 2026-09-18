@@ -1,3 +1,4 @@
+import { BTN_PRIMARY } from '@/app/components/UI/formClasses';
 import { useCartPageHook, type CartRow } from '../hooks/useCartPageHook';
 import CartLine from './CartLine';
 import CartPageSummary from './CartPageSummary';
@@ -7,7 +8,7 @@ import CartPageSummary from './CartPageSummary';
 function GroupHeader({ title, meta }: { title: string; meta: string }) {
   return (
     <div className="mb-1 flex items-end justify-between border-b border-border pb-4">
-      <h2 className="font-display text-2xl font-light text-text">{title}</h2>
+      <h2 className="font-heading text-2xl font-normal text-text">{title}</h2>
       <span className="font-body text-[10px] uppercase tracking-[0.16em] text-text-muted">{meta}</span>
     </div>
   );
@@ -68,13 +69,13 @@ export default function CartPage() {
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.75" className="text-text-muted">
           <path d="M5 8h14l-1 12H6L5 8z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" />
         </svg>
-        <h1 className="font-display text-4xl font-light text-text">Tu carrito está vacío</h1>
+        <h1 className="font-heading text-4xl font-normal text-text">Tu carrito está vacío</h1>
         <p className="max-w-sm font-body text-sm text-text-soft">
           Explora la tienda y descubre nuestras pañaleras y mochilas de cuero.
         </p>
         <a
           href="/catalogo"
-          className="mt-2 inline-flex items-center gap-2 bg-text px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent"
+          className={`mt-2 inline-flex max-w-xs items-center justify-center gap-2 ${BTN_PRIMARY}`}
         >
           Explorar catálogo
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M5 12h14M14 6l6 6-6 6" /></svg>
@@ -102,7 +103,7 @@ export default function CartPage() {
       {/* ── Encabezado ── */}
       <header className="mb-6 md:mb-10">
         <span className="eyebrow">— Tu selección</span>
-        <h1 className="mt-3 font-display text-5xl font-light leading-none tracking-[-0.025em] text-text md:text-7xl">
+        <h1 className="mt-3 font-heading text-5xl font-normal leading-none tracking-[-0.025em] text-text md:text-7xl">
           Carrito <span className="italic text-text-soft">({itemCount})</span>
         </h1>
         <p className="mt-4 max-w-xl font-body text-sm text-text-soft">

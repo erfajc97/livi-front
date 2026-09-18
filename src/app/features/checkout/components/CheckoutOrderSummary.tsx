@@ -44,7 +44,7 @@ export default function CheckoutOrderSummary({
 
   return (
     <div className="flex flex-col">
-      <h2 className="mb-6 font-display text-3xl font-light text-text">Tu pedido</h2>
+      <h2 className="mb-6 font-heading text-3xl font-normal text-text">Tu pedido</h2>
 
       {/* Cart Items */}
       <div className="flex flex-col gap-5 mb-8 flex-1">
@@ -58,7 +58,7 @@ export default function CheckoutOrderSummary({
               </div>
               <div className="flex-1">
                 <div className="flex items-start justify-between">
-                  <h3 className="pr-4 font-display text-base font-light leading-snug text-text">{item.name}</h3>
+                  <h3 className="pr-4 font-heading text-base font-normal leading-snug text-text">{item.name}</h3>
                   <button onClick={() => removeItem(item.variantId)} className="text-text-muted hover:text-error transition-colors" aria-label="Eliminar producto">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="3 6 5 6 21 6" />
@@ -67,7 +67,7 @@ export default function CheckoutOrderSummary({
                   </button>
                 </div>
                 {item.variationName && (
-                  <div className="mt-1.5 inline-block border border-border px-2 py-0.5 font-body text-[10px] uppercase tracking-[0.14em] text-text-muted">
+                  <div className="mt-1.5 inline-block border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
                     {item.variationName}
                     {item.size ? ` · Talla ${item.size}` : ''}
                   </div>
@@ -114,7 +114,7 @@ export default function CheckoutOrderSummary({
               <button
                 type="button"
                 onClick={onRemoveCoupon}
-                className="font-body text-[11px] uppercase tracking-[0.14em] text-text-muted transition-colors hover:text-error"
+                className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted transition-colors hover:text-error"
               >
                 Quitar
               </button>
@@ -133,7 +133,7 @@ export default function CheckoutOrderSummary({
                 type="button"
                 onClick={onApplyCoupon}
                 disabled={couponLoading || !couponCode.trim()}
-                className="bg-text px-6 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-text px-6 py-3 font-mono text-[11px] uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {couponLoading ? '...' : 'Aplicar'}
               </button>
@@ -175,8 +175,8 @@ export default function CheckoutOrderSummary({
         <div className="mt-2 h-px w-full bg-border" />
 
         <div className="mt-2 flex items-center justify-between text-text">
-          <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text-muted">Total</span>
-          <span className="font-display text-2xl font-light">{formatCurrency(total)}</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-text-muted">Total</span>
+          <span className="font-heading text-2xl">{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

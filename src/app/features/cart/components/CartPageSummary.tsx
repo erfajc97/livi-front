@@ -1,6 +1,7 @@
 import { formatCurrency } from '@/app/helpers/formatCurrency';
 import PaymentMethodIcons from '@/app/components/PaymentMethodIcons';
 import TrustIcons from '@/app/components/UI/TrustIcons';
+import { BTN_PRIMARY } from '@/app/components/UI/formClasses';
 
 interface CartPageSummaryProps {
   immediateSubtotal: number;
@@ -50,8 +51,8 @@ export default function CartPageSummary({
         </div>
 
         <div className="mt-4 flex items-end justify-between border-t border-border pt-5">
-          <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text">Subtotal</span>
-          <span className="font-display text-3xl font-light text-text">{formatCurrency(total)}</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.20em] text-text">Subtotal</span>
+          <span className="font-heading text-3xl font-normal text-text">{formatCurrency(total)}</span>
         </div>
         <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
           Envío calculado en el checkout
@@ -60,7 +61,7 @@ export default function CartPageSummary({
         {/* CTA — burgundy, el paso que queremos que se siga (ref. PDF carrito) */}
         <a
           href="/checkout"
-          className="gold-frame mt-6 flex w-full items-center justify-center gap-2 bg-accent px-6 py-4 font-body text-xs font-medium uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent-hover"
+          className={`mt-6 flex items-center justify-center gap-2 ${BTN_PRIMARY}`}
         >
           Finalizar compra
         </a>

@@ -158,7 +158,7 @@ export default function ProfileTab() {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="font-display text-2xl font-light text-text">Mi perfil</h2>
+        <h2 className="font-heading text-2xl font-normal text-text">Mi perfil</h2>
         <p className="mt-1 font-body text-sm text-text-soft">Administra tu información personal y de envío</p>
       </div>
 

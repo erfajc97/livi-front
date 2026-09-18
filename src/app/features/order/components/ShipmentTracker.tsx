@@ -1,3 +1,4 @@
+import { BTN_PRIMARY, INPUT_UNDERLINE } from '@/app/components/UI/formClasses';
 import { useShipmentTrackerHook } from '../hooks/useShipmentTrackerHook';
 import { SEARCH_OPTIONS, SEARCH_PLACEHOLDERS } from '../data';
 
@@ -6,40 +7,40 @@ export default function ShipmentTracker() {
     useShipmentTrackerHook();
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-10">
-      <div className="flex flex-col items-center text-center gap-6 py-6 max-w-lg mx-auto">
+    <div className="border border-border bg-surface p-6 sm:p-10">
+      <div className="mx-auto flex max-w-lg flex-col items-center gap-6 py-6 text-center">
 
         {/* Servientrega logo */}
         <img
           src="/servientrega.png"
           alt="Servientrega"
-          className="h-20 sm:h-24 object-contain"
+          className="h-20 object-contain sm:h-24"
         />
 
         {/* Title */}
-        <h2 className="font-heading text-xl sm:text-2xl font-bold uppercase tracking-wide text-black">
+        <h2 className="font-heading text-xl font-normal text-text sm:text-2xl">
           Rastrea la ubicación de tu envío
         </h2>
 
-        {/* Radio buttons */}
+        {/* Radio buttons — cuadrados, como el resto del flujo de compra */}
         <div className="flex items-center gap-6">
           {SEARCH_OPTIONS.map((opt) => (
             <label
               key={opt.value}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2"
               onClick={() => setSearchType(opt.value)}
             >
               <span
                 className={[
-                  'w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors',
-                  searchType === opt.value ? 'border-black' : 'border-text-muted',
+                  'flex h-4 w-4 items-center justify-center border transition-colors',
+                  searchType === opt.value ? 'border-text' : 'border-border',
                 ].join(' ')}
               >
-                {searchType === opt.value && (
-                  <span className="w-2 h-2 rounded-full bg-black" />
-                )}
+                {searchType === opt.value && <span className="h-2 w-2 bg-text" />}
               </span>
-              <span className="text-sm font-medium text-black">{opt.label}</span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text">
+                {opt.label}
+              </span>
             </label>
           ))}
         </div>
@@ -51,14 +52,11 @@ export default function ShipmentTracker() {
           onChange={(e) => setTrackingNumber(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
           placeholder={SEARCH_PLACEHOLDERS[searchType]}
-          className="w-full border border-border rounded-lg px-4 py-3 text-sm text-black placeholder:text-text-muted focus:outline-none focus:border-black transition-colors"
+          className={INPUT_UNDERLINE}
         />
 
         {/* Button */}
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-black text-white font-heading font-bold text-sm uppercase tracking-wider py-3.5 rounded-full hover:bg-black/85 transition-colors"
-        >
+        <button onClick={handleSubmit} className={BTN_PRIMARY}>
           Consultar
         </button>
       </div>

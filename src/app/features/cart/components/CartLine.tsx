@@ -37,11 +37,11 @@ export default function CartLine({ row, deliveryOffset = 0, cutoffHour = DEFAULT
 
       {/* Info */}
       <div className="min-w-0">
-        <h3 className="font-display text-xl font-light leading-snug text-text line-clamp-2 sm:text-2xl">
+        <h3 className="font-heading text-xl font-normal leading-snug text-text line-clamp-2 sm:text-2xl">
           {item.name}
         </h3>
         {variantLabel && (
-          <p className="mt-1.5 font-body text-[11px] tracking-[0.04em] text-text-soft">{variantLabel}</p>
+          <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.20em] text-text-soft">{variantLabel}</p>
         )}
 
         <div className="mt-2.5 min-w-0 overflow-hidden">
@@ -55,7 +55,7 @@ export default function CartLine({ row, deliveryOffset = 0, cutoffHour = DEFAULT
 
         <button
           onClick={() => onRemove(item.variantId)}
-          className="mt-3 border-b border-border pb-[2px] font-body text-[10px] uppercase tracking-[0.16em] text-text-muted transition-colors hover:border-text hover:text-text"
+          className="mt-3 border-b border-border pb-[2px] font-mono text-[10px] uppercase tracking-[0.20em] text-text-muted transition-colors hover:border-text hover:text-text"
         >
           Quitar
         </button>

@@ -67,7 +67,17 @@ export const mapProduct = (raw: any): Product => {
       if (!raw.sizes) return undefined;
       try {
         const parsed = JSON.parse(raw.sizes);
-        return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : undefined;
+        if (!Array.isArray(parsed)) return undefined;
+        // Dedupe sin distinguir mayúsculas: el catálogo suelto llegaba con
+        // "X, x" y la ficha pintaba dos botones de talla idénticos.
+        const unique = new Map<string, string>();
+        for (const value of parsed) {
+          const label = String(value).replace(/\s+/g, ' ').trim();
+          if (!label) continue;
+          const key = label.toLocaleLowerCase();
+          if (!unique.has(key)) unique.set(key, label);
+        }
+        return unique.size > 0 ? [...unique.values()] : undefined;
       } catch { return undefined; }
     })(),
     instagramPosts: (() => {

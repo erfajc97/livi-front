@@ -9,6 +9,7 @@ export interface RegisterPayload {
   lastName:  string;
   email:     string;
   password:  string;
+  phone?:    string;
 }
 
 export interface AuthResponse {

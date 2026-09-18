@@ -1,4 +1,5 @@
 import Loader from '@/app/components/Loader';
+import { BTN_PRIMARY } from '@/app/components/UI/formClasses';
 import CheckoutStepTabs from './CheckoutStepTabs';
 import ContactSection from './ContactSection';
 import AddressSection from './AddressSection';
@@ -114,14 +115,12 @@ export default function CheckoutForm({
             onSelectAddress={handleSelectAddress}
           />
           <div className="mt-2">
-            {/* El marco dorado solo cuando el paso se puede dar: en gris sería
-                una invitación a un botón que no responde. */}
+            {/* Mismo CTA que el resto del flujo de compra (formClasses):
+                deshabilitado se atenúa, no cambia de forma. */}
             <button
               type="submit"
               disabled={!canContinue}
-              className={`w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-text/40 disabled:hover:bg-text/40 ${
-                canContinue ? 'gold-frame' : ''
-              }`}
+              className={BTN_PRIMARY}
             >
               Continuar
             </button>
@@ -141,12 +140,10 @@ export default function CheckoutForm({
           <button
             type="submit"
             disabled={isPending || !paymentMethod || !termsAccepted}
-            className={`mt-2 w-full bg-accent py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 ${
-              !isPending && paymentMethod && termsAccepted ? 'gold-frame' : ''
-            }`}
+            className={`mt-2 ${BTN_PRIMARY}`}
           >
             {isPending ? (
-              <Loader size={18} color="#fff" className="mx-auto" />
+              <Loader size={18} color="currentColor" className="mx-auto" />
             ) : paymentMethod === 'TRANSFERENCIA' ? (
               'Ver datos bancarios'
             ) : (

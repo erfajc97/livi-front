@@ -1,7 +1,5 @@
+import { INPUT_UNDERLINE } from '@/app/components/UI/formClasses';
 import type { CustomerFormData } from '../types';
-
-const INPUT_CLASS =
-  'w-full border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:ring-0 transition-colors';
 
 interface ContactSectionProps {
   customer: CustomerFormData;
@@ -23,7 +21,7 @@ export default function ContactSection({
 }: ContactSectionProps) {
   return (
     <section>
-      <h2 className="mb-4 text-center font-display text-xl font-light text-text">
+      <h2 className="mb-4 font-heading text-xl font-normal text-text">
         Información de contacto
       </h2>
 
@@ -32,7 +30,7 @@ export default function ContactSection({
         placeholder="Correo electrónico *"
         value={customer.email}
         onChange={(e) => onChange('email', e.target.value)}
-        className={INPUT_CLASS}
+        className={INPUT_UNDERLINE}
         required
       />
 
@@ -45,7 +43,7 @@ export default function ContactSection({
           <button
             type="button"
             onClick={onLogin}
-            className="shrink-0 border-b border-text pb-0.5 font-body text-[11px] uppercase tracking-[0.16em] text-text transition-colors hover:border-accent hover:text-accent"
+            className="shrink-0 border-b border-text pb-0.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text transition-colors hover:border-accent hover:text-accent"
           >
             Crear cuenta o entrar
           </button>

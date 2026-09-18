@@ -30,8 +30,22 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) return;
-    register({ firstName: name, lastName, email, password });
+    if (password !== confirmPassword) {
+      sonnerResponse('Las contraseñas no coinciden.', 'error');
+      return;
+    }
+    if (phoneInvalid) {
+      sonnerResponse('El teléfono debe tener 10 dígitos.', 'error');
+      return;
+    }
+    register({
+      firstName: name.trim(),
+      lastName: lastName.trim(),
+      email: email.trim().toLowerCase(),
+      password,
+      // Opcional: solo viaja si está completo, el backend exige 10 dígitos.
+      ...(phone.length === 10 ? { phone } : {}),
+    });
   };
 
   const handleResend = async () => {
@@ -47,16 +61,18 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
   };
 
   const passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+  // El backend valida 10 dígitos exactos: se avisa antes de enviar.
+  const phoneInvalid = phone.length > 0 && phone.length !== 10;
 
   if (sent) {
     return (
       <div className="text-center py-6">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center bg-success-muted">
           <svg className="h-7 w-7 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="mb-2 font-display text-3xl font-light text-text">Revisa tu bandeja de entrada</h2>
+        <h2 className="mb-2 font-heading text-3xl font-normal text-text">Revisa tu bandeja de entrada</h2>
         <p className="mb-6 font-body text-sm text-text-soft">
           Te enviamos un enlace de verificación a <span className="text-text">{email}</span>
         </p>
@@ -82,7 +98,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
   return (
     <div>
       {/* Title */}
-      <h2 className="mb-1 text-center font-display text-3xl font-light text-text">Crear cuenta</h2>
+      <h2 className="mb-1 text-center font-heading text-3xl font-normal text-text">Crear cuenta</h2>
       <p className="mb-7 text-center font-body text-sm text-text-soft">Regístrate para empezar a comprar</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -93,9 +109,11 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value.slice(0, 60))}
               placeholder="Juan"
               required
+              maxLength={60}
+              autoComplete="given-name"
               className={AUTH_INPUT_CLASS}
             />
           </div>
@@ -104,9 +122,11 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             <input
               type="text"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e) => setLastName(e.target.value.slice(0, 60))}
               placeholder="Pérez"
               required
+              maxLength={60}
+              autoComplete="family-name"
               className={AUTH_INPUT_CLASS}
             />
           </div>
@@ -118,9 +138,11 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.slice(0, 120))}
             placeholder="tu@email.com"
             required
+            maxLength={120}
+            autoComplete="email"
             className={AUTH_INPUT_CLASS}
           />
         </div>
@@ -130,11 +152,24 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
           <label className={AUTH_LABEL_CLASS}>Teléfono</label>
           <input
             type="tel"
+            inputMode="numeric"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            /* Solo dígitos y 10 como máximo: es el formato que exige el API. */
+            onChange={(e) => setPhone(e.target.value.replace(/\D+/g, '').slice(0, 10))}
             placeholder="09X XXX XXXX"
-            className={AUTH_INPUT_CLASS}
+            maxLength={10}
+            autoComplete="tel"
+            className={
+              phoneInvalid
+                ? `${AUTH_INPUT_CLASS} border-error`
+                : AUTH_INPUT_CLASS
+            }
           />
+          {phoneInvalid && (
+            <p className="mt-1.5 font-body text-xs text-error">
+              Debe tener 10 dígitos (ej. 0999123456)
+            </p>
+          )}
         </div>
 
         {/* Password */}
@@ -148,6 +183,8 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
               placeholder="Mínimo 6 caracteres"
               required
               minLength={6}
+              maxLength={72}
+              autoComplete="new-password"
               className={`${AUTH_INPUT_CLASS} pr-10`}
             />
             <button
@@ -170,9 +207,11 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             placeholder="Repite tu contraseña"
             required
             minLength={6}
-            className={`w-full border-b bg-transparent px-1 py-2.5 font-body text-sm text-text placeholder:text-text-muted focus:outline-none transition-colors ${
-              passwordMismatch ? 'border-error' : 'border-border focus:border-text'
-            }`}
+            maxLength={72}
+            autoComplete="new-password"
+            className={
+              passwordMismatch ? `${AUTH_INPUT_CLASS} border-error` : AUTH_INPUT_CLASS
+            }
           />
           {passwordMismatch && (
             <p className="mt-1.5 font-body text-xs text-error">Las contraseñas no coinciden</p>
@@ -182,16 +221,16 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
         {/* Submit */}
         <button
           type="submit"
-          disabled={isPending || passwordMismatch}
+          disabled={isPending || passwordMismatch || phoneInvalid}
           className={AUTH_SUBMIT_CLASS}
         >
-          {isPending ? <Loader size={18} color="#fff" className="mx-auto" /> : 'Crear cuenta'}
+          {isPending ? <Loader size={18} color="currentColor" className="mx-auto" /> : 'Crear cuenta'}
         </button>
 
         {/* Divider */}
         <div className="my-1 flex items-center gap-4">
           <div className="h-px flex-1 bg-border" />
-          <span className="font-body text-[10px] uppercase tracking-[0.2em] text-text-muted">o</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">o</span>
           <div className="h-px flex-1 bg-border" />
         </div>
 

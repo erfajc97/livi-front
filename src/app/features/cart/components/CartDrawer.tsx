@@ -39,7 +39,7 @@ export default function CartDrawer() {
       <div className="absolute inset-0 bg-negro/40" onClick={close} aria-hidden="true" />
 
       {/* Panel — 440 px, entra desde la derecha */}
-      <aside className="cart-drawer-panel absolute right-0 top-0 flex h-full w-full max-w-[440px] flex-col bg-bg text-text shadow-2xl">
+      <aside className="cart-drawer-panel absolute right-0 top-0 flex h-full w-full max-w-[440px] flex-col border-l border-border bg-bg text-text">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-5">
           <h2 className="font-heading text-2xl font-normal text-text">Tu carrito</h2>
@@ -112,7 +112,7 @@ export default function CartDrawer() {
                       </div>
                       <button
                         onClick={() => removeItem(item.variantId)}
-                        className="font-body text-[10px] uppercase tracking-[0.16em] text-text-muted underline-offset-2 transition-colors hover:text-text hover:underline"
+                        className="font-mono text-[10px] uppercase tracking-[0.20em] text-text-muted underline-offset-2 transition-colors hover:text-text hover:underline"
                       >
                         Quitar
                       </button>
@@ -133,7 +133,7 @@ export default function CartDrawer() {
             </div>
 
             <div className="flex items-end justify-between">
-              <span className="font-body text-[11px] uppercase tracking-[0.18em] text-text">Subtotal</span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.20em] text-text">Subtotal</span>
               <span className="font-heading text-2xl text-accent">{formatCurrency(subtotal)}</span>
             </div>
             <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-text-muted">

@@ -1,3 +1,5 @@
+import { LABEL_MONO } from '@/app/components/UI/formClasses';
+
 interface CheckoutStepTabsProps {
   step: 1 | 2;
   setStep: (step: 1 | 2) => void;
@@ -8,7 +10,7 @@ interface CheckoutStepTabsProps {
 
 export default function CheckoutStepTabs({ step, setStep, canGoToStep2 = false }: CheckoutStepTabsProps) {
   return (
-    <div className="flex gap-8 border-b border-border font-body text-[11px] uppercase tracking-[0.16em] text-text-muted">
+    <div className={`flex gap-8 border-b border-border ${LABEL_MONO}`}>
       <button
         type="button"
         onClick={() => setStep(1)}

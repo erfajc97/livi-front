@@ -31,6 +31,9 @@ interface ProductPurchaseOptionsProps {
  * Si ninguna variante tiene talla, se usa el catálogo de tallas del producto
  * (product.sizes) como selector suelto; si tampoco hay, no se muestra talla.
  */
+/** Debajo de este stock se avisa "Últimas N unidades". */
+const LOW_STOCK_THRESHOLD = 5;
+
 export default function ProductPurchaseOptions({
   product,
   selectedVariant: externalVariant,
@@ -39,12 +42,17 @@ export default function ProductPurchaseOptions({
 }: ProductPurchaseOptionsProps) {
   const variants = product.variants ?? [];
 
+  // Clave de comparación: "X", "x" y "X " son la misma talla. Sin esto el
+  // selector pintaba un botón por cada variante escrita distinto.
+  const labelKey = (value?: string | null) =>
+    (value ?? '').replace(/\s+/g, ' ').trim().toLocaleLowerCase();
+
   // Colores únicos por nombre, en orden de aparición (cada entrada representa
   // un color; su variante sirve para swatch, hex y fotos).
   const colors = (() => {
     const seen = new Map<string, ProductVariant>();
     for (const v of variants) {
-      const key = v.name ?? '';
+      const key = labelKey(v.name);
       if (!seen.has(key)) seen.set(key, v);
     }
     return [...seen.values()];
@@ -52,9 +60,22 @@ export default function ProductPurchaseOptions({
 
   // Tallas: las que traen las variantes (combo real); si ninguna trae, cae al
   // catálogo del producto (tallas sueltas, sin variante por combinación).
-  const variantSizes = [...new Set(variants.map((v) => v.size).filter(Boolean))] as string[];
+  const variantSizes = (() => {
+    const seen = new Map<string, string>();
+    for (const v of variants) {
+      const label = (v.size ?? '').replace(/\s+/g, ' ').trim();
+      if (!label) continue;
+      const key = label.toLocaleLowerCase();
+      if (!seen.has(key)) seen.set(key, label);
+    }
+    return [...seen.values()];
+  })();
   const hasComboSizes = variantSizes.length > 0;
   const sizes = hasComboSizes ? variantSizes : (product.sizes ?? []);
+
+  /** Variantes de un color (comparación normalizada). */
+  const variantsForColor = (color: string | null) =>
+    variants.filter((v) => labelKey(v.name) === labelKey(color));
 
   const [selectedColor, setSelectedColor] = useState<string | null>(colors[0]?.name ?? null);
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
@@ -65,8 +86,10 @@ export default function ProductPurchaseOptions({
   // Variante resuelta: color + talla exactos; si el combo no existe, el
   // primero del color (mantiene precio/fotos del color aunque falte la talla).
   const selected =
-    variants.find((v) => (v.name ?? null) === selectedColor && (v.size ?? null) === selectedSize) ??
-    variants.find((v) => (v.name ?? null) === selectedColor) ??
+    variants.find(
+      (v) => labelKey(v.name) === labelKey(selectedColor) && labelKey(v.size) === labelKey(selectedSize),
+    ) ??
+    variantsForColor(selectedColor)[0] ??
     variants[0] ??
     null;
 
@@ -79,9 +102,11 @@ export default function ProductPurchaseOptions({
     setSelectedColor(name);
     // Si la talla elegida no existe para este color, saltar a la primera que sí.
     if (hasComboSizes && selectedSize) {
-      const exists = variants.some((v) => (v.name ?? null) === name && v.size === selectedSize);
+      const exists = variantsForColor(name).some(
+        (v) => labelKey(v.size) === labelKey(selectedSize),
+      );
       if (!exists) {
-        const firstForColor = variants.find((v) => (v.name ?? null) === name && v.size);
+        const firstForColor = variantsForColor(name).find((v) => v.size);
         setSelectedSize(firstForColor?.size ?? sizes[0] ?? null);
       }
     }
@@ -131,7 +156,13 @@ export default function ProductPurchaseOptions({
   const discountedPrice = hasDiscount ? currentPrice * (1 - discount / 100) : currentPrice;
 
   const inStock = stock > 0;
-  const statusLabel = inStock ? 'En stock' : 'Agotado';
+  // El stock es por producto (no por variante): se muestra la cantidad real
+  // para que el cliente sepa cuántas quedan, y "Últimas N" cuando escasea.
+  const statusLabel = !inStock
+    ? 'Agotado'
+    : stock <= LOW_STOCK_THRESHOLD
+      ? `Últimas ${stock} unidades`
+      : `En stock · ${stock} disponibles`;
   const statusIsBad = !inStock;
 
   const getCartItem = () => {
@@ -263,7 +294,7 @@ export default function ProductPurchaseOptions({
               const available =
                 !hasComboSizes ||
                 selectedColor === null ||
-                variants.some((v) => (v.name ?? null) === selectedColor && v.size === size);
+                variantsForColor(selectedColor).some((v) => labelKey(v.size) === labelKey(size));
               return (
                 <button
                   key={size}

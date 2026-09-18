@@ -106,7 +106,7 @@ function OrderConfirmationContent() {
             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </div>
-        <h1 className="font-display text-3xl font-light text-text">Pago no completado</h1>
+        <h1 className="font-heading text-3xl font-normal text-text">Pago no completado</h1>
         <p className="max-w-sm font-body text-sm text-text-muted">{error}</p>
         <a href="/checkout" className="mt-4 bg-text px-8 py-4 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent">
           Intentar de nuevo
@@ -129,7 +129,7 @@ function OrderConfirmationContent() {
         </svg>
       </div>
 
-      <h1 className="font-display text-3xl font-light text-text md:text-4xl">
+      <h1 className="font-heading text-3xl font-normal text-text md:text-4xl">
         {isTransfer ? '¡Orden registrada!' : '¡Pago exitoso!'}
       </h1>
 
