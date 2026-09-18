@@ -6,14 +6,16 @@ import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import Loader from '@/app/components/Loader';
+import { INPUT_UNDERLINE, LABEL_MONO } from '@/app/components/UI/formClasses';
 
-const INPUT =
-  'w-full border border-border bg-surface px-3.5 py-3 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:outline-none transition-colors';
-const INPUT_RO =
-  'w-full border border-border bg-bg-alt px-3.5 py-3 font-body text-sm text-text-soft cursor-default';
+// Mismo dialecto que checkout y auth: inputs subrayados, labels en mono.
+// Antes eran cajas con borde completo y labels en `font-body`, que hacían
+// ver la cuenta como un panel genérico y no como la tienda.
+const INPUT = INPUT_UNDERLINE;
+const INPUT_RO = `${INPUT_UNDERLINE} cursor-default text-text-soft`;
 const SELECT =
-  'w-full cursor-pointer appearance-none border border-border bg-surface px-3.5 py-3 font-body text-sm text-text focus:border-text focus:outline-none transition-colors';
-const LABEL = 'mb-2 block font-body text-[10px] uppercase tracking-[0.18em] text-text-muted';
+  'w-full cursor-pointer appearance-none border-0 border-b border-border bg-transparent px-0 py-2.5 font-body text-sm text-text transition-colors focus:border-text focus:ring-0';
+const LABEL = `mb-2 block ${LABEL_MONO}`;
 
 export default function ProfileTab() {
   const user = useAuthStore((s) => s.user);
@@ -174,7 +176,7 @@ export default function ProfileTab() {
               <button
                 onClick={() => user.email && resendVerification(user.email)}
                 disabled={isResending}
-                className="bg-text px-4 py-2 font-body text-[11px] uppercase tracking-[0.16em] text-bg transition-colors hover:bg-accent disabled:opacity-50"
+                className="bg-accent px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-bg transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {isResending ? <Loader size={14} color="#fff" /> : 'Reenviar correo'}
               </button>
@@ -318,7 +320,7 @@ export default function ProfileTab() {
             <button
               onClick={handleChangePassword}
               disabled={isChangingPwd}
-              className="border border-text px-8 py-3 font-body text-xs uppercase tracking-[0.2em] text-text transition-colors hover:bg-text hover:text-bg disabled:opacity-50"
+              className="border border-text px-8 py-3 font-mono text-[11px] uppercase tracking-[0.22em] text-text transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
             >
               {isChangingPwd ? <Loader size={16} /> : 'Cambiar contraseña'}
             </button>
@@ -331,14 +333,14 @@ export default function ProfileTab() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-text px-8 py-3.5 font-body text-xs font-medium uppercase tracking-[0.2em] text-bg transition-colors hover:bg-accent disabled:opacity-50"
+          className="gold-frame bg-accent px-8 py-3.5 font-mono text-[11px] uppercase tracking-[0.24em] text-bg transition-colors hover:bg-accent-hover disabled:opacity-50"
         >
-          {isSaving ? <Loader size={16} color="#fff" /> : 'Guardar cambios'}
+          {isSaving ? <Loader size={16} color="currentColor" /> : 'Guardar cambios'}
         </button>
         <button
           onClick={() => logout()}
           disabled={isLoggingOut}
-          className="border border-border px-8 py-3.5 font-body text-xs uppercase tracking-[0.2em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
+          className="border border-border px-8 py-3.5 font-mono text-[11px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
         >
           {isLoggingOut ? <Loader size={16} /> : 'Cerrar sesión'}
         </button>

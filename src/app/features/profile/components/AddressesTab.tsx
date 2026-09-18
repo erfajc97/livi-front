@@ -79,7 +79,7 @@ export default function AddressesTab() {
                   <button
                     type="button"
                     onClick={() => startEdit(address)}
-                    className="border border-border px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-text-soft transition-colors hover:border-text hover:text-text"
+                    className="border border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-text hover:text-text"
                   >
                     Editar
                   </button>
@@ -88,7 +88,7 @@ export default function AddressesTab() {
                       type="button"
                       onClick={() => markDefault(address.id)}
                       disabled={busy}
-                      className="border border-border px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
+                      className="border border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
                     >
                       {isMarkingDefault && markingDefaultId === address.id
                         ? 'Marcando…'
@@ -99,7 +99,7 @@ export default function AddressesTab() {
                     type="button"
                     onClick={() => requestDelete(address.id)}
                     disabled={busy}
-                    className="border border-border px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-text-soft transition-colors hover:border-error hover:text-error disabled:opacity-50"
+                    className="border border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-error hover:text-error disabled:opacity-50"
                   >
                     Eliminar
                   </button>
@@ -123,7 +123,7 @@ export default function AddressesTab() {
                         type="button"
                         onClick={cancelDelete}
                         disabled={isDeleting}
-                        className="border border-border px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
+                        className="border border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-text hover:text-text disabled:opacity-50"
                       >
                         Cancelar
                       </button>
@@ -145,7 +145,7 @@ export default function AddressesTab() {
             <button
               type="button"
               onClick={startCreate}
-              className="w-full border border-dashed border-border px-6 py-4 font-body text-xs uppercase tracking-[0.2em] text-text-soft transition-colors hover:border-text hover:text-text"
+              className="w-full border border-dashed border-border px-6 py-4 font-mono text-[11px] uppercase tracking-[0.22em] text-text-soft transition-colors hover:border-text hover:text-text"
             >
               + Agregar dirección
             </button>
