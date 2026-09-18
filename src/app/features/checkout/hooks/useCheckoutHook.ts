@@ -1,3 +1,4 @@
+import { prepareReceiptUpload } from '@/app/helpers/prepareImageUpload';
 import { useState, useEffect, useRef } from 'react';
 import { useCartStore } from '@/app/store/cart/cartStore';
 import { useAuthStore } from '@/app/store/auth/authStore';
@@ -398,7 +399,8 @@ export function useCheckoutHook() {
       // 2. Upload receipt immediately
       if (orderId && receiptFile) {
         const fd = new FormData();
-        fd.append('receipt', receiptFile);
+        // Una foto de teléfono pasa fácil los 5 MB que acepta el endpoint.
+        fd.append('receipt', await prepareReceiptUpload(receiptFile));
         // Quien compra sin sesión no tiene token: el correo del pedido es lo que
         // le permite al backend confirmar que la orden es suya.
         fd.append('email', customer.email);

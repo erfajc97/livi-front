@@ -1,3 +1,4 @@
+import { prepareReceiptUpload } from '@/app/helpers/prepareImageUpload';
 import { useState, useEffect, useRef } from 'react';
 import AppProviders from '@/app/providers/AppProviders';
 import axiosInstance from '@/app/config/axiosConfig';
@@ -75,7 +76,7 @@ function OrderConfirmationContent() {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('receipt', file);
+      formData.append('receipt', await prepareReceiptUpload(file));
       await axiosInstance.post(`/payments/${order.id}/upload-receipt`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
