@@ -6,8 +6,6 @@ import { sonnerResponse } from '@/app/helpers/sonnerResponse';
 import axiosInstance from '@/app/config/axiosConfig';
 import { API_ENDPOINTS } from '@/app/api/endpoints';
 import Loader from '@/app/components/Loader';
-import SearchableSelect from '@/app/components/UI/SearchableSelect';
-import { PROVINCE_NAMES, cantonsOf, ALL_CANTONS } from '@/app/data/ecuadorLocations';
 
 const INPUT =
   'w-full border border-border bg-surface px-3.5 py-3 font-body text-sm text-text placeholder:text-text-muted focus:border-text focus:outline-none transition-colors';
@@ -221,7 +219,15 @@ export default function ProfileTab() {
           </div>
           <div>
             <label className={LABEL}>Cédula</label>
-            <input type="text" value={form.cedula} onChange={(e) => updateField('cedula', e.target.value)} placeholder="0912345678" className={INPUT} />
+            <input
+              type="text"
+              inputMode="numeric"
+              value={form.cedula}
+              onChange={(e) => updateField('cedula', e.target.value.replace(/\D+/g, '').slice(0, 13))}
+              placeholder="0912345678"
+              maxLength={13}
+              className={INPUT}
+            />
           </div>
         </div>
       </div>
@@ -232,36 +238,31 @@ export default function ProfileTab() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className={LABEL}>Teléfono</label>
-            <input type="tel" value={form.phone} onChange={(e) => updateField('phone', e.target.value)} placeholder="09XXXXXXXX" className={INPUT} />
-          </div>
-          <div>
-            <label className={LABEL}>Provincia</label>
-            <SearchableSelect
-              value={form.province}
-              options={PROVINCE_NAMES}
-              placeholder="Buscar provincia"
-              onChange={(v) => {
-                updateField('province', v);
-                if (v !== form.province) updateField('city', '');
-              }}
+            <input
+              type="tel"
+              inputMode="numeric"
+              value={form.phone}
+              /* 10 dígitos, como en el checkout y en las direcciones. */
+              onChange={(e) => updateField('phone', e.target.value.replace(/\D+/g, '').slice(0, 10))}
+              placeholder="09XXXXXXXX"
+              maxLength={10}
+              className={INPUT}
             />
           </div>
-          <div>
-            <label className={LABEL}>Ciudad</label>
-            <SearchableSelect
-              value={form.city}
-              options={form.province ? cantonsOf(form.province) : ALL_CANTONS}
-              placeholder="Buscar ciudad"
-              onChange={(v) => updateField('city', v)}
-            />
-          </div>
-          <div>
-            <label className={LABEL}>Dirección</label>
-            <input type="text" value={form.address} onChange={(e) => updateField('address', e.target.value)} placeholder="Av. Principal 123" className={INPUT} />
-          </div>
-          <div className="sm:col-span-2">
-            <label className={LABEL}>Referencia</label>
-            <input type="text" value={form.reference} onChange={(e) => updateField('reference', e.target.value)} placeholder="Cerca de..." className={INPUT} />
+          <div className="sm:col-span-2 border border-border-soft bg-bg-alt p-4">
+            {/* Provincia, ciudad, dirección y referencia vivían también aquí:
+                dos fuentes de verdad para el mismo envío, sin sincronizar y
+                sin validación. La dirección se administra solo en su pestaña. */}
+            <p className="font-body text-sm text-text-soft">
+              Tus direcciones de envío se guardan en la pestaña{' '}
+              <a
+                href="#direcciones"
+                className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent underline"
+              >
+                Direcciones
+              </a>
+              , donde puedes tener varias y marcar una como predeterminada.
+            </p>
           </div>
           <div className="sm:col-span-2">
             <label className={LABEL}>Método de envío preferido</label>
