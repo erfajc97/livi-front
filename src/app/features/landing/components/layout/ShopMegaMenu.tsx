@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  useNormalCategoriesQuery,
+  useMenuCategoriesQuery,
   sortCategoriesByHierarchy,
 } from '@/app/tanstack-queries/categoriesQuery';
 import { useNavbarAdQuery } from '@/app/tanstack-queries/navbarAdQuery';
@@ -29,7 +29,7 @@ export default function ShopMegaMenu({
   onMouseEnter,
   onMouseLeave,
 }: MegaMenuProps) {
-  const { data: categories = [], isLoading } = useNormalCategoriesQuery();
+  const { data: categories = [], isLoading } = useMenuCategoriesQuery();
 
   const cats = sortCategoriesByHierarchy(categories.filter((c) => c.name.toLowerCase() !== 'all'));
 
@@ -116,6 +116,11 @@ export default function ShopMegaMenu({
                 </a>
 
                 <div className="mt-6 flex flex-col gap-2.5">
+                  {cat.marcas.length === 0 && (
+                    <span className="font-body text-[13px] text-text-muted">
+                      Ver productos
+                    </span>
+                  )}
                   {cat.marcas.slice(0, 6).map((sub) => (
                     <a
                       key={sub.id}

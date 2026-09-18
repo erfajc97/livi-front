@@ -82,6 +82,16 @@ export const useCategoriesWithMarcasQuery = () => useAllCategories(selectActiveM
 /** Tienda dropdown — categorías activas con sus marcas activas. */
 export const useNormalCategoriesQuery = () => useAllCategories(selectActive)
 
+/** Mega menú: categorías activas aunque todavía no tengan marcas cargadas
+ *  (con `selectActive` una categoría sin marcas desaparecía del menú). */
+const selectActiveWithOptionalMarcas = (cats: NavCategory[]): NavCategory[] =>
+  cats
+    .filter((c) => c.isActive)
+    .map((c) => ({ ...c, marcas: c.marcas.filter((m) => m.isActive) }))
+
+export const useMenuCategoriesQuery = () =>
+  useAllCategories(selectActiveWithOptionalMarcas)
+
 /** Sin filtrar — todas las categorías y todas sus marcas (banner: resolver una
  *  marca por id aunque esté inactiva). */
 export const useRawCategoriesQuery = () => useAllCategories((cats) => cats)

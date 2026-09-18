@@ -7,12 +7,14 @@ import { useNavbarHook, isLinkActive } from '../../hooks/useNavbarHook';
 import AnnouncementBar from './AnnouncementBar';
 import MobileMenu from './MobileMenu';
 import NavbarSearch from './NavbarSearch';
+import ShopMegaMenu from './ShopMegaMenu';
 
 /**
  * Navbar LIVI — dirección de arte del PDF:
  * barra de anuncios burgundy, fila principal butter con links mono en
  * mayúsculas a la izquierda, wordmark centrado y BUSCAR / CUENTA /
- * CARRITO (n) a la derecha. Sin mega menú ni tab bar inferior.
+ * CARRITO (n) a la derecha. "Tienda" abre al hover el mega menú con las
+ * categorías, sus marcas y el panel de publicidad del navbar.
  * Tras el scroll (ref. PDF navegación B): sombra mínima y logo reducido;
  * el carrito con piezas se vuelve píldora burgundy.
  */
@@ -25,6 +27,13 @@ export default function Navbar() {
     mobileOpen,
     setMobileOpen,
     pathname,
+    openDropdown,
+    setOpenDropdown,
+    dropdownRef,
+    handleDropdownEnter,
+    handleDropdownLeave,
+    handleDropdownContentEnter,
+    handleDropdownContentLeave,
   } = useNavbarHook();
 
   const [scrolled, setScrolled] = useState(false);
@@ -37,10 +46,11 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // `dropdown` marca el link que despliega el mega menú al pasar el mouse.
   const NAV = [
-    { href: '/catalogo', label: 'Tienda' },
-    { href: '/nuestra-historia', label: 'Nuestra Historia' },
-    { href: '/el-taller', label: 'El Taller' },
+    { href: '/catalogo', label: 'Tienda', dropdown: 'tienda' },
+    { href: '/nuestra-historia', label: 'Nuestra Historia', dropdown: null },
+    { href: '/el-taller', label: 'El Taller', dropdown: null },
   ];
 
   const linkCls = (href: string) =>
@@ -79,11 +89,32 @@ export default function Navbar() {
               </button>
 
               <nav className="hidden items-center gap-8 md:flex" aria-label="Navegación principal">
-                {NAV.map((l) => (
-                  <a key={l.href} href={l.href} className={linkCls(l.href)}>
-                    {l.label}
-                  </a>
-                ))}
+                {NAV.map((l) =>
+                  l.dropdown ? (
+                    // El wrapper mantiene el menú abierto mientras el mouse
+                    // viaja del link al panel (el cierre lleva retardo).
+                    <div
+                      key={l.href}
+                      className="flex items-center"
+                      onMouseEnter={() => handleDropdownEnter(l.dropdown as string)}
+                      onMouseLeave={handleDropdownLeave}
+                    >
+                      <a
+                        href={l.href}
+                        className={linkCls(l.href)}
+                        aria-haspopup="true"
+                        aria-expanded={openDropdown === l.dropdown}
+                        onFocus={() => handleDropdownEnter(l.dropdown as string)}
+                      >
+                        {l.label}
+                      </a>
+                    </div>
+                  ) : (
+                    <a key={l.href} href={l.href} className={linkCls(l.href)}>
+                      {l.label}
+                    </a>
+                  ),
+                )}
               </nav>
             </div>
 
@@ -126,6 +157,16 @@ export default function Navbar() {
               </button>
             </div>
           </div>
+
+          {/* Mega menú de Tienda: categorías → marcas + publicidad del navbar */}
+          {openDropdown === 'tienda' && (
+            <ShopMegaMenu
+              dropdownRef={dropdownRef}
+              onClose={() => setOpenDropdown(null)}
+              onMouseEnter={handleDropdownContentEnter}
+              onMouseLeave={handleDropdownContentLeave}
+            />
+          )}
         </div>
 
         {/* Menú móvil */}
