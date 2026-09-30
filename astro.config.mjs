@@ -11,7 +11,7 @@ export default defineConfig({
   // Dominio público: sin esto las URLs absolutas de og:image y canonical se
   // arman con el host de la request, que en las páginas prerenderizadas es
   // localhost y rompe la vista previa al compartir.
-  site: 'https://livi.ec',
+  site: 'https://liviec.com',
   output: 'hybrid',
   adapter: node({ mode: 'standalone' }),
   integrations: [react()],

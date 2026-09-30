@@ -1,7 +1,7 @@
 import { productUrl } from '@/app/helpers/productUrl';
 import type { Product } from '@/app/types/global.types';
 
-export const SITE_ORIGIN = 'https://livi.ec';
+export const SITE_ORIGIN = 'https://liviec.com';
 
 /** Copy de la tarjeta al compartir (WhatsApp, Linktree, Facebook). */
 export const SHARE_DESCRIPTION =
@@ -39,12 +39,12 @@ export function organizationJsonLd() {
     url: SITE_ORIGIN,
     logo: absoluteUrl('/favicon.png'),
     sameAs: [
-      'https://www.instagram.com/livi.ec',
-      'https://www.tiktok.com/@livi.ec',
+      'https://www.instagram.com/livi.ecuador',
+      'https://www.tiktok.com/@livi.ecuador',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: '+593992305463',
+      telephone: '+593959010268',
       contactType: 'customer service',
       areaServed: 'EC',
       availableLanguage: ['Spanish'],

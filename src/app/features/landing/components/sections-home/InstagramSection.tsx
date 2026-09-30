@@ -5,8 +5,8 @@
  * las fotos son curadas y viven en /productos; cada card enlaza al perfil.
  * El handle se puede cambiar desde aquí cuando LIVI confirme su cuenta.
  */
-const INSTAGRAM_URL = 'https://www.instagram.com/livi.ec';
-const INSTAGRAM_HANDLE = '@livi.ec';
+const INSTAGRAM_URL = 'https://www.instagram.com/livi.ecuador';
+const INSTAGRAM_HANDLE = '@Livi.ecuador';
 
 interface IgPost {
   url: string;

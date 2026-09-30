@@ -226,9 +226,9 @@ export default function ProductPurchaseOptions({
     const url =
       typeof window !== 'undefined'
         ? window.location.href
-        : `https://livi.ec${productUrl(product)}`;
+        : `https://liviec.com${productUrl(product)}`;
     const msg = `Hola, me interesa ${product.name} de LIVI: ${url}`;
-    window.open(`https://wa.me/593992305463?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/593959010268?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (

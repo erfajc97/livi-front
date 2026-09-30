@@ -7,7 +7,7 @@ import { useAuthStore } from '@/app/store/auth/authStore';
 // En build/prod el fallback es el dominio de producción de LIVI.
 const FALLBACK_BASE_URL = import.meta.env.DEV
   ? 'http://localhost:4101/api'
-  : 'https://api.livi.ec/api';
+  : 'https://api.liviec.com/api';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || FALLBACK_BASE_URL,

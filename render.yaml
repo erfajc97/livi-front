@@ -7,9 +7,9 @@
 # despliega como web service Node con el servidor standalone de Astro.
 #
 # VITE_API_BASE_URL debe apuntar al servicio livi-api desplegado
-# (https://livi-api.onrender.com/api) o al dominio propio (https://api.livi.ec/api).
+# (https://livi-api.onrender.com/api) o al dominio propio (https://api.liviec.com/api).
 #
-# Dominio: cuando compren el dominio → Settings → Custom Domain (ej. livi.ec / www.livi.ec)
+# Dominio: cuando compren el dominio → Settings → Custom Domain (ej. liviec.com / www.liviec.com)
 # y actualizar `site:` en astro.config.mjs.
 
 services:

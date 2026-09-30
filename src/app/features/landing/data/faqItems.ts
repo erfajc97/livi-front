@@ -28,7 +28,7 @@ export const PRODUCT_FAQ: FaqItem[] = [
   {
     question: '¿Cómo sé que la pieza es auténtica?',
     answer:
-      'Cada pieza pasa por control de calidad en nuestro taller antes de despacharse. Comprando en livi.ec tienes la garantía completa de la marca.',
+      'Cada pieza pasa por control de calidad en nuestro taller antes de despacharse. Comprando en liviec.com tienes la garantía completa de la marca.',
   },
 ];
 

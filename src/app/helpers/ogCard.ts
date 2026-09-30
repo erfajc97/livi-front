@@ -12,9 +12,9 @@ function isAllowedImageHost(hostname: string): boolean {
   return (
     host === 'localhost' ||
     host === '127.0.0.1' ||
-    host === 'livi.ec' ||
-    host === 'www.livi.ec' ||
-    host.endsWith('.livi.ec') ||
+    host === 'liviec.com' ||
+    host === 'www.liviec.com' ||
+    host.endsWith('.liviec.com') ||
     host.endsWith('.amazonaws.com')
   );
 }

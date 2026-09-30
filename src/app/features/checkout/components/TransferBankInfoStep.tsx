@@ -32,7 +32,7 @@ const BANKS: BankInfo[] = [
       ['Número de cuenta', '2213099079', true],
       ['Titular', 'Jean Philippe Wong'],
       ['Cédula', '0951454917', true],
-      ['Correo', 'contacto@livi.ec'],
+      ['Correo', 'contacto@liviec.com'],
     ],
   },
   {
@@ -44,8 +44,8 @@ const BANKS: BankInfo[] = [
       ['Número de cuenta', '20009323889', true],
       ['Titular', 'Wong Diaz Jean Philippe'],
       ['RUC / Identificación', '0951454917', true],
-      ['Correo', 'contacto@livi.ec'],
-      ['Celular', '0992305463', true],
+      ['Correo', 'contacto@liviec.com'],
+      ['Celular', '0959010268', true],
     ],
   },
   {
@@ -56,8 +56,8 @@ const BANKS: BankInfo[] = [
       ['Tipo de cuenta', 'Cuenta de Ahorros'],
       ['Número de cuenta', '0060453629', true],
       ['CI', '0951454917', true],
-      ['Correo', 'contacto@livi.ec'],
-      ['Celular', '0992305463', true],
+      ['Correo', 'contacto@liviec.com'],
+      ['Celular', '0959010268', true],
     ],
   },
 ];
