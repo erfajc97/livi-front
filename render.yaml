@@ -16,7 +16,7 @@ services:
   - type: web
     name: livi-web
     runtime: node
-    plan: free # el plan free "duerme" tras inactividad; subir a starter en prod
+    plan: starter # el free duerme tras 15 min; producción corre en starter
     buildCommand: npm install && npm run build
     # Servidor standalone del adapter @astrojs/node
     startCommand: node ./dist/server/entry.mjs
