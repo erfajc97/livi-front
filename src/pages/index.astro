@@ -10,20 +10,39 @@ import {
   websiteJsonLd,
 } from '@/app/helpers/seoMeta';
 import { fetchVisibleBanners } from '@/app/tanstack-queries/bannersQuery';
+import { isVideoUrl } from '@/app/helpers/bannerMedia';
+import type { Banner } from '@/app/types/global.types';
 
 const banners = await fetchVisibleBanners();
-const firstBannerImage = absoluteImageUrl(banners[0]?.imageUrl || banners[0]?.image);
+// `/banners/visible` ya filtra por tipo `hero` y ordena por `position`:
+// el primero es la portada que administra el panel (imagen o video).
+const heroBanner = banners[0] ?? null;
+
+/** Ni og:image ni ImageObject admiten un video: se cambia por su arte móvil. */
+const asStillImage = (banner: Banner) => {
+  const main = banner.imageUrl || banner.image;
+  const isVideo = banner.mediaType === 'video' || isVideoUrl(main);
+  return isVideo ? { ...banner, imageUrl: banner.mobileImageUrl, image: undefined } : banner;
+};
+
+const stillBanners = banners
+  .map(asStillImage)
+  .filter((banner) => Boolean(banner.imageUrl || banner.image));
+
+const firstBannerImage = absoluteImageUrl(
+  stillBanners[0]?.imageUrl || stillBanners[0]?.image,
+);
 ---
 
 <PublicLayout
   title="Pañaleras y mochilas de cuero premium en Ecuador | LIVI"
   description="Pañaleras y mochilas de cuero genuino, hechas a mano en Ecuador. For modern parenthood. Envío nacional 24–72 h."
   ogImage={firstBannerImage ?? '/og-image.jpg'}
-  jsonLd={[websiteJsonLd(), homepageBannersJsonLd(banners)]}
+  jsonLd={[websiteJsonLd(), homepageBannersJsonLd(stillBanners)]}
 >
   <h1 class="sr-only">Pañaleras y mochilas de cuero premium en Ecuador</h1>
-  {/* Hero editorial LIVI (ref. PDF pág. 14). Los banners del admin quedan
-      disponibles, pero el home usa este panel fijo de marca. */}
-  <HeroSection />
+  {/* Hero editorial LIVI (ref. PDF pág. 14). La portada (imagen o video) sale
+      del primer banner `hero` visible; sin banner cae al arte de marca. */}
+  <HeroSection banner={heroBanner} />
   <Home client:load />
 </PublicLayout>

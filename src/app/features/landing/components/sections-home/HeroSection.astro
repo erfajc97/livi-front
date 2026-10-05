@@ -1,18 +1,59 @@
 ---
 // Hero LIVI (ref. PDF pág. 14 + mobile home):
-// · Mobile: foto a pantalla completa con el copy superpuesto abajo a la
+// · Mobile: portada a pantalla completa con el copy superpuesto abajo a la
 //   izquierda (eyebrow mono + titular serif + botón blanco).
-// · Desktop: panel editorial con wordmark + foto a la derecha.
+// · Desktop: panel editorial con wordmark + portada a la derecha.
+//
+// La portada la administra el panel: el primer banner visible de tipo `hero`
+// llega por props y puede ser imagen o video. Sin banner (o sin archivo) se
+// mantiene la foto de marca de siempre, así la home nunca queda en blanco.
+import type { Banner } from '@/app/types/global.types';
+import { resolveBannerMedia } from '@/app/helpers/bannerMedia';
+
+interface Props {
+  banner?: Banner | null;
+}
+
+const { banner = null } = Astro.props;
+
+/** Respaldo cuando el admin todavía no subió una portada. */
+const FALLBACK_SRC = '/productos/olivia-espresso-2.jpg';
+const FALLBACK_ALT = 'Olivia Maxi Tote en cuero espresso';
+
+const media = resolveBannerMedia(banner, FALLBACK_ALT);
+
+const isVideo = media?.isVideo ?? false;
+const alt = media?.alt ?? FALLBACK_ALT;
+const poster = media?.poster ?? undefined;
+/** Vertical si el admin lo subió; si no, el mismo arte de escritorio. */
+const mobileImageSrc = media?.mobileImage ?? media?.src ?? FALLBACK_SRC;
+const desktopImageSrc = media?.src ?? FALLBACK_SRC;
+const videoSrc = media?.src;
 ---
 
 {/* ── MOBILE: full-bleed con overlay ── */}
 <section class="relative flex h-[86svh] flex-col justify-end overflow-hidden lg:hidden">
-  <img
-    src="/productos/olivia-espresso-2.jpg"
-    alt="Olivia Maxi Tote en cuero espresso"
-    class="absolute inset-0 h-full w-full object-cover object-center"
-    fetchpriority="high"
-  />
+  {isVideo && videoSrc ? (
+    <video
+      data-hero-video
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      src={videoSrc}
+      poster={poster}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+    ></video>
+  ) : (
+    <img
+      src={mobileImageSrc}
+      alt={alt}
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      fetchpriority="high"
+    />
+  )}
   {/* Veladura para leer el copy sin tapar la foto */}
   <div class="absolute inset-0 bg-gradient-to-t from-text/70 via-text/20 to-transparent" aria-hidden="true"></div>
 
@@ -71,14 +112,63 @@
     </div>
   </div>
 
-  {/* Panel derecho: foto editorial */}
+  {/* Panel derecho: portada editorial (imagen o video) */}
   <div class="relative overflow-hidden bg-bg-alt">
-    <img
-      src="/productos/olivia-espresso-2.jpg"
-      alt="Olivia Maxi Tote en cuero espresso"
-      class="absolute inset-0 h-full w-full object-cover object-center"
-      fetchpriority="high"
-    />
+    {isVideo && videoSrc ? (
+      <video
+        data-hero-video
+        class="absolute inset-0 h-full w-full object-cover object-center"
+        src={videoSrc}
+        poster={poster}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      ></video>
+    ) : (
+      <img
+        src={desktopImageSrc}
+        alt={alt}
+        class="absolute inset-0 h-full w-full object-cover object-center"
+        fetchpriority="high"
+      />
+    )}
   </div>
 
 </section>
+
+{/* Sin videos el script no encuentra nada y no hace nada. */}
+<script is:inline>
+  // 1) `prefers-reduced-motion`: se deja el poster quieto, sin reproducir.
+  // 2) El hero existe dos veces (móvil / escritorio): solo se reproduce el
+  //    que está visible, para no gastar datos en el oculto.
+  (function () {
+    var reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // Al cruzar el breakpoint cambia cuál de los dos heroes está visible.
+    var desktopQuery = window.matchMedia('(min-width: 1024px)');
+
+    function sync() {
+      var reduceMotion = reduceMotionQuery.matches;
+      var videos = document.querySelectorAll('video[data-hero-video]');
+      for (var i = 0; i < videos.length; i++) {
+        var video = videos[i];
+        if (reduceMotion || video.offsetParent === null) {
+          video.removeAttribute('autoplay');
+          video.pause();
+          video.currentTime = 0;
+        } else {
+          var started = video.play();
+          if (started && typeof started.catch === 'function') started.catch(function () {});
+        }
+      }
+    }
+
+    sync();
+    if (typeof desktopQuery.addEventListener === 'function') {
+      desktopQuery.addEventListener('change', sync);
+      reduceMotionQuery.addEventListener('change', sync);
+    }
+  })();
+</script>

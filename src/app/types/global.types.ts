@@ -87,7 +87,11 @@ export interface Banner {
   subtitle?: string;
   image?: string;
   imageUrl?: string;
-  /** Arte vertical subido para teléfono. Si falta se usa `imageUrl`. */
+  /** Qué hay en `imageUrl`: una imagen o un video. Los banners creados antes
+   *  de esta columna no lo traen (se deduce de la URL). */
+  mediaType?: 'image' | 'video';
+  /** Arte vertical subido para teléfono. Si falta se usa `imageUrl`. Cuando
+   *  `imageUrl` es un video, hace de `poster`. */
   mobileImageUrl?: string;
   link?: string;
   buttonText?: string;
