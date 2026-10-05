@@ -5,6 +5,7 @@ import {
   sortCategoriesByHierarchy,
 } from '@/app/tanstack-queries/categoriesQuery';
 import { useNavbarAdQuery } from '@/app/tanstack-queries/navbarAdQuery';
+import { useCartStore } from '@/app/store/cart/cartStore';
 import { LABEL_MONO } from '@/app/components/UI/formClasses';
 
 interface MobileMenuProps {
@@ -69,6 +70,21 @@ export default function MobileMenu({
   const { data: categories = [], isLoading } = useMenuCategoriesQuery();
   const { data: navAd } = useNavbarAdQuery();
 
+  const itemCount = useCartStore((s) => s.itemCount());
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+
+  /** El buscador vive en la navbar de escritorio: en móvil se cierra el menú
+   *  y se lleva al catálogo, que tiene su propio campo de búsqueda. */
+  const handleSearch = () => {
+    onClose();
+    window.location.href = `${BASE_PATH}?buscar=1`;
+  };
+
+  const handleCart = () => {
+    onClose();
+    setDrawerOpen(true);
+  };
+
   // Una sola categoría abierta a la vez: en una pantalla de teléfono varios
   // acordeones abiertos esconden el resto de la lista.
   const [openCat, setOpenCat] = useState<string | null>(null);
@@ -99,22 +115,54 @@ export default function MobileMenu({
 
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-bg text-text md:hidden">
-      {/* Barra superior — logo + cierre */}
-      <div className="flex shrink-0 items-center justify-between border-b border-border px-6 py-4">
-        <a href="/" onClick={onClose} aria-label="LIVI — Inicio">
-          <img src="/logo-livi.svg" alt="LIVI Ecuador" className="h-7 w-auto" />
-        </a>
+      {/* Cerrar · wordmark · buscar y carrito: desde el menú se puede seguir
+          comprando sin tener que cerrarlo primero (ref. de marca). */}
+      <div className="grid shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-border px-4 py-4">
         <button
           type="button"
           onClick={onClose}
           aria-label="Cerrar menú"
-          className="p-2 text-text-soft transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="justify-self-start p-2 text-text-soft transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </button>
+
+        <a href="/" onClick={onClose} aria-label="LIVI — Inicio" className="justify-self-center">
+          <img src="/logo-livi.svg" alt="LIVI Ecuador" className="h-6 w-auto" />
+        </a>
+
+        <div className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            onClick={handleSearch}
+            aria-label="Buscar"
+            className="p-2 text-text-soft transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={handleCart}
+            aria-label={`Abrir carrito (${itemCount})`}
+            className="relative p-2 text-text-soft transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <path d="M6 7h12l-1 13H7L6 7z" />
+              <path d="M9 7V5.5a3 3 0 0 1 6 0V7" />
+            </svg>
+            {itemCount > 0 && (
+              <span className="absolute right-0 top-0 min-w-4 bg-accent px-1 text-center font-mono text-[10px] leading-4 text-bg">
+                {itemCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Lista de navegación — scroll propio cuando el contenido no entra */}
